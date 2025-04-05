@@ -1,6 +1,6 @@
 package com.drtx.ecomerce.amazon.core.models;
 
-public enum State {
+public enum OrderState {
     PENDING,
     SENT,
     DELIVERED,

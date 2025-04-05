@@ -8,17 +8,17 @@ public class Order {
     private User user;
     private List<Product> products;
     private Double total;
-    private State state;
+    private OrderState orderState;
     private LocalDateTime createdAt;
     private LocalDateTime deliveredAt;
     private String paymentType;
 
-    public Order(Long id, User user, List<Product> products, Double total, State state, LocalDateTime createdAt, LocalDateTime deliveredAt, String paymentType) {
+    public Order(Long id, User user, List<Product> products, Double total, OrderState orderState, LocalDateTime createdAt, LocalDateTime deliveredAt, String paymentType) {
         this.id = id;
         this.user = user;
         this.products = products;
         this.total = total;
-        this.state = state;
+        this.orderState = orderState;
         this.createdAt = createdAt;
         this.deliveredAt = deliveredAt;
         this.paymentType = paymentType;
@@ -56,12 +56,12 @@ public class Order {
         this.total = total;
     }
 
-    public State getState() {
-        return state;
+    public OrderState getState() {
+        return orderState;
     }
 
-    public void setState(State state) {
-        this.state = state;
+    public void setState(OrderState orderState) {
+        this.orderState = orderState;
     }
 
     public LocalDateTime getCreatedAt() {

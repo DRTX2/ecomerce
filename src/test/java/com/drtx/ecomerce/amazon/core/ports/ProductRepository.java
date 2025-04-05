@@ -1,0 +1,14 @@
+package com.drtx.ecomerce.amazon.core.ports;
+
+import com.drtx.ecomerce.amazon.core.models.Product;
+
+import java.util.List;
+import java.util.Optional;
+
+public interface ProductRepository {
+    Product save(Product product);
+    Optional<Product> findById(Long id);
+    List<Product> findAll();
+    Product updateById(Long id, Product productToUPdate);
+    void delete(Long id);
+}
