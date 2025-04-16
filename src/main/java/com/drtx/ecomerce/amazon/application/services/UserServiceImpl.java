@@ -1,8 +1,8 @@
-package com.drtx.ecomerce.amazon.adapters.services;
+package com.drtx.ecomerce.amazon.application.services;
 
 import com.drtx.ecomerce.amazon.core.models.User;
-import com.drtx.ecomerce.amazon.core.ports.UserRepository;
-import com.drtx.ecomerce.amazon.core.usecases.UserService;
+import com.drtx.ecomerce.amazon.core.ports.out.UserRepository;
+import com.drtx.ecomerce.amazon.core.ports.in.UserService;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

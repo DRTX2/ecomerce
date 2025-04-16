@@ -1,4 +1,4 @@
-package com.drtx.ecomerce.amazon.adapters.rest.user.dto;
+package com.drtx.ecomerce.amazon.adapters.inbound.rest.user.dto;
 
 import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Email;

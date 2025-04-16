@@ -1,4 +1,4 @@
-package com.drtx.ecomerce.amazon.adapters.persistence.user;
+package com.drtx.ecomerce.amazon.adapters.outbound.persistence.user;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

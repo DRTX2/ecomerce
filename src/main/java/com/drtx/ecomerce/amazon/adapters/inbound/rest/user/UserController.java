@@ -1,10 +1,10 @@
-package com.drtx.ecomerce.amazon.adapters.rest.user;
+package com.drtx.ecomerce.amazon.adapters.inbound.rest.user;
 
-import com.drtx.ecomerce.amazon.adapters.rest.user.dto.UserRequest;
-import com.drtx.ecomerce.amazon.adapters.rest.user.dto.UserResponse;
-import com.drtx.ecomerce.amazon.adapters.rest.user.mappers.UserRestMapper;
+import com.drtx.ecomerce.amazon.adapters.inbound.rest.user.dto.UserRequest;
+import com.drtx.ecomerce.amazon.adapters.inbound.rest.user.dto.UserResponse;
+import com.drtx.ecomerce.amazon.adapters.inbound.rest.user.mappers.UserRestMapper;
 import com.drtx.ecomerce.amazon.core.models.User;
-import com.drtx.ecomerce.amazon.core.usecases.UserService;
+import com.drtx.ecomerce.amazon.core.ports.in.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

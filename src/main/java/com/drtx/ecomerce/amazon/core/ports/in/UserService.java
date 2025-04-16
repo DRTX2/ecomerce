@@ -1,4 +1,4 @@
-package com.drtx.ecomerce.amazon.core.usecases;
+package com.drtx.ecomerce.amazon.core.ports.in;
 
 import com.drtx.ecomerce.amazon.core.models.User;
 

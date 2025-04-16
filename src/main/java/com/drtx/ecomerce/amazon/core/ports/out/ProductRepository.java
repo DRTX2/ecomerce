@@ -1,4 +1,4 @@
-package com.drtx.ecomerce.amazon.core.ports;
+package com.drtx.ecomerce.amazon.core.ports.out;
 
 import com.drtx.ecomerce.amazon.core.models.Product;
 

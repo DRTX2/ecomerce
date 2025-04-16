@@ -1,7 +1,7 @@
-package com.drtx.ecomerce.amazon.adapters.persistence.user;
+package com.drtx.ecomerce.amazon.adapters.outbound.persistence.user;
 
 import com.drtx.ecomerce.amazon.core.models.User;
-import com.drtx.ecomerce.amazon.core.ports.UserRepository;
+import com.drtx.ecomerce.amazon.core.ports.out.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 
 import java.util.List;
