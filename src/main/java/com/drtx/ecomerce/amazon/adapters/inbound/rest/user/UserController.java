@@ -8,6 +8,9 @@ import com.drtx.ecomerce.amazon.core.ports.in.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @RestController
 @RequestMapping("/api/users/")
 public class UserController {
@@ -32,9 +35,19 @@ public class UserController {
         User user = userMapper.toDomain(request);
         return ResponseEntity.ok(userMapper.toResponse(userService.createUser(user) ) );
     }
-    //update
 
+    @PutMapping("/{id}")
+    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, UserRequest request){
+        User user =userMapper.toDomain(request);
+        return ResponseEntity.ok(userMapper.toResponse(userService.updateUser(id,user)));
+    }
     //getAll
+    @GetMapping
+    public ResponseEntity<List<UserResponse>> getUsers(){
+        List<User> users= userService.getAllUsers();
+        List<UserResponse> listUserResponse=users.stream().map(user->userMapper.toResponse(user)).collect(Collectors.toList());
+        return ResponseEntity.ok( listUserResponse);
+    }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable Long id){
