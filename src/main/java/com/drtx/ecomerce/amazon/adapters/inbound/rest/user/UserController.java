@@ -21,6 +21,16 @@ public class UserController {
         this.userService = userService;
         this.userMapper = userMapper;
     }
+
+    @GetMapping
+    public ResponseEntity<List<UserResponse>> getUsers(){
+        List<User> users= userService.getAllUsers();
+        List<UserResponse> listUserResponse=users.stream()
+                .map(userMapper::toResponse)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok( listUserResponse);
+    }
+
     //getOne
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> findById(@PathVariable Long id){
@@ -40,13 +50,6 @@ public class UserController {
     public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, UserRequest request){
         User user =userMapper.toDomain(request);
         return ResponseEntity.ok(userMapper.toResponse(userService.updateUser(id,user)));
-    }
-    //getAll
-    @GetMapping
-    public ResponseEntity<List<UserResponse>> getUsers(){
-        List<User> users= userService.getAllUsers();
-        List<UserResponse> listUserResponse=users.stream().map(user->userMapper.toResponse(user)).collect(Collectors.toList());
-        return ResponseEntity.ok( listUserResponse);
     }
 
     @DeleteMapping("/{id}")
