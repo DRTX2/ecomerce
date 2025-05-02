@@ -15,7 +15,7 @@ sequenceDiagram
     participant ExceptionHandler as GlobalExceptionHandler
 
     Client->>Controller: POST /users (UserRequest DTO)
-    Controller->>Service: userService.createUser(userDomain)
+    Controller->>Service: userServicePort.createUser(userDomain)
     Service->>Repository: userRepository.save(userDomain)
     Repository->>Adapter: userPersistenceAdapter.save(userDomain)
     Adapter->>DB: userJpaRepository.save(userEntity)
@@ -35,7 +35,7 @@ sequenceDiagram
    @RestController
    @RequestMapping("/api/v1/users")
    public class UserController {
-       private final UserService userService;
+       private final UserService userServicePort;
        private final UserMapper userMapper;
        
        @PostMapping
@@ -43,7 +43,7 @@ sequenceDiagram
            @Valid @RequestBody UserCreateRequest request
        ) {
            User user = userMapper.toDomain(request);
-           User createdUser = userService.createUser(user);
+           User createdUser = userServicePort.createUser(user);
            return ResponseEntity
                .created(URI.create("/users/" + createdUser.getId()))
                .body(userMapper.toResponse(createdUser));
@@ -213,7 +213,7 @@ public class GlobalExceptionHandler {
 2. **Controller**:
     - Valida formato con `@Valid`
     - Mapea a `User` (dominio)
-    - Llama a `userService.updateUser()`
+    - Llama a `userServicePort.updateUser()`
 3. **Service**:
     - Verifica existencia
     - Valida reglas de negocio

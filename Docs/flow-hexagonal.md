@@ -31,7 +31,7 @@ Entiendo, vamos a simplificar y clarificar el flujo **usando arquitectura hexago
 @RestController
 public class UserController {
 
-   private final UserService userService; // Use Case del Core
+   private final UserService userServicePort; // Use Case del Core
    private final UserMapper userMapper;   // Mapper a DTOs
 
    @PostMapping("/users")
@@ -40,7 +40,7 @@ public class UserController {
       User user = userMapper.toDomain(request);
 
       // Ejecuta Caso de Uso
-      User createdUser = userService.createUser(user);
+      User createdUser = userServicePort.createUser(user);
 
       // Convierte a DTO de Respuesta
       UserResponse response = userMapper.toResponse(createdUser);
@@ -117,7 +117,7 @@ sequenceDiagram
    participant DB
 
    Cliente->>Controller: POST /users (UserRequest)
-   Controller->>Service: userService.createUser(user)
+   Controller->>Service: userServicePort.createUser(user)
    Service->>RepositoryAdapter: userRepository.save(user)
    RepositoryAdapter->>JpaRepository: save(UserEntity)
    JpaRepository->>DB: INSERT INTO users...
