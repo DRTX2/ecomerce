@@ -1,7 +1,7 @@
-package com.drtx.ecomerce.amazon.adapters.outbound.persistence.user;
+package com.drtx.ecomerce.amazon.adapters.out.persistence.user;
 
-import com.drtx.ecomerce.amazon.adapters.inbound.rest.user.dto.UserUpdateRequest;
-import com.drtx.ecomerce.amazon.core.models.User;
+import com.drtx.ecomerce.amazon.adapters.in.rest.user.dto.UserUpdateRequest;
+import com.drtx.ecomerce.amazon.core.model.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;

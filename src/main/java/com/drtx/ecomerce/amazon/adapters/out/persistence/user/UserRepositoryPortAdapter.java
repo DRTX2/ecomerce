@@ -1,19 +1,19 @@
-package com.drtx.ecomerce.amazon.adapters.outbound.persistence.user;
+package com.drtx.ecomerce.amazon.adapters.out.persistence.user;
 
-import com.drtx.ecomerce.amazon.core.models.User;
-import com.drtx.ecomerce.amazon.core.ports.out.UserRepository;
+import com.drtx.ecomerce.amazon.core.model.User;
+import com.drtx.ecomerce.amazon.core.ports.out.UserRepositoryPort;
 import jakarta.persistence.EntityNotFoundException;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class UserRepositoryAdapter implements UserRepository {
+public class UserRepositoryPortAdapter implements UserRepositoryPort {
 
     private final UserPersistenceRepository repository;
     private final UserPersistenceMapper mapper;
 
-    public UserRepositoryAdapter(UserPersistenceRepository repository, UserPersistenceMapper mapper) {
+    public UserRepositoryPortAdapter(UserPersistenceRepository repository, UserPersistenceMapper mapper) {
         this.repository = repository;
         this.mapper = mapper;
     }

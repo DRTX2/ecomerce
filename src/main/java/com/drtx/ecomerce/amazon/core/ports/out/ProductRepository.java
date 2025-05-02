@@ -1,6 +1,6 @@
 package com.drtx.ecomerce.amazon.core.ports.out;
 
-import com.drtx.ecomerce.amazon.core.models.Product;
+import com.drtx.ecomerce.amazon.core.model.Product;
 
 import java.util.List;
 import java.util.Optional;
