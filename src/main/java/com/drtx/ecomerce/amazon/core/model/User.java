@@ -1,4 +1,4 @@
-package com.drtx.ecomerce.amazon.core.models;
+package com.drtx.ecomerce.amazon.core.model;
 
 public class User {
     private Long id;

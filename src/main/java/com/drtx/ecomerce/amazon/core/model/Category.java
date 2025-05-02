@@ -1,4 +1,4 @@
-package com.drtx.ecomerce.amazon.core.models;
+package com.drtx.ecomerce.amazon.core.model;
 
 import java.util.List;
 

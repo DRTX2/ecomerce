@@ -1,4 +1,4 @@
-package com.drtx.ecomerce.amazon.core.models;
+package com.drtx.ecomerce.amazon.core.model;
 
 import java.time.LocalDateTime;
 import java.util.List;
