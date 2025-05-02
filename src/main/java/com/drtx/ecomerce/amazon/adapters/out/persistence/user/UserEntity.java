@@ -1,4 +1,4 @@
-package com.drtx.ecomerce.amazon.adapters.outbound.persistence.user;
+package com.drtx.ecomerce.amazon.adapters.out.persistence.user;
 
 import jakarta.persistence.*;
 import lombok.Builder;

@@ -1,4 +1,4 @@
-package com.drtx.ecomerce.amazon.adapters.inbound.rest.user.dto;
+package com.drtx.ecomerce.amazon.adapters.in.rest.user.dto;
 
 import jakarta.annotation.Nullable;
 
