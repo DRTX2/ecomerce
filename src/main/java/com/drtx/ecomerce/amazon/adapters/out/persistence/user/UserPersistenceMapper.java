@@ -13,6 +13,5 @@ public interface UserPersistenceMapper {
 
     UserEntity toEntity(User domain);
 
-    @Mapping(target = "id", ignore = true)
     void updateEntityFromRequest(@MappingTarget UserEntity entity, UserUpdateRequest request);
 }

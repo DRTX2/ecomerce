@@ -31,7 +31,6 @@ public class UserController {
         return ResponseEntity.ok( listUserResponse);
     }
 
-    //getOne
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> findById(@PathVariable Long id){
         return userServicePort.getUserById(id)
