@@ -12,3 +12,5 @@ public interface CategoryRestMapper {
     @Mapping(target = "id", source = "id")
     CategoryResponse toResponse(Category category);
 }
+
+
