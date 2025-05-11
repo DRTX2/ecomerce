@@ -11,5 +11,4 @@ public interface CategoryServicePort {
     List<Category> getAllCategories();
     Category updateCategory(Long id, Category category);
     void deleteCategory(Long id);
-
 }
