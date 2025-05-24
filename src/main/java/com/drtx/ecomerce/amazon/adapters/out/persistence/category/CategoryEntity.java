@@ -1,5 +1,6 @@
 package com.drtx.ecomerce.amazon.adapters.out.persistence.category;
 
+import com.drtx.ecomerce.amazon.adapters.out.persistence.product.ProductEntity;
 import com.drtx.ecomerce.amazon.core.model.Product;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -22,5 +23,5 @@ public class CategoryEntity {
     private String name;
     private String description;
     @OneToMany
-    private List<Product> products;
+    private List<ProductEntity> products;
 }

@@ -9,6 +9,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface ProductRestMapper {
     Product toDomain(ProductRequest request);
+
     @Mapping(target = "id", source = "id")
     ProductResponse toResponse(Product domain);
 }
