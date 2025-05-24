@@ -7,7 +7,7 @@ public class Product {
     private String name;
     private String description;
     private Double price;
-    private Integer stock;// creo q podria ponerse un dato mas bajito
+    private Integer stock;
     private Category category;
     private Double averageRating;
     private List<String> images;

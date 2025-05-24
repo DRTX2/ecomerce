@@ -9,6 +9,9 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface CategoryRestMapper {
     Category toDomain(CategoryRequest request);
+
     @Mapping(target = "id", source = "id")
     CategoryResponse toResponse(Category category);
 }
+
+
