@@ -9,6 +9,6 @@ public interface OrderRepositoryPort {
     Order save(Order order);
     Optional<Order> findById(Long id);
     List<Order> findAll();
-    Order updateById(Long id, Order order);
+    Order updateById(Order order);
     void delete(Long id);
 }
