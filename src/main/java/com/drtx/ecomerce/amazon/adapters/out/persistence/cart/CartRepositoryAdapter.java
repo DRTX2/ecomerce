@@ -13,7 +13,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class CartRepositoryAdapter implements CartRepositoryPort {
     private final CartPersistenceRepository repository;
-    private final CartMapper mapper;
+    private final CartPersistenceMapper mapper;
 
     @Override
     public Cart save(Cart cart) {

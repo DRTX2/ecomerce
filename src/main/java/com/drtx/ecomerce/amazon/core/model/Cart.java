@@ -7,6 +7,8 @@ public class Cart {
     private User user;
     private List<Product> products;
 
+    public Cart(){
+    }
     public Cart(User user, List<Product> products) {
         this.user = user;
         this.products = products;
