@@ -1,5 +1,6 @@
 package com.drtx.ecomerce.amazon.adapters.out.persistence.order;
 
+import com.drtx.ecomerce.amazon.adapters.out.persistence.payment.PaymentEntity;
 import com.drtx.ecomerce.amazon.adapters.out.persistence.product.ProductEntity;
 import com.drtx.ecomerce.amazon.adapters.out.persistence.user.UserEntity;
 import com.drtx.ecomerce.amazon.core.model.OrderState;
@@ -49,6 +50,7 @@ public class OrderEntity {
 
     private LocalDateTime deliveredAt;
 
-    @Column(nullable = false)
-    private String paymentType;
+    @OneToOne
+    @JoinColumn(name="payment_id",nullable = false,unique = true)
+    private PaymentEntity payment;
 }
