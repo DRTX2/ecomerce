@@ -11,9 +11,9 @@ public class Order {
     private OrderState orderState;
     private LocalDateTime createdAt;
     private LocalDateTime deliveredAt;
-    private String paymentType;
+    private Payment payment;
 
-    public Order(Long id, User user, List<Product> products, Double total, OrderState orderState, LocalDateTime createdAt, LocalDateTime deliveredAt, String paymentType) {
+    public Order(Long id, User user, List<Product> products, Double total, OrderState orderState, LocalDateTime createdAt, LocalDateTime deliveredAt, Payment payment) {
         this.id = id;
         this.user = user;
         this.products = products;
@@ -21,7 +21,7 @@ public class Order {
         this.orderState = orderState;
         this.createdAt = createdAt;
         this.deliveredAt = deliveredAt;
-        this.paymentType = paymentType;
+        this.payment = payment;
     }
 
     public Long getId() {
@@ -56,11 +56,11 @@ public class Order {
         this.total = total;
     }
 
-    public OrderState getState() {
+    public OrderState getOrderState() {
         return orderState;
     }
 
-    public void setState(OrderState orderState) {
+    public void setOrderState(OrderState orderState) {
         this.orderState = orderState;
     }
 
@@ -80,11 +80,11 @@ public class Order {
         this.deliveredAt = deliveredAt;
     }
 
-    public String getPaymentType() {
-        return paymentType;
+    public Payment getPayment() {
+        return payment;
     }
 
-    public void setPaymentType(String paymentType) {
-        this.paymentType = paymentType;
+    public void setPayment(Payment payment) {
+        this.payment = payment;
     }
 }
