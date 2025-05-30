@@ -1,8 +1,11 @@
 package com.drtx.ecomerce.amazon.adapters.out.persistence.order;
 
+import com.drtx.ecomerce.amazon.adapters.out.persistence.payment.PaymentEntity;
+import com.drtx.ecomerce.amazon.adapters.out.persistence.payment.PaymentMapper;
 import com.drtx.ecomerce.amazon.adapters.out.persistence.product.ProductEntity;
 import com.drtx.ecomerce.amazon.adapters.out.persistence.product.ProductPersistenceMapper;
 import com.drtx.ecomerce.amazon.core.model.Order;
+import com.drtx.ecomerce.amazon.core.model.Payment;
 import com.drtx.ecomerce.amazon.core.ports.out.OrderRepositoryPort;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
@@ -16,7 +19,7 @@ import java.util.Optional;
 public class OrderRepositoryAdapter implements OrderRepositoryPort {
     private final OrderPersistenceRepository repository;
     private final OrderPersistenceMapper orderMapper;
-    private final ProductPersistenceMapper productMapper;
+    private final OrderUpdater updater;
 
     @Override
     public Order save(Order order) {
@@ -41,19 +44,10 @@ public class OrderRepositoryAdapter implements OrderRepositoryPort {
                 orElseThrow(
                         () -> new EntityNotFoundException("Order not found with id: " + order.getId())
                 );
-        List<ProductEntity> products = order.getProducts()
-                .stream()
-                .map(productMapper::toEntity)
-                .toList();
+        updater.applyChanges(order,orderToUpdate);
 
-        orderToUpdate.setProducts(products);
-        orderToUpdate.setOrderState(order.getState());
-        orderToUpdate.setDeliveredAt(order.getDeliveredAt());
-        orderToUpdate.setTotal(order.getTotal());
-        orderToUpdate.setPaymentType(order.getPaymentType());
-
-        orderToUpdate = repository.save(orderToUpdate);
-        return orderMapper.toDomain(orderToUpdate);
+        OrderEntity updated= repository.save(orderToUpdate);
+        return orderMapper.toDomain(updated);
     }
 
     @Override
