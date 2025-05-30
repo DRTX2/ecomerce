@@ -9,6 +9,6 @@ public interface ProductServicePort {
     Product createProduct(Product product);
     Optional<Product> getProductById(Long id);
     List<Product> getAllProducts();
-    Optional<Product> updateProduct(Product product);
+    Product updateProduct(Product product);
     void deleteProduct(Long id);
 }
