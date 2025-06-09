@@ -13,11 +13,14 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    database: POSTGRESQL
     show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    database: POSTGRESQL
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
-# Validación (comentado)
+# Validaciï¿½n (comentado)
 # mvc:
 #   throw-exception-if-not-handler-found: true
 
