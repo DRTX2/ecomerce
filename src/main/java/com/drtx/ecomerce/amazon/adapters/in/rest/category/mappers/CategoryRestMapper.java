@@ -11,6 +11,9 @@ public interface CategoryRestMapper {
     Category toDomain(CategoryRequest request);
 
     @Mapping(target = "id", source = "id")
+//    @Mapping(target = "products", source = "products") tratarlo, si es necesario
+    // Si no se quiere mapear los productos, se puede ignorar la propiedad
+//    @Mapping(target = "products", ignore = true)
     CategoryResponse toResponse(Category category);
 }
 

@@ -12,6 +12,9 @@ public class Product {
     private Double averageRating;
     private List<String> images;
 
+    public Product() {
+    }
+
     public Product(Long id, String name, String description, Double price, Integer stock, Category category, Double averageRating, List<String> images) {
         this.id = id;
         this.name = name;

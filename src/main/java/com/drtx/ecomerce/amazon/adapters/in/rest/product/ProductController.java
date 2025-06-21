@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/products")
+@RequestMapping("/products")
 @AllArgsConstructor
 public class ProductController {
     private final ProductServicePort service;

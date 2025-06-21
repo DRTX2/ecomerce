@@ -9,7 +9,7 @@ spring:
 
   datasource:
     url: jdbc:postgresql://localhost:5432/ecomerce
-    username: root
+    username: david
     password: root
     driver-class-name: org.postgresql.Driver
 

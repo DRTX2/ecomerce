@@ -6,17 +6,19 @@ import com.drtx.ecomerce.amazon.core.model.Product;
 import com.drtx.ecomerce.amazon.core.ports.out.ProductRepositoryPort;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
 
 @Component
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class ProductRepositoryAdapter implements ProductRepositoryPort {
     private final ProductPersistenceRepository productPersistenceRepository;
     private final CategoryPersistenceRepository categoryPersistenceRepository;
     private final ProductPersistenceMapper mapper;
+    private final ProductMapperHelper mapperHelper;
 
     @Override
     public Product save(Product product) {
@@ -36,17 +38,21 @@ public class ProductRepositoryAdapter implements ProductRepositoryPort {
 
     @Override
     public Product updateById(Long id, Product product) {
-        ProductEntity productToUpdate = productPersistenceRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Product: " + id));
+        ProductEntity productToUpdate = productPersistenceRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Product: " + id));
+
         productToUpdate.setName(product.getName());
         productToUpdate.setDescription(product.getDescription());
         productToUpdate.setPrice(product.getPrice());
         productToUpdate.setStock(product.getStock());
         productToUpdate.setAverageRating(product.getAverageRating());
 
-        List<ProductImageEntity> images = mapper.mapToEntities(product.getImages());
-        productToUpdate.setImages(images);// entity!=string
+        List<ProductImageEntity> images = mapperHelper.mapToEntities(product.getImages());
+        productToUpdate.setImages(images);
 
-        CategoryEntity categoryEntity = categoryPersistenceRepository.findById(product.getCategory().getId())
+        CategoryEntity categoryEntity = categoryPersistenceRepository.findById(
+                    product.getCategory().getId()
+                )
                 .orElseThrow(() -> new EntityNotFoundException("Category not found"));
         productToUpdate.setCategory(categoryEntity);// categoryEntity!=Category
         return mapper.toDomain(productPersistenceRepository.save(productToUpdate));

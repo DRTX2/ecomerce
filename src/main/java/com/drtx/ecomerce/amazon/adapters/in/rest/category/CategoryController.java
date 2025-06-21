@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/categories/")
+@RequestMapping("/categories/")
 @AllArgsConstructor
 public class CategoryController {
     private final CategoryServicePort categoryServicePort;

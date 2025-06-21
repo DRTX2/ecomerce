@@ -4,13 +4,14 @@ import com.drtx.ecomerce.amazon.core.model.Cart;
 import com.drtx.ecomerce.amazon.core.ports.in.CartServicePort;
 import com.drtx.ecomerce.amazon.core.ports.out.CartRepositoryPort;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class CartUseCasePort implements CartServicePort {
     private final CartRepositoryPort repositort;
 
