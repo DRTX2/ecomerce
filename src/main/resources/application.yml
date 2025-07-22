@@ -20,14 +20,10 @@ spring:
     show-sql: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
-# Validaci�n (comentado)
-# mvc:
-#   throw-exception-if-not-handler-found: true
-
-# Manejador de excepciones de controlador (comentado)
-# web:
-#   resources:
-#     add-mappings: false
+security:
+  jwt:
+    secret-key: TWlTdXBlckNsYXZlSldUZGVDb2RpbmcyNTZCaXRzMTIzNDU2
+    expiration: 86400000
 
 management:
   endpoints:
