@@ -1,11 +1,11 @@
-package com.drtx.ecomerce.amazon.core.ports.in;
+package com.drtx.ecomerce.amazon.core.ports.in.rest;
 
 import com.drtx.ecomerce.amazon.core.model.Cart;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface CartServicePort {
+public interface CartUseCasePort {
     Cart createCart(Cart cart);
     Optional<Cart> getCartById(Long id);
     List<Cart> getAllCarts(Long userId);

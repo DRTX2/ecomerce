@@ -5,7 +5,7 @@ import com.drtx.ecomerce.amazon.adapters.in.rest.cart.dtos.CartResponse;
 import com.drtx.ecomerce.amazon.adapters.in.rest.cart.mappers.CartRestMapper;
 
 import com.drtx.ecomerce.amazon.core.model.Cart;
-import com.drtx.ecomerce.amazon.core.ports.in.CartServicePort;
+import com.drtx.ecomerce.amazon.core.ports.in.rest.CartUseCasePort;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +16,7 @@ import java.util.List;
 @RequestMapping("cart")
 @AllArgsConstructor
 public class CartController {
-    private final CartServicePort cartService;
+    private final CartUseCasePort cartService;
     private final CartRestMapper mapper;
 
     @GetMapping

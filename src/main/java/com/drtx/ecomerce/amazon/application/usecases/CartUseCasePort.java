@@ -1,9 +1,7 @@
 package com.drtx.ecomerce.amazon.application.usecases;
 
 import com.drtx.ecomerce.amazon.core.model.Cart;
-import com.drtx.ecomerce.amazon.core.ports.in.CartServicePort;
-import com.drtx.ecomerce.amazon.core.ports.out.CartRepositoryPort;
-import lombok.AllArgsConstructor;
+import com.drtx.ecomerce.amazon.core.ports.out.persistence.CartRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -12,7 +10,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class CartUseCasePort implements CartServicePort {
+public class CartUseCasePort implements com.drtx.ecomerce.amazon.core.ports.in.rest.CartUseCasePort {
     private final CartRepositoryPort repositort;
 
     @Override
