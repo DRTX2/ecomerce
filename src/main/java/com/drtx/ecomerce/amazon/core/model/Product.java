@@ -1,21 +1,24 @@
 package com.drtx.ecomerce.amazon.core.model;
 
+import com.drtx.ecomerce.amazon.core.model.exceptions.DomainException;
+
+import java.math.BigDecimal;
 import java.util.List;
 
 public class Product {
     private Long id;
     private String name;
     private String description;
-    private Double price;
+    private BigDecimal price;
     private Integer stock;
     private Category category;
-    private Double averageRating;
+    private BigDecimal averageRating;
     private List<String> images;
 
     public Product() {
     }
 
-    public Product(Long id, String name, String description, Double price, Integer stock, Category category, Double averageRating, List<String> images) {
+    public Product(Long id, String name, String description, BigDecimal price, Integer stock, Category category, BigDecimal averageRating, List<String> images) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -50,11 +53,11 @@ public class Product {
         this.description = description;
     }
 
-    public Double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(Double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 
@@ -74,11 +77,11 @@ public class Product {
         this.category = category;
     }
 
-    public Double getAverageRating() {
+    public BigDecimal getAverageRating() {
         return averageRating;
     }
 
-    public void setAverageRating(Double averageRating) {
+    public void setAverageRating(BigDecimal averageRating) {
         this.averageRating = averageRating;
     }
 
@@ -88,5 +91,14 @@ public class Product {
 
     public void setImages(List<String> images) {
         this.images = images;
+    }
+
+    public void validate(){
+        if(this.name == null || this.name.isBlank()){
+            throw new DomainException("Product name cannot be null or blank");
+        }
+        if(price.compareTo(BigDecimal.ZERO) < 0){
+            throw new DomainException("Product price cannot be negative");
+        }
     }
 }

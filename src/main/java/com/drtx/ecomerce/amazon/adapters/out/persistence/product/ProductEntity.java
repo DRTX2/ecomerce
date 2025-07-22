@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -26,8 +27,8 @@ public class ProductEntity {
     @Column(nullable = false)
     private String description;
 
-    @Column(nullable = false)
-    private Double price;
+    @Column(precision=19, scale=2)
+    private BigDecimal price;
 
     @Column(nullable = false)
     private Integer stock;
@@ -36,7 +37,8 @@ public class ProductEntity {
     @JoinColumn(name="category_id")
     private CategoryEntity category;
 
-    private Double averageRating;
+    @Column(precision=3, scale=2)
+    private BigDecimal averageRating;
 
     @OneToMany
     private List<ProductImageEntity> images;

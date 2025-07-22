@@ -1,8 +1,7 @@
 package com.drtx.ecomerce.amazon.application.usecases;
 
 import com.drtx.ecomerce.amazon.core.model.Product;
-import com.drtx.ecomerce.amazon.core.ports.in.ProductServicePort;
-import com.drtx.ecomerce.amazon.core.ports.out.ProductRepositoryPort;
+import com.drtx.ecomerce.amazon.core.ports.out.persistence.ProductRepositoryPort;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +10,7 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-public class ProductUseCasePort implements ProductServicePort {
+public class ProductUseCasePort implements com.drtx.ecomerce.amazon.core.ports.in.rest.ProductUseCasePort {
     private final ProductRepositoryPort repository;
 
     @Override
@@ -30,7 +29,7 @@ public class ProductUseCasePort implements ProductServicePort {
     }
 
     @Override
-    public Product updateProduct(Product product) {
+    public Product updateProduct(Long id, Product product) {
         return repository.updateById(product.getId(),product);
     }
 

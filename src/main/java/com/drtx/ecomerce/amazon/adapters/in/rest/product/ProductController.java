@@ -4,20 +4,18 @@ import com.drtx.ecomerce.amazon.adapters.in.rest.product.dto.ProductRequest;
 import com.drtx.ecomerce.amazon.adapters.in.rest.product.dto.ProductResponse;
 import com.drtx.ecomerce.amazon.adapters.in.rest.product.mappers.ProductRestMapper;
 import com.drtx.ecomerce.amazon.core.model.Product;
-import com.drtx.ecomerce.amazon.core.ports.in.ProductServicePort;
+import com.drtx.ecomerce.amazon.core.ports.in.rest.ProductUseCasePort;
 import lombok.AllArgsConstructor;
-import org.apache.coyote.Response;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/products")
 @AllArgsConstructor
 public class ProductController {
-    private final ProductServicePort service;
+    private final ProductUseCasePort service;
     private final ProductRestMapper mapper;
 
     @GetMapping
@@ -50,7 +48,7 @@ public class ProductController {
     public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id, @RequestBody ProductRequest req) {
         Product product = mapper.toDomain(req);
         return ResponseEntity.ok(mapper.toResponse(
-                service.updateProduct(product)
+                service.updateProduct(id,product)
         ));
     }
 
