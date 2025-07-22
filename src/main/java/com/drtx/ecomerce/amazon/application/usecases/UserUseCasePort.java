@@ -1,15 +1,14 @@
 package com.drtx.ecomerce.amazon.application.usecases;
 
 import com.drtx.ecomerce.amazon.core.model.User;
-import com.drtx.ecomerce.amazon.core.ports.in.UserServicePort;
-import com.drtx.ecomerce.amazon.core.ports.out.UserRepositoryPort;
+import com.drtx.ecomerce.amazon.core.ports.out.persistence.UserRepositoryPort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class UserUseCasePort implements UserServicePort {
+public class UserUseCasePort implements com.drtx.ecomerce.amazon.core.ports.in.rest.UserUseCasePort {
     private final UserRepositoryPort repository;
 
     public UserUseCasePort(UserRepositoryPort repository) {
@@ -38,6 +37,6 @@ public class UserUseCasePort implements UserServicePort {
 
     @Override
     public void deleteUser(Long id) {
-
+        repository.delete(id);
     }
 }
