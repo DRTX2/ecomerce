@@ -1,7 +1,7 @@
 package com.drtx.ecomerce.amazon.adapters.out.persistence.user;
 
 import com.drtx.ecomerce.amazon.core.model.User;
-import com.drtx.ecomerce.amazon.core.ports.out.UserRepositoryPort;
+import com.drtx.ecomerce.amazon.core.ports.out.persistence.UserRepositoryPort;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Component;
@@ -61,5 +61,11 @@ public class UserRepositoryPortAdapter implements UserRepositoryPort {
         if(!repository.existsById(id))
             throw  new EntityNotFoundException("User: "+id);
         repository.deleteById(id);
+    }
+
+    @Override
+    public Optional<User> findByEmail(String email){
+        return repository.findByEmail(email)
+                .map(mapper::toDomain);
     }
 }

@@ -7,10 +7,10 @@ public class User {
     private String password;
     private String address;
     private String phone;
-    private String role;
+    private UserRole role;
 //    private String orderList;
 
-    public User(Long id, String name, String email, String password, String address, String phone, String role) {
+    public User(Long id, String name, String email, String password, String address, String phone, UserRole role) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -68,11 +68,11 @@ public class User {
         this.phone = phone;
     }
 
-    public String getRole() {
+    public UserRole getRole() {
         return role;
     }
 
-    public void setRole(String role) {
+    public void setRole(UserRole role) {
         this.role = role;
     }
 }
