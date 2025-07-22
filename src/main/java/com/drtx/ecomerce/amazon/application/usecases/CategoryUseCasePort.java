@@ -1,8 +1,7 @@
 package com.drtx.ecomerce.amazon.application.usecases;
 
 import com.drtx.ecomerce.amazon.core.model.Category;
-import com.drtx.ecomerce.amazon.core.ports.in.CategoryServicePort;
-import com.drtx.ecomerce.amazon.core.ports.out.CategoryRepositoryPort;
+import com.drtx.ecomerce.amazon.core.ports.out.persistence.CategoryRepositoryPort;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +10,7 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-public class CategoryUseCasePort implements CategoryServicePort {
+public class CategoryUseCasePort implements com.drtx.ecomerce.amazon.core.ports.in.rest.CategoryUseCasePort {
     private final CategoryRepositoryPort repository;
 
     @Override

@@ -1,7 +1,7 @@
 package com.drtx.ecomerce.amazon.adapters.out.persistence.category;
 
 import com.drtx.ecomerce.amazon.core.model.Category;
-import com.drtx.ecomerce.amazon.core.ports.out.CategoryRepositoryPort;
+import com.drtx.ecomerce.amazon.core.ports.out.persistence.CategoryRepositoryPort;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
