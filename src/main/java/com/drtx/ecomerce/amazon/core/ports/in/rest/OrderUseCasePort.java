@@ -1,11 +1,11 @@
-package com.drtx.ecomerce.amazon.core.ports.in;
+package com.drtx.ecomerce.amazon.core.ports.in.rest;
 
 import com.drtx.ecomerce.amazon.core.model.Order;
 
 import java.util.List;
 import java.util.Optional;
 
-public interface OrderServicePort {
+public interface OrderUseCasePort {
     Order createOrder(Order order);
     Optional<Order> getOrderById(Long id);
     List<Order> getAllOrders();

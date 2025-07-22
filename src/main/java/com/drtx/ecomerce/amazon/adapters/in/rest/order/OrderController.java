@@ -3,9 +3,8 @@ package com.drtx.ecomerce.amazon.adapters.in.rest.order;
 import com.drtx.ecomerce.amazon.adapters.in.rest.order.dto.OrderRequest;
 import com.drtx.ecomerce.amazon.adapters.in.rest.order.dto.OrderResponse;
 import com.drtx.ecomerce.amazon.adapters.in.rest.order.mappers.OrderRestMapper;
-import com.drtx.ecomerce.amazon.adapters.out.persistence.order.OrderEntity;
 import com.drtx.ecomerce.amazon.core.model.Order;
-import com.drtx.ecomerce.amazon.core.ports.in.OrderServicePort;
+import com.drtx.ecomerce.amazon.core.ports.in.rest.OrderUseCasePort;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -16,7 +15,7 @@ import java.util.List;
 @RequestMapping("api/orders")
 @AllArgsConstructor
 public class OrderController {
-    private final OrderServicePort service;
+    private final OrderUseCasePort service;
     private final OrderRestMapper mapper;
 
     @GetMapping

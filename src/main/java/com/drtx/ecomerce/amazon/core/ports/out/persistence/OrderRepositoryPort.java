@@ -1,4 +1,4 @@
-package com.drtx.ecomerce.amazon.core.ports.out;
+package com.drtx.ecomerce.amazon.core.ports.out.persistence;
 
 import com.drtx.ecomerce.amazon.core.model.Order;
 

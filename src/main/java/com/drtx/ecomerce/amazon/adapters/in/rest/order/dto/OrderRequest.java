@@ -4,6 +4,7 @@ import com.drtx.ecomerce.amazon.core.model.OrderState;
 import com.drtx.ecomerce.amazon.core.model.Product;
 import com.drtx.ecomerce.amazon.core.model.User;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -11,7 +12,7 @@ public record OrderRequest(
         Long id,
         User user,
         List<Product>products,
-        Double total,
+        BigDecimal total,
         OrderState orderState,
         LocalDateTime createdAt,
         LocalDateTime deliveredAt,

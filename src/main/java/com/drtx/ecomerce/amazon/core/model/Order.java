@@ -1,5 +1,6 @@
 package com.drtx.ecomerce.amazon.core.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -7,13 +8,13 @@ public class Order {
     private Long id;
     private User user;
     private List<Product> products;
-    private Double total;
+    private BigDecimal total;
     private OrderState orderState;
     private LocalDateTime createdAt;
     private LocalDateTime deliveredAt;
     private String paymentType;
 
-    public Order(Long id, User user, List<Product> products, Double total, OrderState orderState, LocalDateTime createdAt, LocalDateTime deliveredAt, String paymentType) {
+    public Order(Long id, User user, List<Product> products, BigDecimal total, OrderState orderState, LocalDateTime createdAt, LocalDateTime deliveredAt, String paymentType) {
         this.id = id;
         this.user = user;
         this.products = products;
@@ -48,11 +49,11 @@ public class Order {
         this.products = products;
     }
 
-    public Double getTotal() {
+    public BigDecimal getTotal() {
         return total;
     }
 
-    public void setTotal(Double total) {
+    public void setTotal(BigDecimal total) {
         this.total = total;
     }
 

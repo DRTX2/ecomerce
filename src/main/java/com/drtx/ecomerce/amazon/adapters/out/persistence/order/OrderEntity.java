@@ -11,6 +11,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -37,8 +38,8 @@ public class OrderEntity {
     )
     private List<ProductEntity> products;
 
-    @Column(nullable = false)
-    private Double total;
+    @Column(precision = 19, scale = 2)
+    private BigDecimal total;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

@@ -1,8 +1,7 @@
 package com.drtx.ecomerce.amazon.application.usecases;
 
 import com.drtx.ecomerce.amazon.core.model.Order;
-import com.drtx.ecomerce.amazon.core.ports.in.OrderServicePort;
-import com.drtx.ecomerce.amazon.core.ports.out.OrderRepositoryPort;
+import com.drtx.ecomerce.amazon.core.ports.out.persistence.OrderRepositoryPort;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +10,7 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-public class OrderUseCasePort implements OrderServicePort {
+public class OrderUseCasePort implements com.drtx.ecomerce.amazon.core.ports.in.rest.OrderUseCasePort {
     private final OrderRepositoryPort repository;
 
     @Override
