@@ -75,4 +75,8 @@ public class JwtService {
     private Date extractExpiration(String token){
         return extractClaims(token, Claims::getExpiration);
     }
+
+    public void invalidateToken(String token) {
+
+    }
 }
