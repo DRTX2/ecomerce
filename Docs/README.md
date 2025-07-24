@@ -226,3 +226,17 @@ Entidades con sus propiedades y métodos clave:
 - `actualizar_estado(nuevo_estado)`
 
 ---
+
+## Proximamente
+
+Colas de mensajes
+
+Contadores atómicos
+
+Rate limiters
+
+Sesiones de usuario
+
+Caches de búsqueda
+
+Notificaciones en tiempo real

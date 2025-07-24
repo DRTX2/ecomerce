@@ -2,7 +2,6 @@ spring:
   application:
     name: amazon
 
-  port: 8080
   web:
     servlet:
       context-path: /api/v1
@@ -19,6 +18,9 @@ spring:
     database: POSTGRESQL
     show-sql: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+
+server:
+  port: 8080
 
 security:
   jwt:
