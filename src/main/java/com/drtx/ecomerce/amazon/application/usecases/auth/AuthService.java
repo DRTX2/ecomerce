@@ -27,6 +27,8 @@ public class AuthService {
     private final AuthResponseMapper authResponseMapper;
     private final SecurityUserMapper securityUserMapper;
 
+    /*
+
     public AuthResponse register(RegisterRequest request) {
         var user = securityMapper.registerRequestToDomain(request);
         user.setPassword(encoder.encode(user.getPassword()));
@@ -35,11 +37,13 @@ public class AuthService {
         return authResponseMapper.fromToken(jwtToken);
     }
 
+    */
+
     public AuthResponse authenticate(AuthRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.email(),
-                        encoder.encode(request.password())
+                        request.password()
                 )
         );
         var user = repository.findByEmail(request.email())
@@ -47,5 +51,10 @@ public class AuthService {
         UserDetails userDetails= securityUserMapper.toUserDetails(user);
         var jwtToken = jwtService.generateToken(userDetails);
         return authResponseMapper.fromToken(jwtToken);
+    }
+
+    public void logout(String authHeader) {
+        String token = authHeader.replace("Bearer ", "");
+        jwtService.invalidateToken(token);
     }
 }
