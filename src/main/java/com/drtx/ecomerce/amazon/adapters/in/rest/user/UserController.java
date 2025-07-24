@@ -5,6 +5,7 @@ import com.drtx.ecomerce.amazon.adapters.in.rest.user.dto.UserResponse;
 import com.drtx.ecomerce.amazon.adapters.in.rest.user.mappers.UserRestMapper;
 import com.drtx.ecomerce.amazon.core.model.User;
 import com.drtx.ecomerce.amazon.core.ports.in.rest.UserUseCasePort;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,15 +13,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/users/")
+@RequestMapping("/users/")
+@RequiredArgsConstructor
 public class UserController {
     private final UserUseCasePort userUseCasePort;
     private final UserRestMapper userMapper;
-
-    public UserController(UserUseCasePort userUseCasePort, UserRestMapper userMapper) {
-        this.userUseCasePort = userUseCasePort;
-        this.userMapper = userMapper;
-    }
 
     @GetMapping
     public ResponseEntity<List<UserResponse>> getUsers(){
@@ -39,7 +36,7 @@ public class UserController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping
+    @PostMapping("/register")
     public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest request){
         User user = userMapper.toDomain(request);
         return ResponseEntity.ok(userMapper.toResponse(userUseCasePort.createUser(user) ) );

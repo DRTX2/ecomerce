@@ -24,6 +24,8 @@ public class UserRepositoryPortAdapter implements UserRepositoryPort {
     @Override
     public User save(User user) {
         UserEntity entity = mapper.toEntity(user);
+        if(repository.findByEmail(user.getEmail()).isPresent())
+            throw new RuntimeException("Email already exists");
         UserEntity savedEntity=repository.save(entity);
         return mapper.toDomain(savedEntity);
     }

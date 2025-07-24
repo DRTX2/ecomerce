@@ -9,6 +9,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface UserRestMapper {
     User toDomain(UserRequest request);
+
     @Mapping(target = "id", source = "id")// refers to properties
     UserResponse toResponse(User user);
 }
