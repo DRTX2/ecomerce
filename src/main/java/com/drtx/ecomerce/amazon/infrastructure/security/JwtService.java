@@ -1,10 +1,13 @@
 package com.drtx.ecomerce.amazon.infrastructure.security;
 
+import com.drtx.ecomerce.amazon.core.ports.in.rest.security.RevokedTokenPort;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +18,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Service
+@RequiredArgsConstructor
 public class JwtService {
     @Value("${security.jwt.secret-key}")
     private String secretKey;
@@ -23,6 +27,8 @@ public class JwtService {
     private long jwtExpirationInMs;
 
     private JwtParser parser;
+
+    private final RevokedTokenPort revokedTokenPort;
 
     private SecretKey getSigningKey(){
         return Keys.hmacShaKeyFor(secretKey.getBytes());
@@ -63,11 +69,6 @@ public class JwtService {
                 .compact();
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails){
-        final String userEmail=extractUsername(token);
-        return userEmail.equals(userDetails.getUsername()) && !isTokenExpired(token);
-    }
-
     private boolean isTokenExpired(String token){
         return extractExpiration(token).before(new Date());
     }
@@ -77,6 +78,30 @@ public class JwtService {
     }
 
     public void invalidateToken(String token) {
-
+        if (!revokedTokenPort.exists(token)) {
+            revokedTokenPort.save(token);
+        }
     }
+
+    public boolean isTokenValid(String token, UserDetails userDetails) {
+        final String userEmail = extractUsername(token);
+
+        // Check blacklist first (faster than parsing claims)
+        if (isTokenInvalidated(token)) {
+            return false;
+        }
+
+        // Then check expiration and user match
+        return userEmail.equals(userDetails.getUsername()) && !isTokenExpired(token);
+    }
+
+    public boolean isTokenInvalidated(String token) {
+        return revokedTokenPort.exists(token);
+    }
+
+    @Scheduled(fixedRate = 3600000)
+    public void cleanupExpiredTokens(){
+        revokedTokenPort.deleteExpiredTokens();
+    }
+
 }
