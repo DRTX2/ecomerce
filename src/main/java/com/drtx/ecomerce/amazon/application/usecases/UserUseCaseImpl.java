@@ -2,6 +2,7 @@ package com.drtx.ecomerce.amazon.application.usecases;
 
 import com.drtx.ecomerce.amazon.core.model.User;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.UserRepositoryPort;
+import com.drtx.ecomerce.amazon.core.ports.out.security.PasswordService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -14,11 +15,12 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserUseCaseImpl implements UserUseCasePort {
     private final UserRepositoryPort repository;
-    private final PasswordEncoder encoder;
+    private final PasswordService passwordService;
 
     @Override
     public User createUser(User user) {
-        user.setPassword(encoder.encode(user.getPassword()));
+        String encodedPassword=passwordService.encode(user.getPassword());
+        user.setPassword(encodedPassword);
         return repository.save(user);
     }
 

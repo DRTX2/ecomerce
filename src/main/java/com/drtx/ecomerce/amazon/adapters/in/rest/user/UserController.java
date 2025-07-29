@@ -36,14 +36,14 @@ public class UserController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping("/register")
+    @PostMapping
     public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest request){
         User user = userMapper.toDomain(request);
         return ResponseEntity.ok(userMapper.toResponse(userUseCasePort.createUser(user) ) );
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, UserRequest request){
+    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody UserRequest request){
         User user =userMapper.toDomain(request);
         return ResponseEntity.ok(userMapper.toResponse(userUseCasePort.updateUser(id,user)));
     }

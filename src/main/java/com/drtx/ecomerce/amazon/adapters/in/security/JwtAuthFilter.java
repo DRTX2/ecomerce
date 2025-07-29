@@ -1,5 +1,7 @@
 package com.drtx.ecomerce.amazon.adapters.in.security;
 
+import com.drtx.ecomerce.amazon.core.ports.out.security.TokenProvider;
+import com.drtx.ecomerce.amazon.core.ports.out.security.TokenRevocationPort;
 import com.drtx.ecomerce.amazon.infrastructure.security.JwtService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -20,7 +22,8 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
 
-    private final JwtService jwtService;
+    private final TokenProvider tokenProvider;
+    private final TokenRevocationPort tokenRevocationPort;
     private final UserDetailsService userDetailsService;
 
     @Override
@@ -31,21 +34,27 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
         final String authHeader = request.getHeader("Authorization");
-        final String jwt;
-        final String username;
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        jwt = authHeader.substring(7); // quitar "Bearer "
-        username = jwtService.extractUsername(jwt);
+        final String token;
+        final String username;
+
+
+        token = authHeader.substring(7);
+        username = tokenProvider.extractUsername(token);
+
+        if(tokenRevocationPort.isInvalidated(token)){
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
 
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
-            if (jwtService.isTokenValid(jwt, userDetails)) {
                 UsernamePasswordAuthenticationToken authToken =
                         new UsernamePasswordAuthenticationToken(
                                 userDetails,
@@ -57,7 +66,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 );
 
                 SecurityContextHolder.getContext().setAuthentication(authToken);
-            }
         }
 
         filterChain.doFilter(request, response);

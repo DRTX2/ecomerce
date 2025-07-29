@@ -1,13 +1,13 @@
 package com.drtx.ecomerce.amazon.infrastructure.security;
 
-import com.drtx.ecomerce.amazon.core.ports.in.rest.security.RevokedTokenPort;
+import com.drtx.ecomerce.amazon.core.ports.out.security.TokenProvider;
+import com.drtx.ecomerce.amazon.core.ports.out.security.TokenRevocationPort;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -19,36 +19,19 @@ import java.util.function.Function;
 
 @Service
 @RequiredArgsConstructor
-public class JwtService {
+public class JwtService implements TokenProvider {
     @Value("${security.jwt.secret-key}")
     private String secretKey;
 
     @Value("${security.jwt.expiration}")
     private long jwtExpirationInMs;
 
-    private JwtParser parser;
+    private SecretKey signingKey;
+    private final TokenRevocationPort tokenRevocationPort;
 
-    private final RevokedTokenPort revokedTokenPort;
-
-    private SecretKey getSigningKey(){
-        return Keys.hmacShaKeyFor(secretKey.getBytes());
-    }
-
-    public String extractUsername(String token){
-        return extractClaims(token, Claims::getSubject);
-    }
-
-    public <T> T extractClaims(String token, Function<Claims, T> claimsResolver){
-        final Claims claims=extractAllClaims(token);
-        return claimsResolver.apply(claims);
-    }
-
-    public Claims extractAllClaims(String token){
-        return Jwts.parser()
-                .verifyWith(getSigningKey())
-                .build()
-                .parseSignedClaims(token)
-                .getPayload();
+    @PostConstruct
+    void init(){
+        this.signingKey=Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
     public String generateToken(UserDetails userDetails){
@@ -65,43 +48,42 @@ public class JwtService {
                 .subject(userDetails.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis()+jwtExpirationInMs))
-                .signWith(getSigningKey())
+                .signWith(signingKey)
                 .compact();
     }
 
-    private boolean isTokenExpired(String token){
-        return extractExpiration(token).before(new Date());
+    @Override
+    public String extractUsername(String token){
+        return extractClaims(token, Claims::getSubject);
     }
 
     private Date extractExpiration(String token){
         return extractClaims(token, Claims::getExpiration);
     }
 
-    public void invalidateToken(String token) {
-        if (!revokedTokenPort.exists(token)) {
-            revokedTokenPort.save(token);
-        }
+    private boolean isTokenExpired(String token){
+        return extractExpiration(token).before(new Date());
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {
         final String userEmail = extractUsername(token);
-
         // Check blacklist first (faster than parsing claims)
-        if (isTokenInvalidated(token)) {
-            return false;
-        }
-
+        // if (isTokenInvalidated(token)) return false;
         // Then check expiration and user match
         return userEmail.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
-    public boolean isTokenInvalidated(String token) {
-        return revokedTokenPort.exists(token);
+    public <T> T extractClaims(String token, Function<Claims, T> claimsResolver){
+        final Claims claims=extractAllClaims(token);
+        return claimsResolver.apply(claims);
     }
 
-    @Scheduled(fixedRate = 3600000)
-    public void cleanupExpiredTokens(){
-        revokedTokenPort.deleteExpiredTokens();
-    }
+    public Claims extractAllClaims(String token){
+        return Jwts.parser()
+                .verifyWith(signingKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
 
+   }
 }
