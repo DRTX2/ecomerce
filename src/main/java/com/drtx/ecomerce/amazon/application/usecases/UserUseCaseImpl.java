@@ -18,13 +18,6 @@ public class UserUseCaseImpl implements UserUseCasePort {
     private final PasswordService passwordService;
 
     @Override
-    public User createUser(User user) {
-        String encodedPassword=passwordService.encode(user.getPassword());
-        user.setPassword(encodedPassword);
-        return repository.save(user);
-    }
-
-    @Override
     public Optional<User> getUserById(Long id) {
         return repository.findById(id);
     }

@@ -36,12 +36,6 @@ public class UserController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PostMapping
-    public ResponseEntity<UserResponse> createUser(@RequestBody UserRequest request){
-        User user = userMapper.toDomain(request);
-        return ResponseEntity.ok(userMapper.toResponse(userUseCasePort.createUser(user) ) );
-    }
-
     @PutMapping("/{id}")
     public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody UserRequest request){
         User user =userMapper.toDomain(request);

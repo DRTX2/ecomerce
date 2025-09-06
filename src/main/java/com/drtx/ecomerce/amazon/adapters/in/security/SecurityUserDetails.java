@@ -12,7 +12,7 @@ import java.util.List;
 
 @RequiredArgsConstructor
 public class SecurityUserDetails implements UserDetails {
-    private final User user;
+    private final User user; // pojo
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities(){
