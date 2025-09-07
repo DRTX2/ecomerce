@@ -1,6 +1,5 @@
 package com.drtx.ecomerce.amazon.adapters.in.security;
 
-import com.drtx.ecomerce.amazon.adapters.out.persistence.user.UserEntity;
 import com.drtx.ecomerce.amazon.core.model.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
