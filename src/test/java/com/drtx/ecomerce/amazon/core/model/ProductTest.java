@@ -28,6 +28,7 @@ public class ProductTest {
         assertEquals("Test Product", product.getName());
         assertEquals("This is a test product", product.getDescription());
         assertEquals(new BigDecimal("19.99"), product.getPrice());
+        assertTrue(product.getStock()>0);
         assertEquals(100, product.getStock());
     }
 
@@ -60,7 +61,4 @@ public class ProductTest {
         assertEquals("Product A", cart.getProducts().get(0).getName(), "El primer producto debería ser 'Product A'");
         assertEquals("Product B", cart.getProducts().get(1).getName(), "El segundo producto debería ser 'Product B'");
     }
-
-
-
 }
