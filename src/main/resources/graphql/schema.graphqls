@@ -1,0 +1,101 @@
+type Query {
+    getAllIncidences: [Incidence]
+    getIncidenceById(id: ID!): Incidence
+}
+
+type Mutation {
+    createIncidence(productId: ID!, input: ReportInput!): Incidence
+    resolveIncidence(id: ID!, input: ResolveIncidenceInput!): Incidence
+    createAppeal(incidenceId: ID!, reason: String!): Appeal
+    resolveAppeal(id: ID!, decision: AppealDecision!): Appeal
+}
+
+input ReportInput {
+    reason: String!
+    comment: String
+}
+
+input ResolveIncidenceInput {
+    decision: IncidenceDecision!
+    moderatorComment: String
+}
+
+type Incidence {
+    id: ID!
+    publicUi: String
+    product: Product
+    status: IncidenceStatus
+    createdAt: String
+    autoclosed: Boolean
+    moderator: User
+    moderatorComment: String
+    decision: IncidenceDecision
+    reports: [Report]
+}
+
+type Report {
+    id: ID!
+    reason: String
+    comment: String
+    reporter: User
+    createdAt: String
+    source: ReportSource
+}
+
+type Appeal {
+    id: ID!
+    incidence: Incidence
+    seller: User
+    reason: String
+    createdAt: String
+    status: AppealStatus
+    newModerator: User
+    finalDecision: AppealDecision
+    finalDecisionAt: String
+}
+
+type Product {
+    id: ID!
+    name: String
+    description: String
+    price: Float
+    stock: Int
+    averageRating: Float
+}
+
+type User {
+    id: ID!
+    name: String
+    email: String
+    role: String
+}
+
+enum IncidenceStatus {
+    OPEN
+    PENDING_REVIEW
+    DECIDED
+    CLOSED
+    APPEALED
+}
+
+enum IncidenceDecision {
+    PENDING
+    MAINTAIN
+    DELETE
+}
+
+enum ReportSource {
+    USER
+    SYSTEM
+}
+
+enum AppealStatus {
+    PENDING
+    RESOLVED
+}
+
+enum AppealDecision {
+    PENDING
+    GRANTED
+    REJECTED
+}

@@ -1,0 +1,79 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.4.4'
+	id 'io.spring.dependency-management' version '1.1.7'
+}
+
+group = 'com.drtx.ecomerce'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+ext {
+	mapstructVersion = '1.5.5.Final'
+	jjwtVersion = '0.12.3'
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-graphql'
+	
+	// Commons
+	implementation 'org.apache.commons:commons-lang3:3.14.0'
+	
+	// MapStruct
+	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
+	
+	// JWT
+	implementation "io.jsonwebtoken:jjwt-api:${jjwtVersion}"
+	runtimeOnly "io.jsonwebtoken:jjwt-impl:${jjwtVersion}"
+	runtimeOnly "io.jsonwebtoken:jjwt-jackson:${jjwtVersion}"
+
+	// DB
+	runtimeOnly 'org.postgresql:postgresql'
+	
+	// DevTools
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+	
+	// Lombok
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+	
+	// Annotation Processors (Lombok + MapStruct binding)
+	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
+    // If you need lombok validation binding or additional bindings, sometimes mapstruct-binding is needed, 
+    // but usually mapstruct-processor is enough if placed after lombok (Gradle handles order automatically mostly, 
+    // but good to keep in mind).
+    // In Gradle 5+, annotation processor path is strict.
+    // The Lombok-Mapstruct binding is often resolved by just having both.
+    // However, for recent versions, we might need lombok-mapstruct-binding if we used it, 
+    // but the pom didn't explicitly show it, just the order in maven-compiler-plugin.
+    // In Gradle, we just declare them.
+	
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'org.springframework.graphql:spring-graphql-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
