@@ -8,45 +8,40 @@ import com.drtx.ecomerce.amazon.core.model.OrderState;
 import com.drtx.ecomerce.amazon.core.model.Product;
 import com.drtx.ecomerce.amazon.core.model.User;
 import com.drtx.ecomerce.amazon.core.ports.in.rest.OrderUseCasePort;
-import com.drtx.ecomerce.amazon.infrastructure.security.TestSecurityConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.Import;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
-import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(OrderController.class)
-@Import(TestSecurityConfig.class)
-@DisplayName("Order Controller Integration Tests")
+@ExtendWith(MockitoExtension.class)
+@DisplayName("Order Controller Tests (Standalone)")
 class OrderControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
     private ObjectMapper objectMapper;
 
-    @MockitoBean
+    @Mock
     private OrderUseCasePort orderUseCasePort;
 
-    @MockitoBean
+    @Mock
     private OrderRestMapper orderMapper;
 
     private Order testOrder;
@@ -55,6 +50,11 @@ class OrderControllerTest {
 
     @BeforeEach
     void setUp() {
+        OrderController controller = new OrderController(orderUseCasePort, orderMapper);
+        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+
         User testUser = new User();
         testUser.setId(1L);
         testUser.setName("John Doe");
@@ -72,8 +72,7 @@ class OrderControllerTest {
                 OrderState.PENDING,
                 LocalDateTime.now(),
                 null,
-                "CREDIT_CARD"
-        );
+                "CREDIT_CARD");
 
         testOrderRequest = new OrderRequest(
                 1L,
@@ -83,8 +82,8 @@ class OrderControllerTest {
                 OrderState.PENDING,
                 LocalDateTime.now(),
                 null,
-                "CREDIT_CARD"
-        );
+                "CREDIT_CARD");
+
         testOrderResponse = new OrderResponse();
     }
 
@@ -98,7 +97,7 @@ class OrderControllerTest {
 
         // When & Then
         mockMvc.perform(get("/api/orders")
-                        .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         verify(orderUseCasePort, times(1)).getAllOrders();
@@ -114,11 +113,57 @@ class OrderControllerTest {
 
         // When & Then
         mockMvc.perform(post("/api/orders")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(testOrderRequest)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(testOrderRequest)))
                 .andExpect(status().isOk());
 
         verify(orderUseCasePort, times(1)).createOrder(any(Order.class));
+    }
+
+    @Test
+    @DisplayName("POST /api/orders - Should return 400 when user is null")
+    void testCreateOrder_ValidationFail_NullUser() throws Exception {
+        // Given
+        OrderRequest invalidRequest = new OrderRequest(
+                1L,
+                null, // User is null, @NotNull violation
+                Arrays.asList(new Product()),
+                new BigDecimal("99.99"),
+                OrderState.PENDING,
+                LocalDateTime.now(),
+                null,
+                "CREDIT_CARD");
+
+        // When & Then
+        mockMvc.perform(post("/api/orders")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidRequest)))
+                .andExpect(status().isBadRequest());
+
+        verify(orderUseCasePort, never()).createOrder(any(Order.class));
+    }
+
+    @Test
+    @DisplayName("POST /api/orders - Should return 400 when products list is empty")
+    void testCreateOrder_ValidationFail_EmptyProducts() throws Exception {
+        // Given
+        OrderRequest invalidRequest = new OrderRequest(
+                1L,
+                new User(),
+                new ArrayList<>(), // Products empty, @NotEmpty violation
+                new BigDecimal("99.99"),
+                OrderState.PENDING,
+                LocalDateTime.now(),
+                null,
+                "CREDIT_CARD");
+
+        // When & Then
+        mockMvc.perform(post("/api/orders")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidRequest)))
+                .andExpect(status().isBadRequest());
+
+        verify(orderUseCasePort, never()).createOrder(any(Order.class));
     }
 
     @Test
@@ -130,7 +175,7 @@ class OrderControllerTest {
 
         // When & Then
         mockMvc.perform(get("/api/orders/{id}", 1L)
-                        .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
         verify(orderUseCasePort, times(1)).getOrderById(1L);
@@ -144,14 +189,14 @@ class OrderControllerTest {
 
         // When & Then
         mockMvc.perform(get("/api/orders/{id}", 999L)
-                        .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
         verify(orderUseCasePort, times(1)).getOrderById(999L);
     }
 
     @Test
-    @DisplayName("PUT /api/orders - Should update order")
+    @DisplayName("PUT /api/orders/{id} - Should update order")
     void testUpdateOrder() throws Exception {
         // Given
         when(orderMapper.toDomain(any(OrderRequest.class))).thenReturn(testOrder);
@@ -159,9 +204,9 @@ class OrderControllerTest {
         when(orderMapper.toResponse(testOrder)).thenReturn(testOrderResponse);
 
         // When & Then
-        mockMvc.perform(put("/api/orders")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(testOrderRequest)))
+        mockMvc.perform(put("/api/orders/{id}", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(testOrderRequest)))
                 .andExpect(status().isOk());
 
         verify(orderUseCasePort, times(1)).updateOrder(any(Order.class));
@@ -175,7 +220,7 @@ class OrderControllerTest {
 
         // When & Then
         mockMvc.perform(delete("/api/orders/{id}", 1L)
-                        .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
         verify(orderUseCasePort, times(1)).deleteOrder(1L);

@@ -6,17 +6,16 @@ import com.drtx.ecomerce.amazon.adapters.in.rest.product.mappers.ProductRestMapp
 import com.drtx.ecomerce.amazon.core.model.Category;
 import com.drtx.ecomerce.amazon.core.model.Product;
 import com.drtx.ecomerce.amazon.core.ports.in.rest.ProductUseCasePort;
-import com.drtx.ecomerce.amazon.infrastructure.security.TestSecurityConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.Import;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -30,21 +29,17 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(ProductController.class)
-@Import(TestSecurityConfig.class)
-@DisplayName("Product Controller Integration Tests")
+@ExtendWith(MockitoExtension.class)
+@DisplayName("Product Controller Tests")
 class ProductControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
     private ObjectMapper objectMapper;
 
-    @MockitoBean
+    @Mock
     private ProductUseCasePort productUseCasePort;
 
-    @MockitoBean
+    @Mock
     private ProductRestMapper productMapper;
 
     private Product testProduct;
@@ -54,6 +49,10 @@ class ProductControllerTest {
 
     @BeforeEach
     void setUp() {
+        ProductController controller = new ProductController(productUseCasePort, productMapper);
+        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+        objectMapper = new ObjectMapper();
+
         testCategory = new Category();
         testCategory.setId(1L);
         testCategory.setName("Electronics");
@@ -76,8 +75,7 @@ class ProductControllerTest {
                 10,
                 1,
                 4.5,
-                Arrays.asList("image1.jpg", "image2.jpg")
-        );
+                Arrays.asList("image1.jpg", "image2.jpg"));
 
         testProductResponse = new ProductResponse(
                 1L,
@@ -87,8 +85,7 @@ class ProductControllerTest {
                 10,
                 testCategory,
                 4.5,
-                Arrays.asList("image1.jpg", "image2.jpg")
-        );
+                Arrays.asList("image1.jpg", "image2.jpg"));
     }
 
     @Test
@@ -101,7 +98,7 @@ class ProductControllerTest {
 
         // When & Then
         mockMvc.perform(get("/products")
-                        .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].id", is(1)))
@@ -122,8 +119,8 @@ class ProductControllerTest {
 
         // When & Then
         mockMvc.perform(post("/products")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(testProductRequest)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(testProductRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(1)))
                 .andExpect(jsonPath("$.name", is("Laptop")))
@@ -141,7 +138,7 @@ class ProductControllerTest {
 
         // When & Then
         mockMvc.perform(get("/products/{id}", 1L)
-                        .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(1)))
                 .andExpect(jsonPath("$.name", is("Laptop")))
@@ -158,7 +155,7 @@ class ProductControllerTest {
 
         // When & Then
         mockMvc.perform(get("/products/{id}", 999L)
-                        .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
         verify(productUseCasePort, times(1)).getProductById(999L);
@@ -174,8 +171,8 @@ class ProductControllerTest {
 
         // When & Then
         mockMvc.perform(put("/products/{id}", 1L)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(testProductRequest)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(testProductRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(1)))
                 .andExpect(jsonPath("$.name", is("Laptop")))
@@ -192,7 +189,7 @@ class ProductControllerTest {
 
         // When & Then
         mockMvc.perform(delete("/products/{id}", 1L)
-                        .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
         verify(productUseCasePort, times(1)).deleteProduct(1L);

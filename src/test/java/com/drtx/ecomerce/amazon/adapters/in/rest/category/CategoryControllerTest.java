@@ -5,17 +5,16 @@ import com.drtx.ecomerce.amazon.adapters.in.rest.category.dto.CategoryResponse;
 import com.drtx.ecomerce.amazon.adapters.in.rest.category.mappers.CategoryRestMapper;
 import com.drtx.ecomerce.amazon.core.model.Category;
 import com.drtx.ecomerce.amazon.core.ports.in.rest.CategoryUseCasePort;
-import com.drtx.ecomerce.amazon.infrastructure.security.TestSecurityConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.Import;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.Arrays;
 import java.util.List;
@@ -28,21 +27,17 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(CategoryController.class)
-@Import(TestSecurityConfig.class)
-@DisplayName("Category Controller Integration Tests")
+@ExtendWith(MockitoExtension.class)
+@DisplayName("Category Controller Tests (Standalone)")
 class CategoryControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
     private ObjectMapper objectMapper;
 
-    @MockitoBean
+    @Mock
     private CategoryUseCasePort categoryUseCasePort;
 
-    @MockitoBean
+    @Mock
     private CategoryRestMapper categoryMapper;
 
     private Category testCategory;
@@ -51,6 +46,12 @@ class CategoryControllerTest {
 
     @BeforeEach
     void setUp() {
+        // Inicializamos el controlador con los mocks y configuramos MockMvc en modo
+        // standalone
+        CategoryController controller = new CategoryController(categoryUseCasePort, categoryMapper);
+        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+        objectMapper = new ObjectMapper();
+
         testCategory = new Category();
         testCategory.setId(1L);
         testCategory.setName("Electronics");
@@ -70,7 +71,7 @@ class CategoryControllerTest {
 
         // When & Then
         mockMvc.perform(get("/categories/")
-                        .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].id", is(1)))
@@ -89,13 +90,28 @@ class CategoryControllerTest {
 
         // When & Then
         mockMvc.perform(post("/categories/")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(testCategoryRequest)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(testCategoryRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(1)))
                 .andExpect(jsonPath("$.name", is("Electronics")));
 
         verify(categoryUseCasePort, times(1)).createCategory(any(Category.class));
+    }
+
+    @Test
+    @DisplayName("POST /categories/ - Should return 400 Bad Request when name is empty")
+    void testCreateCategory_ValidationFail() throws Exception {
+        // Given
+        CategoryRequest invalidRequest = new CategoryRequest("", "Description");
+
+        // When & Then
+        mockMvc.perform(post("/categories/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidRequest)))
+                .andExpect(status().isBadRequest()); // Esperamos 400 por @NotBlank
+
+        verify(categoryUseCasePort, never()).createCategory(any(Category.class));
     }
 
     @Test
@@ -107,7 +123,7 @@ class CategoryControllerTest {
 
         // When & Then
         mockMvc.perform(get("/categories/{id}", 1L)
-                        .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(1)))
                 .andExpect(jsonPath("$.name", is("Electronics")));
@@ -123,7 +139,7 @@ class CategoryControllerTest {
 
         // When & Then
         mockMvc.perform(get("/categories/{id}", 999L)
-                        .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
         verify(categoryUseCasePort, times(1)).getCategoryById(999L);
@@ -139,8 +155,8 @@ class CategoryControllerTest {
 
         // When & Then
         mockMvc.perform(put("/categories/{id}", 1L)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(testCategoryRequest)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(testCategoryRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(1)))
                 .andExpect(jsonPath("$.name", is("Electronics")));
@@ -156,7 +172,7 @@ class CategoryControllerTest {
 
         // When & Then
         mockMvc.perform(delete("/categories/{id}", 1L)
-                        .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
         verify(categoryUseCasePort, times(1)).deleteCategory(1L);

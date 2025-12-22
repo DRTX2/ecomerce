@@ -9,47 +9,55 @@ import com.drtx.ecomerce.amazon.core.model.Favorite;
 import com.drtx.ecomerce.amazon.core.model.Product;
 import com.drtx.ecomerce.amazon.core.model.User;
 import com.drtx.ecomerce.amazon.core.ports.in.rest.FavoriteUseCasePort;
-import com.drtx.ecomerce.amazon.infrastructure.security.TestSecurityConfig;
+import com.drtx.ecomerce.amazon.adapters.in.rest.user.dto.UserResponse;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.Import;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
-
-import com.drtx.ecomerce.amazon.adapters.in.rest.user.dto.UserResponse;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(FavoriteController.class)
-@Import(TestSecurityConfig.class)
-@DisplayName("Favorite Controller Integration Tests")
+@ExtendWith(MockitoExtension.class)
+@DisplayName("Favorite Controller Tests (Standalone)")
 class FavoriteControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
 
-    @MockitoBean
+    @Mock
     private FavoriteUseCasePort favoriteUseCasePort;
 
-    @MockitoBean
+    @Mock
     private FavoriteRestMapper favoriteMapper;
 
-    @MockitoBean
+    @Mock
     private ProductRestMapper productMapper;
+
+    @Mock
+    private SecurityContext securityContext;
+
+    @Mock
+    private Authentication authentication;
 
     private Favorite testFavorite;
     private FavoriteResponse testFavoriteResponse;
@@ -58,6 +66,16 @@ class FavoriteControllerTest {
 
     @BeforeEach
     void setUp() {
+        // Mock Security Context
+        SecurityContextHolder.setContext(securityContext);
+        lenient().when(securityContext.getAuthentication()).thenReturn(authentication);
+        lenient().when(authentication.isAuthenticated()).thenReturn(true);
+        lenient().when(authentication.getPrincipal()).thenReturn("userPrincipal");
+        lenient().when(authentication.getName()).thenReturn("user@example.com");
+
+        FavoriteController controller = new FavoriteController(favoriteUseCasePort, favoriteMapper, productMapper);
+        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+
         User testUser = new User();
         testUser.setId(1L);
         testUser.setEmail("user@example.com");
@@ -78,17 +96,25 @@ class FavoriteControllerTest {
         testFavorite.setProduct(testProduct);
 
         UserResponse userResponse = new UserResponse(1L, "Test User", "user@example.com", "USER", "Address", "Phone");
-        testFavoriteResponse = new FavoriteResponse(1L, userResponse, testProductResponse, LocalDateTime.now());
+
+        // Constructor ProductResponse: Long id, String name, String description,
+        // BigDecimal price, Integer stock, Category category, Double rating, List image
         testProductResponse = new ProductResponse(1L, "Laptop", "Description", 999.99, 10, testCategory, 4.5,
-                Arrays.asList());
+                Collections.emptyList());
+
+        testFavoriteResponse = new FavoriteResponse(1L, userResponse, testProductResponse, LocalDateTime.now());
+    }
+
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
     }
 
     @Test
-    @WithMockUser(username = "user@example.com")
-    @DisplayName("POST /favorites/product/{productId} - Should add favorite")
+    @DisplayName("POST /favorites/product/{productId} - Should add favorite for authenticated user")
     void testAddFavorite() throws Exception {
         // Given
-        when(favoriteUseCasePort.addFavorite(eq(1L), anyString())).thenReturn(testFavorite);
+        when(favoriteUseCasePort.addFavorite(eq(1L), eq("user@example.com"))).thenReturn(testFavorite);
         when(favoriteMapper.toResponse(testFavorite)).thenReturn(testFavoriteResponse);
 
         // When & Then
@@ -97,32 +123,30 @@ class FavoriteControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(1)));
 
-        verify(favoriteUseCasePort, times(1)).addFavorite(eq(1L), anyString());
+        verify(favoriteUseCasePort, times(1)).addFavorite(eq(1L), eq("user@example.com"));
     }
 
     @Test
-    @WithMockUser(username = "user@example.com")
-    @DisplayName("DELETE /favorites/product/{productId} - Should remove favorite")
+    @DisplayName("DELETE /favorites/product/{productId} - Should remove favorite for authenticated user")
     void testRemoveFavorite() throws Exception {
         // Given
-        doNothing().when(favoriteUseCasePort).removeFavorite(eq(1L), anyString());
+        doNothing().when(favoriteUseCasePort).removeFavorite(eq(1L), eq("user@example.com"));
 
         // When & Then
         mockMvc.perform(delete("/favorites/product/{productId}", 1L)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
-        verify(favoriteUseCasePort, times(1)).removeFavorite(eq(1L), anyString());
+        verify(favoriteUseCasePort, times(1)).removeFavorite(eq(1L), eq("user@example.com"));
     }
 
     @Test
-    @WithMockUser(username = "user@example.com")
     @DisplayName("GET /favorites - Should return user favorites")
     void testGetUserFavorites() throws Exception {
         // Given
         List<Product> products = Arrays.asList(testProduct);
-        when(favoriteUseCasePort.getUserFavorites(anyString())).thenReturn(products);
-        when(productMapper.toResponse(any())).thenReturn(testProductResponse);
+        when(favoriteUseCasePort.getUserFavorites(eq("user@example.com"))).thenReturn(products);
+        when(productMapper.toResponse(any(Product.class))).thenReturn(testProductResponse);
 
         // When & Then
         mockMvc.perform(get("/favorites")
@@ -132,6 +156,6 @@ class FavoriteControllerTest {
                 .andExpect(jsonPath("$[0].id", is(1)))
                 .andExpect(jsonPath("$[0].name", is("Laptop")));
 
-        verify(favoriteUseCasePort, times(1)).getUserFavorites(anyString());
+        verify(favoriteUseCasePort, times(1)).getUserFavorites(eq("user@example.com"));
     }
 }

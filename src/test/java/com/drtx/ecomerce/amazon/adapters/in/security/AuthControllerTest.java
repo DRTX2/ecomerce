@@ -7,17 +7,16 @@ import com.drtx.ecomerce.amazon.adapters.in.security.mappers.UserSecurityMapper;
 import com.drtx.ecomerce.amazon.application.usecases.auth.AuthService;
 import com.drtx.ecomerce.amazon.core.model.User;
 import com.drtx.ecomerce.amazon.core.model.UserRole;
-import com.drtx.ecomerce.amazon.infrastructure.security.TestSecurityConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.Import;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -26,21 +25,17 @@ import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(AuthController.class)
-@Import(TestSecurityConfig.class)
-@DisplayName("Auth Controller Integration Tests")
+@ExtendWith(MockitoExtension.class)
+@DisplayName("Auth Controller Tests (Standalone)")
 class AuthControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
     private ObjectMapper objectMapper;
 
-    @MockitoBean
+    @Mock
     private AuthService authService;
 
-    @MockitoBean
+    @Mock
     private UserSecurityMapper userSecurityMapper;
 
     private User testUser;
@@ -50,6 +45,10 @@ class AuthControllerTest {
 
     @BeforeEach
     void setUp() {
+        AuthController authController = new AuthController(authService, userSecurityMapper);
+        mockMvc = MockMvcBuilders.standaloneSetup(authController).build();
+        objectMapper = new ObjectMapper();
+
         testUser = new User();
         testUser.setId(1L);
         testUser.setName("John Doe");
@@ -90,6 +89,27 @@ class AuthControllerTest {
     }
 
     @Test
+    @DisplayName("POST /auth/register - Should return 400 when request invalid (Invalid Email)")
+    void testRegister_InvalidEmail() throws Exception {
+        // Given
+        RegisterRequest invalidRequest = new RegisterRequest(
+                "John Doe",
+                "not-an-email", // Email inválido
+                UserRole.USER,
+                "123 Main St",
+                "555-1234",
+                "password123");
+
+        // When & Then
+        mockMvc.perform(post("/auth/register")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidRequest)))
+                .andExpect(status().isBadRequest());
+
+        verify(authService, never()).register(any(User.class));
+    }
+
+    @Test
     @DisplayName("POST /auth/login - Should login user and return token")
     void testLogin() throws Exception {
         // Given
@@ -103,6 +123,21 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.token", is("mock-jwt-token")));
 
         verify(authService, times(1)).login(any(AuthRequest.class));
+    }
+
+    @Test
+    @DisplayName("POST /auth/login - Should return 400 when request invalid (Short Password)")
+    void testLogin_InvalidPassword() throws Exception {
+        // Given
+        AuthRequest invalidRequest = new AuthRequest("john@example.com", "short"); // Password muy corto (<8)
+
+        // When & Then
+        mockMvc.perform(post("/auth/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidRequest)))
+                .andExpect(status().isBadRequest());
+
+        verify(authService, never()).login(any(AuthRequest.class));
     }
 
     @Test

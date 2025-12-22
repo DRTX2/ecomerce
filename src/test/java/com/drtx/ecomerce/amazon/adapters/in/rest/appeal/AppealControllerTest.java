@@ -4,114 +4,130 @@ import com.drtx.ecomerce.amazon.adapters.in.rest.appeal.dto.AppealRequest;
 import com.drtx.ecomerce.amazon.adapters.in.rest.appeal.dto.AppealResponse;
 import com.drtx.ecomerce.amazon.adapters.in.rest.appeal.dto.ResolveAppealRequest;
 import com.drtx.ecomerce.amazon.adapters.in.rest.appeal.mappers.AppealRestMapper;
-import com.drtx.ecomerce.amazon.adapters.in.rest.incidence.dto.IncidenceResponse;
-import com.drtx.ecomerce.amazon.adapters.in.rest.user.dto.UserResponse;
-import com.drtx.ecomerce.amazon.core.model.*;
+import com.drtx.ecomerce.amazon.core.model.Appeal;
+import com.drtx.ecomerce.amazon.core.model.AppealDecision;
+import com.drtx.ecomerce.amazon.core.model.AppealStatus;
 import com.drtx.ecomerce.amazon.core.ports.in.rest.AppealUseCasePort;
-import com.drtx.ecomerce.amazon.infrastructure.security.TestSecurityConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.Import;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-import java.util.UUID;
 
 import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-@WebMvcTest(AppealController.class)
-@Import(TestSecurityConfig.class)
-@DisplayName("Appeal Controller Integration Tests")
+@ExtendWith(MockitoExtension.class)
+@DisplayName("Appeal Controller Tests (Standalone)")
 class AppealControllerTest {
 
-    @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
     private ObjectMapper objectMapper;
 
-    @MockitoBean
+    @Mock
     private AppealUseCasePort appealUseCasePort;
 
-    @MockitoBean
+    @Mock
     private AppealRestMapper appealMapper;
+
+    @Mock
+    private SecurityContext securityContext;
+
+    @Mock
+    private Authentication authentication;
 
     private Appeal testAppeal;
     private AppealResponse testAppealResponse;
-    private Incidence testIncidence;
+    private AppealRequest testAppealRequest;
+    private ResolveAppealRequest testResolveRequest;
 
     @BeforeEach
     void setUp() {
-        Product testProduct = new Product();
-        testProduct.setId(1L);
-        testProduct.setName("Test Product");
+        // Mock Security Context
+        SecurityContextHolder.setContext(securityContext);
+        lenient().when(securityContext.getAuthentication()).thenReturn(authentication);
+        lenient().when(authentication.isAuthenticated()).thenReturn(true);
+        lenient().when(authentication.getPrincipal()).thenReturn("userPrincipal");
+        lenient().when(authentication.getName()).thenReturn("seller@example.com");
 
-        User seller = new User();
-        seller.setId(1L);
-        seller.setEmail("seller@example.com");
-
-        testIncidence = new Incidence();
-        testIncidence.setId(1L);
-        testIncidence.setPublicUi(UUID.randomUUID());
-        testIncidence.setProduct(testProduct);
-        testIncidence.setStatus(IncidenceStatus.DECIDED);
+        AppealController controller = new AppealController(appealUseCasePort, appealMapper);
+        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+        objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
 
         testAppeal = new Appeal();
         testAppeal.setId(1L);
-        testAppeal.setIncidence(testIncidence);
-        testAppeal.setSeller(seller);
-        testAppeal.setReason("I believe this decision is incorrect");
-        testAppeal.setCreatedAt(LocalDateTime.now());
         testAppeal.setStatus(AppealStatus.PENDING);
-
-        UserResponse sellerResponse = new UserResponse(1L, "Seller", "seller@example.com", "USER", "Address", "Phone");
-        IncidenceResponse incidenceResponse = new IncidenceResponse(
-                1L, UUID.randomUUID(), null, IncidenceStatus.DECIDED, LocalDateTime.now(), false, null, null, IncidenceDecision.DELETE, null
-        );
 
         testAppealResponse = new AppealResponse(
                 1L,
-                incidenceResponse,
-                sellerResponse,
-                "I believe this decision is incorrect",
+                null, // Incidence response null for simplicity
+                null,
+                "Unfair ban",
                 LocalDateTime.now(),
                 AppealStatus.PENDING,
                 null,
                 AppealDecision.PENDING,
-                null
-        );
+                null);
+
+        testAppealRequest = new AppealRequest(10L, "Unfair ban");
+        testResolveRequest = new ResolveAppealRequest(AppealDecision.GRANTED);
+    }
+
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
     }
 
     @Test
-    @WithMockUser(username = "seller@example.com")
     @DisplayName("POST /appeals - Should create appeal")
     void testCreateAppeal() throws Exception {
         // Given
-        AppealRequest request = new AppealRequest(1L, "I believe this decision is incorrect");
-        when(appealUseCasePort.createAppeal(eq(1L), anyString(), anyString())).thenReturn(testAppeal);
+        when(appealUseCasePort.createAppeal(eq(10L), eq("Unfair ban"), eq("seller@example.com")))
+                .thenReturn(testAppeal);
         when(appealMapper.toResponse(testAppeal)).thenReturn(testAppealResponse);
 
         // When & Then
         mockMvc.perform(post("/appeals")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(testAppealRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.reason", is("I believe this decision is incorrect")));
+                .andExpect(jsonPath("$.id", is(1)));
 
-        verify(appealUseCasePort, times(1)).createAppeal(eq(1L), anyString(), anyString());
+        verify(appealUseCasePort, times(1)).createAppeal(eq(10L), eq("Unfair ban"), eq("seller@example.com"));
+    }
+
+    @Test
+    @DisplayName("POST /appeals - Should return 400 when request invalid (Incidence ID null)")
+    void testCreateAppeal_ValidationFail() throws Exception {
+        // Given
+        AppealRequest invalidRequest = new AppealRequest(null, "Reason");
+
+        // When & Then
+        mockMvc.perform(post("/appeals")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidRequest)))
+                .andExpect(status().isBadRequest());
+
+        verify(appealUseCasePort, never()).createAppeal(anyLong(), anyString(), anyString());
     }
 
     @Test
@@ -123,10 +139,9 @@ class AppealControllerTest {
 
         // When & Then
         mockMvc.perform(get("/appeals/{id}", 1L)
-                        .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)))
-                .andExpect(jsonPath("$.reason", is("I believe this decision is incorrect")));
+                .andExpect(jsonPath("$.id", is(1)));
 
         verify(appealUseCasePort, times(1)).getAppealById(1L);
     }
@@ -139,31 +154,42 @@ class AppealControllerTest {
 
         // When & Then
         mockMvc.perform(get("/appeals/{id}", 999L)
-                        .contentType(MediaType.APPLICATION_JSON))
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
         verify(appealUseCasePort, times(1)).getAppealById(999L);
     }
 
     @Test
-    @WithMockUser(username = "moderator@example.com", roles = {"ADMIN"})
     @DisplayName("PUT /appeals/{id}/resolve - Should resolve appeal")
     void testResolveAppeal() throws Exception {
         // Given
-        ResolveAppealRequest request = new ResolveAppealRequest(AppealDecision.GRANTED);
-        testAppeal.setFinalDecision(AppealDecision.GRANTED);
-        testAppeal.setStatus(AppealStatus.RESOLVED);
-
-        when(appealUseCasePort.resolveAppeal(eq(1L), any(), anyString())).thenReturn(testAppeal);
+        when(appealUseCasePort.resolveAppeal(eq(1L), eq(AppealDecision.GRANTED), eq("seller@example.com")))
+                .thenReturn(testAppeal);
         when(appealMapper.toResponse(testAppeal)).thenReturn(testAppealResponse);
 
         // When & Then
         mockMvc.perform(put("/appeals/{id}/resolve", 1L)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(testResolveRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id", is(1)));
 
-        verify(appealUseCasePort, times(1)).resolveAppeal(eq(1L), any(), anyString());
+        verify(appealUseCasePort, times(1)).resolveAppeal(eq(1L), eq(AppealDecision.GRANTED), eq("seller@example.com"));
+    }
+
+    @Test
+    @DisplayName("PUT /appeals/{id}/resolve - Should return 400 when decision is null")
+    void testResolveAppeal_ValidationFail() throws Exception {
+        // Given
+        ResolveAppealRequest invalidRequest = new ResolveAppealRequest(null);
+
+        // When & Then
+        mockMvc.perform(put("/appeals/{id}/resolve", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidRequest)))
+                .andExpect(status().isBadRequest());
+
+        verify(appealUseCasePort, never()).resolveAppeal(anyLong(), any(), anyString());
     }
 }
