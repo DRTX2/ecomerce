@@ -8,8 +8,8 @@
 ## ✅ Componentes Implementados
 
 ### Core (Dominio)
-- ✅ **Modelos:** User, Product, Order, Cart, Category, Favorite, Incidence, Appeal, Report
-- ✅ **Enums:** UserRole, OrderState, IncidenceStatus, IncidenceDecision, AppealStatus, AppealDecision, ReportSource
+- ✅ **Modelos:** User, Product, Order, Cart, Category, Favorite, Incidence, Appeal, Report, Payment, Shipping, Inventory, Review, Supplier, Discount, Notification, Return
+- ✅ **Enums:** UserRole, OrderState, IncidenceStatus, IncidenceDecision, AppealStatus, AppealDecision, ReportSource, PaymentStatus, PaymentMethod, ShippingStatus, DiscountType, NotificationType, NotificationStatus, ReturnStatus
 - ✅ **Puertos (Interfaces):** Todos los ports de entrada y salida definidos
 - ✅ **Tests unitarios de modelos:** Cart, Category, Order, Product, User, UserRole, OrderState
 
@@ -39,27 +39,31 @@
 
 **Prioridad:** 🔥 **ALTA** (Crítico para calidad)
 
-Faltan tests de integración para **TODOS** los controladores REST:
+Estado de tests de controladores REST:
 
-- ❌ `UserControllerTest.java`
-- ❌ `ProductControllerTest.java`
-- ❌ `OrderControllerTest.java`
-- ❌ `CartControllerTest.java`
-- ❌ `CategoryControllerTest.java`
-- ❌ `FavoriteControllerTest.java`
-- ❌ `IncidenceControllerTest.java`
-- ❌ `AppealControllerTest.java`
-- ❌ `AuthControllerTest.java`
+- ✅ `UserControllerTest.java` - **COMPLETADO**
+- ✅ `ProductControllerTest.java` - **COMPLETADO**
+- ✅ `OrderControllerTest.java` - **COMPLETADO**
+- ✅ `CartControllerTest.java` - **COMPLETADO**
+- ✅ `CategoryControllerTest.java` - **COMPLETADO**
+- ✅ `FavoriteControllerTest.java` - **COMPLETADO**
+- ✅ `IncidenceControllerTest.java` - **COMPLETADO**
+- ✅ `AppealControllerTest.java` - **COMPLETADO**
+- ✅ `AuthControllerTest.java` - **COMPLETADO**
+
+**Enfoque implementado:** MockMvc Standalone (sin Spring Context)
+- ✅ Tests más rápidos
+- ✅ Sin dependencias de BD o seguridad
+- ✅ Aislamiento total del controlador
 
 **Qué probar:**
 - Endpoints HTTP (GET, POST, PUT, DELETE)
 - Validaciones de request/response
 - Códigos de estado HTTP
 - Manejo de errores (404, 400, 500)
-- Seguridad y autenticación JWT
 - Serialización/deserialización JSON
 
-**Herramientas:** `@WebMvcTest`, `MockMvc`, `@SpringBootTest`
+**Herramientas:** `MockMvc`, `MockitoExtension`, `@Mock`
 
 ---
 
@@ -87,14 +91,14 @@ Faltan tests de integración para **TODOS** los controladores REST:
 
 Faltan tests de integración con base de datos para **TODOS** los repositorios:
 
-- ❌ `UserRepositoryAdapterTest.java`
-- ❌ `ProductRepositoryAdapterTest.java`
-- ❌ `OrderRepositoryAdapterTest.java`
-- ❌ `CartRepositoryAdapterTest.java`
-- ❌ `CategoryRepositoryAdapterTest.java`
-- ❌ `FavoriteRepositoryAdapterTest.java`
-- ❌ `IncidenceRepositoryAdapterTest.java`
-- ❌ `AppealRepositoryAdapterTest.java`
+- ✅ `UserRepositoryAdapterTest.java` - **COMPLETADO**
+- ✅ `ProductRepositoryAdapterTest.java` - **COMPLETADO**
+- ✅ `OrderRepositoryAdapterTest.java` - **COMPLETADO**
+- ✅ `CartRepositoryAdapterTest.java` - **COMPLETADO**
+- ✅ `CategoryRepositoryAdapterTest.java` - **COMPLETADO**
+- ✅ `FavoriteRepositoryAdapterTest.java` - **COMPLETADO**
+- ✅ `IncidenceRepositoryAdapterTest.java` - **COMPLETADO**
+- ✅ `AppealRepositoryAdapterTest.java` - **COMPLETADO**
 
 **Qué probar:**
 - Operaciones CRUD
@@ -107,151 +111,20 @@ Faltan tests de integración con base de datos para **TODOS** los repositorios:
 
 ---
 
-### 🟡 **4. Entidades del Dominio Faltantes**
+### ✅ **4. Entidades del Dominio Implementadas**
 
-**Prioridad:** 🟠 **MEDIA-ALTA** (Según roadmap del README.md)
+**Prioridad:** 🟢 **COMPLETADA**
 
-Según el documento `Docs/README.md`, faltan las siguientes entidades:
+Se han implementado el Dominio y la Persistencia (Entidad, Repositorio, Adapter, Mapper, Puerto) para:
 
-#### 4.1 **Payment (Pago)**
-- ❌ Modelo de dominio `Payment.java`
-- ❌ Enum `PaymentStatus` (PENDING, COMPLETED, FAILED)
-- ❌ Enum `PaymentMethod` (CARD, PAYPAL, TRANSFER)
-- ❌ `PaymentRepositoryPort` y adaptador
-- ❌ `PaymentUseCasePort` e implementación
-- ❌ Controlador REST/GraphQL
-- ❌ Tests
-
-**Atributos sugeridos:**
-```java
-- Long id
-- Order order
-- BigDecimal amount
-- PaymentStatus status
-- PaymentMethod method
-- LocalDateTime paymentDate
-```
-
-#### 4.2 **Shipping (Envío)**
-- ❌ Modelo de dominio `Shipping.java`
-- ❌ Enum `ShippingStatus` (PREPARING, SHIPPED, DELIVERED)
-- ❌ `ShippingRepositoryPort` y adaptador
-- ❌ `ShippingUseCasePort` e implementación
-- ❌ Controlador REST/GraphQL
-- ❌ Tests
-
-**Atributos sugeridos:**
-```java
-- Long id
-- Order order
-- String deliveryAddress
-- ShippingStatus status
-- String carrier
-- String trackingNumber
-- LocalDateTime estimatedDelivery
-```
-
-#### 4.3 **Inventory (Inventario)**
-- ❌ Modelo de dominio `Inventory.java`
-- ❌ `InventoryRepositoryPort` y adaptador
-- ❌ `InventoryUseCasePort` e implementación
-- ❌ Controlador REST/GraphQL
-- ❌ Tests
-
-**Atributos sugeridos:**
-```java
-- Long id
-- Product product
-- Integer availableQuantity
-- String warehouseLocation
-```
-
-#### 4.4 **Review & Rating (Reseñas)**
-- ❌ Modelo de dominio `Review.java`
-- ❌ `ReviewRepositoryPort` y adaptador
-- ❌ `ReviewUseCasePort` e implementación
-- ❌ Controlador REST/GraphQL
-- ❌ Tests
-
-**Atributos sugeridos:**
-```java
-- Long id
-- User user
-- Product product
-- Integer rating (1-5)
-- String comment
-- LocalDateTime createdAt
-```
-
-#### 4.5 **Supplier/Vendor (Proveedor)**
-- ❌ Modelo de dominio `Supplier.java`
-- ❌ `SupplierRepositoryPort` y adaptador
-- ❌ `SupplierUseCasePort` e implementación
-- ❌ Controlador REST/GraphQL
-- ❌ Tests
-
-**Atributos sugeridos:**
-```java
-- Long id
-- String name
-- String contact
-- List<Product> suppliedProducts
-```
-
-#### 4.6 **Discount & Promotion (Descuentos)**
-- ❌ Modelo de dominio `Discount.java`
-- ❌ Enum `DiscountType` (PERCENTAGE, FIXED)
-- ❌ `DiscountRepositoryPort` y adaptador
-- ❌ `DiscountUseCasePort` e implementación
-- ❌ Controlador REST/GraphQL
-- ❌ Tests
-
-**Atributos sugeridos:**
-```java
-- Long id
-- String code
-- DiscountType type
-- BigDecimal value
-- List<Product> applicableProducts
-- LocalDateTime expirationDate
-```
-
-#### 4.7 **Notification (Notificaciones)**
-- ❌ Modelo de dominio `Notification.java`
-- ❌ Enum `NotificationType` (ORDER, SHIPPING, PROMOTION)
-- ❌ Enum `NotificationStatus` (READ, UNREAD)
-- ❌ `NotificationRepositoryPort` y adaptador
-- ❌ `NotificationUseCasePort` e implementación
-- ❌ Controlador REST/GraphQL
-- ❌ Tests
-
-**Atributos sugeridos:**
-```java
-- Long id
-- User user
-- String message
-- NotificationType type
-- NotificationStatus status
-- LocalDateTime createdAt
-```
-
-#### 4.8 **Return (Devoluciones)**
-- ❌ Modelo de dominio `Return.java`
-- ❌ Enum `ReturnStatus` (PENDING, APPROVED, REJECTED)
-- ❌ `ReturnRepositoryPort` y adaptador
-- ❌ `ReturnUseCasePort` e implementación
-- ❌ Controlador REST/GraphQL
-- ❌ Tests
-
-**Atributos sugeridos:**
-```java
-- Long id
-- User user
-- Order order
-- String reason
-- ReturnStatus status
-- LocalDateTime requestedAt
-```
+- ✅ **Payment (Pago):** Status, Method, Relación con Order.
+- ✅ **Shipping (Envío):** Status, Carrier, Tracking, Relación con Order.
+- ✅ **Inventory (Inventario):** Quantity, Warehouse, Relación con Product.
+- ✅ **Review (Reseñas):** Rating, Comment, Relación User-Product.
+- ✅ **Supplier (Proveedor):** Contact, Relación con Products.
+- ✅ **Discount (Descuentos):** Type, Value, Expiration, Relación con Products.
+- ✅ **Notification (Notificaciones):** Type, Status, Relación con User.
+- ✅ **Return (Devoluciones):** Reason, Status, Relación User-Order.
 
 ---
 
@@ -338,49 +211,15 @@ Según `Docs/README.md` - **Proximamente:**
 
 | Categoría | Prioridad | Estado |
 |-----------|-----------|--------|
-| Tests de Controladores REST | 🔥 ALTA | ❌ Pendiente |
+| Tests de Controladores REST | 🔥 ALTA | ✅ Completado |
 | Tests de Controladores GraphQL | 🔥 ALTA | ❌ Pendiente |
-| Tests de Repositorios | 🔥 ALTA | ❌ Pendiente |
+| Tests de Repositorios | 🔥 ALTA | ✅ Completado |
 | Tests de Seguridad | 🟠 MEDIA-ALTA | ❌ Pendiente |
-| Entidades faltantes (Payment, Shipping, etc.) | 🟠 MEDIA-ALTA | ❌ Pendiente |
+| Entidades (Payment, Shipping, etc.) | 🟠 MEDIA-ALTA | ✅ Completado |
 | Tests E2E | 🟢 MEDIA | ❌ Pendiente |
 | Documentación API | 🟢 MEDIA-BAJA | ❌ Pendiente |
 | Infraestructura (CI/CD, Logs) | 🟢 MEDIA-BAJA | ❌ Pendiente |
 | Funcionalidades avanzadas | 🟢 BAJA | ❌ Futuro |
-
----
-
-## 🎯 Recomendación de Orden de Implementación
-
-### Fase 1: Calidad y Robustez (CRÍTICO)
-1. ✅ Tests de integración de controladores REST (8 controladores)
-2. ✅ Tests de integración de repositorios (8 repositorios)
-3. ✅ Tests de controladores GraphQL (2 controladores)
-4. ✅ Tests de seguridad (JWT, roles, autenticación)
-
-### Fase 2: Completar Funcionalidades Core (IMPORTANTE)
-5. ✅ Implementar entidad **Payment** (completa con tests)
-6. ✅ Implementar entidad **Shipping** (completa con tests)
-7. ✅ Implementar entidad **Review** (completa con tests)
-8. ✅ Implementar entidad **Discount** (completa con tests)
-
-### Fase 3: Funcionalidades Secundarias (RECOMENDADO)
-9. ✅ Implementar entidad **Inventory**
-10. ✅ Implementar entidad **Notification**
-11. ✅ Implementar entidad **Return**
-12. ✅ Implementar entidad **Supplier**
-
-### Fase 4: Infraestructura y DevOps (PRODUCCIÓN)
-13. ✅ Documentación de API (Swagger/OpenAPI)
-14. ✅ Configuración de perfiles y migraciones
-15. ✅ CI/CD pipeline
-16. ✅ Logging estructurado y monitoreo
-
-### Fase 5: Optimización y Escalabilidad (FUTURO)
-17. ✅ Tests E2E completos
-18. ✅ Colas de mensajes
-19. ✅ Caché distribuido (Redis)
-20. ✅ Notificaciones en tiempo real
 
 ---
 
@@ -408,4 +247,4 @@ Según `Docs/README.md` - **Proximamente:**
 
 ---
 
-**Última actualización:** 2025-12-20
+**Última actualización:** 2025-12-22
