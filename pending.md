@@ -1,3 +1,14 @@
+# ✅ COMPLETADO - Refactoring de Nomenclatura de Casos de Uso
+
+**Fecha de Completación:** 2025-12-19
+
+Se completó el refactoring de las implementaciones de casos de uso para seguir el patrón `*Impl`.
+Ver detalles en: [REFACTORING_SUMMARY.md](./REFACTORING_SUMMARY.md)
+
+---
+
+## 📝 Notas Anteriores sobre Auth y User
+
 Perfecto, ya veo el panorama. Lo que quieres hacer es separar el **registro de usuarios** del módulo general de `User` y ponerlo en `Auth`, manteniendo la arquitectura hexagonal. El problema principal que veo es **la confusión de mappers** y referencias entre `RegisterRequest`, `User`, `UserRestMapper` y `UserSecurityMapper`.
 
 Te hago un resumen de los pasos y ajustes necesarios para que tu `register` funcione limpio:
