@@ -8,6 +8,9 @@ public class Category {
     private String description;
     private List<Product> products;
 
+    public Category() {
+    }
+
     public Category(Long id, String name, String description, List<Product> products) {
         this.id = id;
         this.name = name;

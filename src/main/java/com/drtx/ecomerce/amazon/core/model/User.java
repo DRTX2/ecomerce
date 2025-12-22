@@ -8,7 +8,10 @@ public class User {
     private String address;
     private String phone;
     private UserRole role;
-//    private String orderList;
+    // private String orderList;
+
+    public User() {
+    }
 
     public User(Long id, String name, String email, String password, String address, String phone, UserRole role) {
         this.id = id;
