@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-public class OrderUseCasePort implements com.drtx.ecomerce.amazon.core.ports.in.rest.OrderUseCasePort {
+public class OrderUseCaseImpl implements com.drtx.ecomerce.amazon.core.ports.in.rest.OrderUseCasePort {
     private final OrderRepositoryPort repository;
 
     @Override

@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class CartUseCasePort implements com.drtx.ecomerce.amazon.core.ports.in.rest.CartUseCasePort {
+public class CartUseCaseImpl implements com.drtx.ecomerce.amazon.core.ports.in.rest.CartUseCasePort {
     private final CartRepositoryPort repositort;
 
     @Override

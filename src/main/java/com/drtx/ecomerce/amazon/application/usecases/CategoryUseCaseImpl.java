@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-public class CategoryUseCasePort implements com.drtx.ecomerce.amazon.core.ports.in.rest.CategoryUseCasePort {
+public class CategoryUseCaseImpl implements com.drtx.ecomerce.amazon.core.ports.in.rest.CategoryUseCasePort {
     private final CategoryRepositoryPort repository;
 
     @Override

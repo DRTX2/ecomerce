@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-public class ProductUseCasePort implements com.drtx.ecomerce.amazon.core.ports.in.rest.ProductUseCasePort {
+public class ProductUseCaseImpl implements com.drtx.ecomerce.amazon.core.ports.in.rest.ProductUseCasePort {
     private final ProductRepositoryPort repository;
 
     @Override
