@@ -18,13 +18,13 @@ public class CartRepositoryAdapter implements CartRepositoryPort {
     @Override
     public Cart save(Cart cart) {
         CartEntity entity = mapper.toEntity(cart);
-        entity=repository.save(entity);
+        entity = repository.save(entity);
         return mapper.toDomain(entity);
     }
 
     @Override
     public List<Cart> findAll(Long userId) {
-        return repository.findAll().stream().map(mapper::toDomain).toList();
+        return repository.findByUserId(userId).stream().map(mapper::toDomain).toList();
     }
 
     @Override
@@ -34,14 +34,15 @@ public class CartRepositoryAdapter implements CartRepositoryPort {
 
     @Override
     public Cart update(Cart cart) {
-        CartEntity entity= mapper.toEntity(cart);
-        entity=repository.save(entity);
+        CartEntity entity = mapper.toEntity(cart);
+        entity = repository.save(entity);
         return mapper.toDomain(entity);
     }
 
     @Override
     public void delete(Long id) {
-        if(repository.existsById(id)) throw new EntityNotFoundException("User not found; id="+id);
+        if (!repository.existsById(id))
+            throw new EntityNotFoundException("Cart not found; id=" + id);
         repository.deleteById(id);
     }
 }

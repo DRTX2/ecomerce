@@ -24,44 +24,36 @@ public class OrderController {
                 service.getAllOrders()
                         .stream()
                         .map(mapper::toResponse)
-                        .toList()
-        );
+                        .toList());
     }
 
     @PostMapping
-    public ResponseEntity<OrderResponse> createOrder(@RequestBody OrderRequest orderRequest){
+    public ResponseEntity<OrderResponse> createOrder(@RequestBody @jakarta.validation.Valid OrderRequest orderRequest) {
         Order orderToCreate = mapper.toDomain(orderRequest);
-        Order createdOrder=service.createOrder(orderToCreate);
+        Order createdOrder = service.createOrder(orderToCreate);
         return ResponseEntity.ok(mapper.toResponse(createdOrder));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<OrderResponse> findProductById(@PathVariable Long id) {
         return service.getOrderById(id)
-                    .map(mapper::toResponse)
-                    .map(ResponseEntity::ok)
-                    .orElse(ResponseEntity.notFound().build());
+                .map(mapper::toResponse)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<OrderResponse> updateOrder(@RequestBody OrderRequest orderRequest){
+    public ResponseEntity<OrderResponse> updateOrder(@PathVariable Long id,
+            @RequestBody @jakarta.validation.Valid OrderRequest orderRequest) {
         Order orderToUpdate = mapper.toDomain(orderRequest);
-        Order updatedOrder=service.updateOrder(orderToUpdate);
+        orderToUpdate.setId(id);
+        Order updatedOrder = service.updateOrder(orderToUpdate);
         return ResponseEntity.ok(mapper.toResponse(updatedOrder));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteOrderById(@PathVariable Long id){
+    public ResponseEntity<Void> deleteOrderById(@PathVariable Long id) {
         service.deleteOrder(id);
         return ResponseEntity.noContent().build();
     }
 }
-
-
-
-
-
-
-
-
-

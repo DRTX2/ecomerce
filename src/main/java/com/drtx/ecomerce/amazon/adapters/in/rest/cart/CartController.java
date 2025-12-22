@@ -23,31 +23,25 @@ public class CartController {
     public ResponseEntity<List<CartResponse>> getAllCategories() {
         List<Cart> carts = cartService.getAllCarts(1111L);
         return ResponseEntity.ok(
-                carts.
-                        stream().
-                        map(mapper::toResponse).
-                        toList()
-        );
+                carts.stream().map(mapper::toResponse).toList());
     }
 
     @PostMapping
-    public ResponseEntity<CartResponse> createcart(@RequestBody CartRequest cart) {
+    public ResponseEntity<CartResponse> createcart(@RequestBody @jakarta.validation.Valid CartRequest cart) {
         Cart newcart = mapper.toDomain(cart);
         return ResponseEntity.ok(mapper.toResponse(
-                cartService.createCart(newcart))
-        );
+                cartService.createCart(newcart)));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<CartResponse> getcartById(@PathVariable Long id) {
-        return cartService.
-                getCartById(id).map(mapper::toResponse).
-                map(ResponseEntity::ok).
-                orElse(ResponseEntity.notFound().build());
+        return cartService.getCartById(id).map(mapper::toResponse).map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CartResponse> updatecart(@PathVariable Long id, @RequestBody CartRequest CartRequest) {
+    public ResponseEntity<CartResponse> updatecart(@PathVariable Long id,
+            @RequestBody @jakarta.validation.Valid CartRequest CartRequest) {
         Cart cart = mapper.toDomain(CartRequest);
         return ResponseEntity.ok(mapper.toResponse(
                 cartService.updateCart(id, cart)));

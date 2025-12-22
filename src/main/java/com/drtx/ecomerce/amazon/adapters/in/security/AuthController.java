@@ -20,16 +20,15 @@ public class AuthController {
     private final UserSecurityMapper userSecurityMapper;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest request){
+    public ResponseEntity<AuthResponse> register(@RequestBody @jakarta.validation.Valid RegisterRequest request) {
         User user = userSecurityMapper.registerRequestToDomain(request);
-        return ResponseEntity.ok(userSecurityMapper.entityToResponse(authService.register(user) ) );
+        return ResponseEntity.ok(userSecurityMapper.entityToResponse(authService.register(user)));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody AuthRequest request) {
+    public ResponseEntity<AuthResponse> login(@RequestBody @jakarta.validation.Valid AuthRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
-
 
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(@RequestHeader("Authorization") String authHeader) {

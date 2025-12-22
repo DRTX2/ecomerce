@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Component
 @AllArgsConstructor
@@ -32,19 +33,17 @@ public class OrderRepositoryAdapter implements OrderRepositoryPort {
 
     @Override
     public List<Order> findAll() {
-        return repository.findAll().stream().map(orderMapper::toDomain).toList();
+        return repository.findAll().stream().map(orderMapper::toDomain).collect(Collectors.toList());
     }
 
     @Override
     public Order updateById(Order order) {
-        OrderEntity orderToUpdate = repository.findById(order.getId()).
-                orElseThrow(
-                        () -> new EntityNotFoundException("Order not found with id: " + order.getId())
-                );
+        OrderEntity orderToUpdate = repository.findById(order.getId()).orElseThrow(
+                () -> new EntityNotFoundException("Order not found with id: " + order.getId()));
         List<ProductEntity> products = order.getProducts()
                 .stream()
                 .map(productMapper::toEntity)
-                .toList();
+                .collect(Collectors.toList()); // Fixed: ensure mutable list
 
         orderToUpdate.setProducts(products);
         orderToUpdate.setOrderState(order.getState());

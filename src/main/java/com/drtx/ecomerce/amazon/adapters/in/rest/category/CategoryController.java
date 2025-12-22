@@ -22,39 +22,33 @@ public class CategoryController {
     public ResponseEntity<List<CategoryResponse>> getAllCategories() {
         List<Category> categories = categoryUseCasePort.getAllCategories();
         return ResponseEntity.ok(
-                categories.
-                        stream().
-                        map(categoryMapper::toResponse).
-                        toList()
-        );
+                categories.stream().map(categoryMapper::toResponse).toList());
     }
 
     @PostMapping
-    public ResponseEntity<CategoryResponse> createCategory(@RequestBody CategoryRequest category) {
+    public ResponseEntity<CategoryResponse> createCategory(
+            @RequestBody @jakarta.validation.Valid CategoryRequest category) {
         Category newCategory = categoryMapper.toDomain(category);
         return ResponseEntity.ok(categoryMapper.toResponse(
-                categoryUseCasePort.createCategory(newCategory))
-        );
+                categoryUseCasePort.createCategory(newCategory)));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable Long id) {
-        return categoryUseCasePort.
-                getCategoryById(id).
-                map(categoryMapper::toResponse).
-                map(ResponseEntity::ok).
-                orElse(ResponseEntity.notFound().build());
+        return categoryUseCasePort.getCategoryById(id).map(categoryMapper::toResponse).map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CategoryResponse> updateCategory(@PathVariable Long id, @RequestBody CategoryRequest categoryRequest){
-        Category category=categoryMapper.toDomain(categoryRequest);
+    public ResponseEntity<CategoryResponse> updateCategory(@PathVariable Long id,
+            @RequestBody @jakarta.validation.Valid CategoryRequest categoryRequest) {
+        Category category = categoryMapper.toDomain(categoryRequest);
         return ResponseEntity.ok(categoryMapper.toResponse(
-                        categoryUseCasePort.updateCategory(id,category)));
+                categoryUseCasePort.updateCategory(id, category)));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable  Long id){
+    public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
         categoryUseCasePort.deleteCategory(id);
         return ResponseEntity.noContent().build();
     }
