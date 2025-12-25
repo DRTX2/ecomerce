@@ -5,19 +5,20 @@ import java.util.List;
 public class Cart {
     private Long id;
     private User user;
-    private List<Product> products;
+    private List<CartItem> items;
 
-    public Cart(){
+    public Cart() {
     }
-    public Cart(User user, List<Product> products) {
+
+    public Cart(User user, List<CartItem> items) {
         this.user = user;
-        this.products = products;
+        this.items = items;
     }
 
-    public Cart(Long id, User user, List<Product> products) {
+    public Cart(Long id, User user, List<CartItem> items) {
         this.id = id;
         this.user = user;
-        this.products = products;
+        this.items = items;
     }
 
     public Long getId() {
@@ -36,11 +37,11 @@ public class Cart {
         this.user = user;
     }
 
-    public List<Product> getProducts() {
-        return products;
+    public List<CartItem> getItems() {
+        return items;
     }
 
-    public void setProducts(List<Product> products) {
-        this.products = products;
+    public void setItems(List<CartItem> items) {
+        this.items = items;
     }
 }

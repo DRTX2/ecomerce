@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 
 public class Return {
     private Long id;
-    private User user;
     private Order order;
     private String reason;
     private ReturnStatus status;
@@ -13,9 +12,8 @@ public class Return {
     public Return() {
     }
 
-    public Return(Long id, User user, Order order, String reason, ReturnStatus status, LocalDateTime requestedAt) {
+    public Return(Long id, Order order, String reason, ReturnStatus status, LocalDateTime requestedAt) {
         this.id = id;
-        this.user = user;
         this.order = order;
         this.reason = reason;
         this.status = status;
@@ -28,14 +26,6 @@ public class Return {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 
     public Order getOrder() {

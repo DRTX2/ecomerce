@@ -45,8 +45,7 @@ class OrderUseCaseImplTest {
                 "password123",
                 "123 Main St",
                 "555-0100",
-                UserRole.USER
-        );
+                UserRole.USER);
 
         testOrder = new Order(
                 1L,
@@ -56,8 +55,7 @@ class OrderUseCaseImplTest {
                 OrderState.PENDING,
                 LocalDateTime.now(),
                 null,
-                "CREDIT_CARD"
-        );
+                List.of());
     }
 
     @Test
@@ -72,8 +70,7 @@ class OrderUseCaseImplTest {
                 OrderState.PENDING,
                 LocalDateTime.now(),
                 null,
-                "DEBIT_CARD"
-        );
+                List.of());
 
         Order savedOrder = new Order(
                 2L,
@@ -83,8 +80,7 @@ class OrderUseCaseImplTest {
                 OrderState.PENDING,
                 newOrder.getCreatedAt(),
                 null,
-                "DEBIT_CARD"
-        );
+                List.of());
 
         when(orderRepositoryPort.save(any(Order.class))).thenReturn(savedOrder);
 
@@ -144,8 +140,7 @@ class OrderUseCaseImplTest {
                 OrderState.SENT,
                 LocalDateTime.now(),
                 null,
-                "PAYPAL"
-        );
+                List.of());
 
         Order order3 = new Order(
                 3L,
@@ -155,8 +150,7 @@ class OrderUseCaseImplTest {
                 OrderState.DELIVERED,
                 LocalDateTime.now().minusDays(5),
                 LocalDateTime.now(),
-                "CREDIT_CARD"
-        );
+                List.of());
 
         List<Order> orders = Arrays.asList(testOrder, order2, order3);
         when(orderRepositoryPort.findAll()).thenReturn(orders);
@@ -196,8 +190,7 @@ class OrderUseCaseImplTest {
                 OrderState.SENT,
                 testOrder.getCreatedAt(),
                 null,
-                "CREDIT_CARD"
-        );
+                List.of());
 
         when(orderRepositoryPort.updateById(any(Order.class))).thenReturn(updatedOrder);
 
@@ -208,7 +201,7 @@ class OrderUseCaseImplTest {
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(1L);
         assertThat(result.getTotal()).isEqualByComparingTo(new BigDecimal("349.99"));
-        assertThat(result.getState()).isEqualTo(OrderState.SENT);
+        assertThat(result.getOrderState()).isEqualTo(OrderState.SENT);
         verify(orderRepositoryPort, times(1)).updateById(updatedOrder);
     }
 

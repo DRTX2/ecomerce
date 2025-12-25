@@ -8,6 +8,8 @@ import com.drtx.ecomerce.amazon.core.model.OrderState;
 import com.drtx.ecomerce.amazon.core.model.Product;
 import com.drtx.ecomerce.amazon.core.model.User;
 import com.drtx.ecomerce.amazon.core.ports.in.rest.OrderUseCasePort;
+import com.drtx.ecomerce.amazon.adapters.in.rest.order.dto.OrderItemDto;
+import com.drtx.ecomerce.amazon.core.model.OrderItem;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -35,194 +37,188 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DisplayName("Order Controller Tests (Standalone)")
 class OrderControllerTest {
 
-    private MockMvc mockMvc;
-    private ObjectMapper objectMapper;
+        private MockMvc mockMvc;
+        private ObjectMapper objectMapper;
 
-    @Mock
-    private OrderUseCasePort orderUseCasePort;
+        @Mock
+        private OrderUseCasePort orderUseCasePort;
 
-    @Mock
-    private OrderRestMapper orderMapper;
+        @Mock
+        private OrderRestMapper orderMapper;
 
-    private Order testOrder;
-    private OrderRequest testOrderRequest;
-    private OrderResponse testOrderResponse;
+        private Order testOrder;
+        private OrderRequest testOrderRequest;
+        private OrderResponse testOrderResponse;
 
-    @BeforeEach
-    void setUp() {
-        OrderController controller = new OrderController(orderUseCasePort, orderMapper);
-        mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
-        objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
+        @BeforeEach
+        void setUp() {
+                OrderController controller = new OrderController(orderUseCasePort, orderMapper);
+                mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
+                objectMapper = new ObjectMapper();
+                objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
 
-        User testUser = new User();
-        testUser.setId(1L);
-        testUser.setName("John Doe");
+                User testUser = new User();
+                testUser.setId(1L);
+                testUser.setName("John Doe");
 
-        Product testProduct = new Product();
-        testProduct.setId(1L);
-        testProduct.setName("Test Product");
-        testProduct.setPrice(new BigDecimal("99.99"));
+                Product testProduct = new Product();
+                testProduct.setId(1L);
+                testProduct.setName("Test Product");
+                testProduct.setPrice(new BigDecimal("99.99"));
 
-        testOrder = new Order(
-                1L,
-                testUser,
-                Arrays.asList(testProduct),
-                new BigDecimal("99.99"),
-                OrderState.PENDING,
-                LocalDateTime.now(),
-                null,
-                "CREDIT_CARD");
+                OrderItem item = new OrderItem(1L, null, testProduct, 1, new BigDecimal("99.99"));
+                testOrder = new Order(
+                                1L,
+                                testUser,
+                                List.of(item),
+                                new BigDecimal("99.99"),
+                                OrderState.PENDING,
+                                LocalDateTime.now(),
+                                null,
+                                List.of());
 
-        testOrderRequest = new OrderRequest(
-                1L,
-                testUser,
-                Arrays.asList(testProduct),
-                new BigDecimal("99.99"),
-                OrderState.PENDING,
-                LocalDateTime.now(),
-                null,
-                "CREDIT_CARD");
+                OrderItemDto itemDto = new OrderItemDto(1L, 1, new BigDecimal("99.99"));
+                testOrderRequest = new OrderRequest(
+                                List.of(itemDto),
+                                new BigDecimal("99.99"),
+                                OrderState.PENDING,
+                                LocalDateTime.now(),
+                                null);
 
-        testOrderResponse = new OrderResponse();
-    }
+                testOrderResponse = new OrderResponse(1L, List.of(itemDto), new BigDecimal("99.99"), OrderState.PENDING,
+                                LocalDateTime.now(), null);
+        }
 
-    @Test
-    @DisplayName("GET /api/orders - Should return all orders")
-    void testGetAllOrders() throws Exception {
-        // Given
-        List<Order> orders = Arrays.asList(testOrder);
-        when(orderUseCasePort.getAllOrders()).thenReturn(orders);
-        when(orderMapper.toResponse(any(Order.class))).thenReturn(testOrderResponse);
+        @Test
+        @DisplayName("GET /api/orders - Should return all orders")
+        void testGetAllOrders() throws Exception {
+                // Given
+                List<Order> orders = Arrays.asList(testOrder);
+                when(orderUseCasePort.getAllOrders()).thenReturn(orders);
+                when(orderMapper.toResponse(any(Order.class))).thenReturn(testOrderResponse);
 
-        // When & Then
-        mockMvc.perform(get("/api/orders")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                // When & Then
+                mockMvc.perform(get("/api/orders")
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isOk());
 
-        verify(orderUseCasePort, times(1)).getAllOrders();
-    }
+                verify(orderUseCasePort, times(1)).getAllOrders();
+        }
 
-    @Test
-    @DisplayName("POST /api/orders - Should create new order")
-    void testCreateOrder() throws Exception {
-        // Given
-        when(orderMapper.toDomain(any(OrderRequest.class))).thenReturn(testOrder);
-        when(orderUseCasePort.createOrder(any(Order.class))).thenReturn(testOrder);
-        when(orderMapper.toResponse(testOrder)).thenReturn(testOrderResponse);
+        @Test
+        @DisplayName("POST /api/orders - Should create new order")
+        void testCreateOrder() throws Exception {
+                // Given
+                when(orderMapper.toDomain(any(OrderRequest.class))).thenReturn(testOrder);
+                when(orderUseCasePort.createOrder(any(Order.class))).thenReturn(testOrder);
+                when(orderMapper.toResponse(testOrder)).thenReturn(testOrderResponse);
 
-        // When & Then
-        mockMvc.perform(post("/api/orders")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(testOrderRequest)))
-                .andExpect(status().isOk());
+                // When & Then
+                mockMvc.perform(post("/api/orders")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(testOrderRequest)))
+                                .andExpect(status().isOk());
 
-        verify(orderUseCasePort, times(1)).createOrder(any(Order.class));
-    }
+                verify(orderUseCasePort, times(1)).createOrder(any(Order.class));
+        }
 
-    @Test
-    @DisplayName("POST /api/orders - Should return 400 when user is null")
-    void testCreateOrder_ValidationFail_NullUser() throws Exception {
-        // Given
-        OrderRequest invalidRequest = new OrderRequest(
-                1L,
-                null, // User is null, @NotNull violation
-                Arrays.asList(new Product()),
-                new BigDecimal("99.99"),
-                OrderState.PENDING,
-                LocalDateTime.now(),
-                null,
-                "CREDIT_CARD");
+        @Test
+        @DisplayName("POST /api/orders - Should return 400 when user is null")
+        void testCreateOrder_ValidationFail_NullUser() throws Exception {
+                // Given
+                OrderRequest invalidRequest = new OrderRequest(
+                                List.of(new OrderItemDto(1L, 1, BigDecimal.TEN)),
+                                null, // Total is null, @NotNull violation
+                                OrderState.PENDING,
+                                LocalDateTime.now(),
+                                null);
 
-        // When & Then
-        mockMvc.perform(post("/api/orders")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(invalidRequest)))
-                .andExpect(status().isBadRequest());
+                // When & Then
+                mockMvc.perform(post("/api/orders")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(invalidRequest)))
+                                .andExpect(status().isBadRequest());
 
-        verify(orderUseCasePort, never()).createOrder(any(Order.class));
-    }
+                verify(orderUseCasePort, never()).createOrder(any(Order.class));
+        }
 
-    @Test
-    @DisplayName("POST /api/orders - Should return 400 when products list is empty")
-    void testCreateOrder_ValidationFail_EmptyProducts() throws Exception {
-        // Given
-        OrderRequest invalidRequest = new OrderRequest(
-                1L,
-                new User(),
-                new ArrayList<>(), // Products empty, @NotEmpty violation
-                new BigDecimal("99.99"),
-                OrderState.PENDING,
-                LocalDateTime.now(),
-                null,
-                "CREDIT_CARD");
+        @Test
+        @DisplayName("POST /api/orders - Should return 400 when products list is empty")
+        void testCreateOrder_ValidationFail_EmptyProducts() throws Exception {
+                // Given
+                OrderRequest invalidRequest = new OrderRequest(
+                                new ArrayList<>(), // Items empty, @NotEmpty violation
+                                new BigDecimal("99.99"),
+                                OrderState.PENDING,
+                                LocalDateTime.now(),
+                                null);
 
-        // When & Then
-        mockMvc.perform(post("/api/orders")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(invalidRequest)))
-                .andExpect(status().isBadRequest());
+                // When & Then
+                mockMvc.perform(post("/api/orders")
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(invalidRequest)))
+                                .andExpect(status().isBadRequest());
 
-        verify(orderUseCasePort, never()).createOrder(any(Order.class));
-    }
+                verify(orderUseCasePort, never()).createOrder(any(Order.class));
+        }
 
-    @Test
-    @DisplayName("GET /api/orders/{id} - Should return order when found")
-    void testGetOrderById_Found() throws Exception {
-        // Given
-        when(orderUseCasePort.getOrderById(1L)).thenReturn(Optional.of(testOrder));
-        when(orderMapper.toResponse(testOrder)).thenReturn(testOrderResponse);
+        @Test
+        @DisplayName("GET /api/orders/{id} - Should return order when found")
+        void testGetOrderById_Found() throws Exception {
+                // Given
+                when(orderUseCasePort.getOrderById(1L)).thenReturn(Optional.of(testOrder));
+                when(orderMapper.toResponse(testOrder)).thenReturn(testOrderResponse);
 
-        // When & Then
-        mockMvc.perform(get("/api/orders/{id}", 1L)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+                // When & Then
+                mockMvc.perform(get("/api/orders/{id}", 1L)
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isOk());
 
-        verify(orderUseCasePort, times(1)).getOrderById(1L);
-    }
+                verify(orderUseCasePort, times(1)).getOrderById(1L);
+        }
 
-    @Test
-    @DisplayName("GET /api/orders/{id} - Should return 404 when order not found")
-    void testGetOrderById_NotFound() throws Exception {
-        // Given
-        when(orderUseCasePort.getOrderById(999L)).thenReturn(Optional.empty());
+        @Test
+        @DisplayName("GET /api/orders/{id} - Should return 404 when order not found")
+        void testGetOrderById_NotFound() throws Exception {
+                // Given
+                when(orderUseCasePort.getOrderById(999L)).thenReturn(Optional.empty());
 
-        // When & Then
-        mockMvc.perform(get("/api/orders/{id}", 999L)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNotFound());
+                // When & Then
+                mockMvc.perform(get("/api/orders/{id}", 999L)
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isNotFound());
 
-        verify(orderUseCasePort, times(1)).getOrderById(999L);
-    }
+                verify(orderUseCasePort, times(1)).getOrderById(999L);
+        }
 
-    @Test
-    @DisplayName("PUT /api/orders/{id} - Should update order")
-    void testUpdateOrder() throws Exception {
-        // Given
-        when(orderMapper.toDomain(any(OrderRequest.class))).thenReturn(testOrder);
-        when(orderUseCasePort.updateOrder(any(Order.class))).thenReturn(testOrder);
-        when(orderMapper.toResponse(testOrder)).thenReturn(testOrderResponse);
+        @Test
+        @DisplayName("PUT /api/orders/{id} - Should update order")
+        void testUpdateOrder() throws Exception {
+                // Given
+                when(orderMapper.toDomain(any(OrderRequest.class))).thenReturn(testOrder);
+                when(orderUseCasePort.updateOrder(any(Order.class))).thenReturn(testOrder);
+                when(orderMapper.toResponse(testOrder)).thenReturn(testOrderResponse);
 
-        // When & Then
-        mockMvc.perform(put("/api/orders/{id}", 1L)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(testOrderRequest)))
-                .andExpect(status().isOk());
+                // When & Then
+                mockMvc.perform(put("/api/orders/{id}", 1L)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(testOrderRequest)))
+                                .andExpect(status().isOk());
 
-        verify(orderUseCasePort, times(1)).updateOrder(any(Order.class));
-    }
+                verify(orderUseCasePort, times(1)).updateOrder(any(Order.class));
+        }
 
-    @Test
-    @DisplayName("DELETE /api/orders/{id} - Should delete order")
-    void testDeleteOrder() throws Exception {
-        // Given
-        doNothing().when(orderUseCasePort).deleteOrder(1L);
+        @Test
+        @DisplayName("DELETE /api/orders/{id} - Should delete order")
+        void testDeleteOrder() throws Exception {
+                // Given
+                doNothing().when(orderUseCasePort).deleteOrder(1L);
 
-        // When & Then
-        mockMvc.perform(delete("/api/orders/{id}", 1L)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isNoContent());
+                // When & Then
+                mockMvc.perform(delete("/api/orders/{id}", 1L)
+                                .contentType(MediaType.APPLICATION_JSON))
+                                .andExpect(status().isNoContent());
 
-        verify(orderUseCasePort, times(1)).deleteOrder(1L);
-    }
+                verify(orderUseCasePort, times(1)).deleteOrder(1L);
+        }
 }

@@ -4,6 +4,8 @@ import com.drtx.ecomerce.amazon.adapters.in.rest.cart.dtos.CartRequest;
 import com.drtx.ecomerce.amazon.adapters.in.rest.cart.dtos.CartResponse;
 import com.drtx.ecomerce.amazon.adapters.in.rest.cart.mappers.CartRestMapper;
 import com.drtx.ecomerce.amazon.core.model.Cart;
+import com.drtx.ecomerce.amazon.adapters.in.rest.cart.dtos.CartItemDto;
+import com.drtx.ecomerce.amazon.core.model.CartItem;
 import com.drtx.ecomerce.amazon.core.model.Product;
 import com.drtx.ecomerce.amazon.core.ports.in.rest.CartUseCasePort;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -61,11 +63,13 @@ class CartControllerTest {
 
         testCart = new Cart();
         testCart.setId(1L);
-        testCart.setProducts(Arrays.asList(testProduct));
+        CartItem cartItem = new CartItem(1L, testCart, testProduct, 1);
+        testCart.setItems(List.of(cartItem));
 
-        testCartRequest = new CartRequest(Arrays.asList(1L));
+        CartItemDto cartItemDto = new CartItemDto(1L, 1);
+        testCartRequest = new CartRequest(List.of(cartItemDto));
 
-        testCartResponse = new CartResponse(1L, Arrays.asList(testProduct));
+        testCartResponse = new CartResponse(1L, List.of(cartItemDto));
     }
 
     @Test

@@ -73,18 +73,17 @@ class OrderRepositoryAdapterTest {
                                 .save(new UserEntity(null, "User", "email@test.com", "pass", "addr", "123", null));
                 CategoryEntity cat = categoryRepository.save(new CategoryEntity(null, "C", null, null));
                 ProductEntity prod = productRepository
-                                .save(new ProductEntity(null, "P", "D", BigDecimal.ONE, 1, cat, BigDecimal.ONE, null));
+                                .save(new ProductEntity(null, "P", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null));
 
-                Order order = new Order(null, null, Collections.singletonList(new Product()), BigDecimal.TEN,
-                                OrderState.PENDING, LocalDateTime.now(), null, "CARD");
+                Order order = new Order(null, null, List.of(), BigDecimal.TEN,
+                                OrderState.PENDING, LocalDateTime.now(), null, List.of());
 
                 OrderEntity entity = new OrderEntity();
                 entity.setUser(user);
-                entity.setProducts(Collections.singletonList(prod));
+                entity.setItems(Collections.emptyList());
                 entity.setTotal(BigDecimal.TEN);
                 entity.setOrderState(OrderState.PENDING);
                 entity.setCreatedAt(LocalDateTime.now());
-                entity.setPaymentType("CARD");
 
                 when(orderMapper.toEntity(order)).thenReturn(entity);
                 when(orderMapper.toDomain(any(OrderEntity.class))).thenAnswer(inv -> {
@@ -99,7 +98,7 @@ class OrderRepositoryAdapterTest {
                 assertThat(savedOrder.getId()).isNotNull();
                 OrderEntity fromDb = orderRepository.findById(savedOrder.getId()).orElseThrow();
                 assertThat(fromDb.getUser().getId()).isEqualTo(user.getId());
-                assertThat(fromDb.getProducts()).hasSize(1);
+                assertThat(fromDb.getItems()).isEmpty();
         }
 
         @Test
@@ -113,11 +112,10 @@ class OrderRepositoryAdapterTest {
                 entity.setTotal(BigDecimal.TEN);
                 entity.setOrderState(OrderState.PENDING);
                 entity.setCreatedAt(LocalDateTime.now());
-                entity.setPaymentType("CASH");
-                entity.setProducts(Collections.emptyList());
+                entity.setItems(Collections.emptyList());
                 entity = orderRepository.save(entity);
 
-                Order domain = new Order(entity.getId(), null, null, null, null, null, null, null);
+                Order domain = new Order(entity.getId(), null, null, null, null, null, null, List.of());
 
                 when(orderMapper.toDomain(any(OrderEntity.class))).thenReturn(domain);
 
@@ -134,13 +132,15 @@ class OrderRepositoryAdapterTest {
                 // Given
                 UserEntity user = userRepository
                                 .save(new UserEntity(null, "User3", "email3@test.com", "pass", "addr", "123", null));
-                orderRepository.save(new OrderEntity(null, user, Collections.emptyList(), BigDecimal.ONE,
-                                OrderState.PENDING, LocalDateTime.now(), null, "CASH"));
-                orderRepository.save(new OrderEntity(null, user, Collections.emptyList(), BigDecimal.ONE,
-                                OrderState.SENT, LocalDateTime.now(), null, "CASH"));
+                orderRepository.save(new OrderEntity(null, user, Collections.emptyList(), Collections.emptyList(),
+                                BigDecimal.ONE,
+                                OrderState.PENDING, LocalDateTime.now(), null));
+                orderRepository.save(new OrderEntity(null, user, Collections.emptyList(), Collections.emptyList(),
+                                BigDecimal.ONE,
+                                OrderState.SENT, LocalDateTime.now(), null));
 
                 when(orderMapper.toDomain(any(OrderEntity.class)))
-                                .thenReturn(new Order(null, null, null, null, null, null, null, null));
+                                .thenReturn(new Order(null, null, null, null, null, null, null, List.of()));
 
                 // When
                 List<Order> all = adapter.findAll();
@@ -157,31 +157,31 @@ class OrderRepositoryAdapterTest {
                                 .save(new UserEntity(null, "User4", "email4@test.com", "pass", "addr", "123", null));
                 CategoryEntity cat = categoryRepository.save(new CategoryEntity(null, "C2", null, null));
                 ProductEntity prod = productRepository
-                                .save(new ProductEntity(null, "P2", "D", BigDecimal.ONE, 1, cat, BigDecimal.ONE, null));
+                                .save(new ProductEntity(null, "P2", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null));
 
                 OrderEntity entity = orderRepository.save(new OrderEntity(null, user, Collections.emptyList(),
-                                BigDecimal.ONE, OrderState.PENDING, LocalDateTime.now(), null, "CASH"));
+                                Collections.emptyList(), BigDecimal.ONE, OrderState.PENDING, LocalDateTime.now(),
+                                null));
 
                 Product domainProduct = new Product();
                 domainProduct.setId(prod.getId());
 
-                Order updateData = new Order(entity.getId(), null, Collections.singletonList(domainProduct),
-                                BigDecimal.valueOf(20), OrderState.SENT, null, null, "CARD");
+                Order updateData = new Order(entity.getId(), null, List.of(),
+                                BigDecimal.valueOf(20), OrderState.SENT, null, null, List.of());
 
                 when(productMapper.toEntity(any(Product.class))).thenReturn(prod);
                 when(orderMapper.toDomain(any(OrderEntity.class))).thenAnswer(inv -> {
                         OrderEntity e = inv.getArgument(0);
-                        return new Order(e.getId(), null, null, null, e.getOrderState(), null, null, null);
+                        return new Order(e.getId(), null, null, null, e.getOrderState(), null, null, List.of());
                 });
 
                 // When
                 Order updated = adapter.updateById(updateData);
 
                 // Then
-                assertThat(updated.getState()).isEqualTo(OrderState.SENT);
+                assertThat(updated.getOrderState()).isEqualTo(OrderState.SENT);
                 OrderEntity fromDb = orderRepository.findById(entity.getId()).orElseThrow();
                 assertThat(fromDb.getOrderState()).isEqualTo(OrderState.SENT);
-                assertThat(fromDb.getProducts()).hasSize(1);
         }
 
         @Test
@@ -191,7 +191,8 @@ class OrderRepositoryAdapterTest {
                 UserEntity user = userRepository
                                 .save(new UserEntity(null, "User5", "email5@test.com", "pass", "addr", "123", null));
                 OrderEntity entity = orderRepository.save(new OrderEntity(null, user, Collections.emptyList(),
-                                BigDecimal.ONE, OrderState.PENDING, LocalDateTime.now(), null, "CASH"));
+                                Collections.emptyList(), BigDecimal.ONE, OrderState.PENDING, LocalDateTime.now(),
+                                null));
 
                 // When
                 adapter.delete(entity.getId());

@@ -5,7 +5,6 @@ import com.drtx.ecomerce.amazon.adapters.out.persistence.order.OrderPersistenceR
 import com.drtx.ecomerce.amazon.adapters.out.persistence.user.UserEntity;
 import com.drtx.ecomerce.amazon.adapters.out.persistence.user.UserPersistenceRepository;
 import com.drtx.ecomerce.amazon.core.model.*;
-import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,8 +56,9 @@ class PaymentRepositoryAdapterTest {
     void testSave() {
         // Given
         UserEntity user = userRepository.save(new UserEntity(null, "UserP", "p@mail.com", "pass", "addr", "1", null));
-        OrderEntity order = new OrderEntity(null, user, Collections.emptyList(), BigDecimal.TEN, OrderState.PENDING,
-                LocalDateTime.now(), null, "CARD");
+        OrderEntity order = new OrderEntity(null, user, Collections.emptyList(), Collections.emptyList(),
+                BigDecimal.TEN, OrderState.PENDING,
+                LocalDateTime.now(), null);
         order = orderRepository.save(order);
 
         Payment payment = new Payment(null, null, BigDecimal.TEN, PaymentStatus.PENDING, PaymentMethod.CREDIT_CARD,

@@ -7,22 +7,23 @@ import java.util.List;
 public class Order {
     private Long id;
     private User user;
-    private List<Product> products;
+    private List<OrderItem> items;
     private BigDecimal total;
     private OrderState orderState;
     private LocalDateTime createdAt;
     private LocalDateTime deliveredAt;
-    private String paymentType;
+    private List<Discount> appliedDiscounts;
 
-    public Order(Long id, User user, List<Product> products, BigDecimal total, OrderState orderState, LocalDateTime createdAt, LocalDateTime deliveredAt, String paymentType) {
+    public Order(Long id, User user, List<OrderItem> items, BigDecimal total, OrderState orderState,
+            LocalDateTime createdAt, LocalDateTime deliveredAt, List<Discount> appliedDiscounts) {
         this.id = id;
         this.user = user;
-        this.products = products;
+        this.items = items;
         this.total = total;
         this.orderState = orderState;
         this.createdAt = createdAt;
         this.deliveredAt = deliveredAt;
-        this.paymentType = paymentType;
+        this.appliedDiscounts = appliedDiscounts;
     }
 
     public Long getId() {
@@ -41,12 +42,12 @@ public class Order {
         this.user = user;
     }
 
-    public List<Product> getProducts() {
-        return products;
+    public List<OrderItem> getItems() {
+        return items;
     }
 
-    public void setProducts(List<Product> products) {
-        this.products = products;
+    public void setItems(List<OrderItem> items) {
+        this.items = items;
     }
 
     public BigDecimal getTotal() {
@@ -57,11 +58,11 @@ public class Order {
         this.total = total;
     }
 
-    public OrderState getState() {
+    public OrderState getOrderState() {
         return orderState;
     }
 
-    public void setState(OrderState orderState) {
+    public void setOrderState(OrderState orderState) {
         this.orderState = orderState;
     }
 
@@ -81,11 +82,11 @@ public class Order {
         this.deliveredAt = deliveredAt;
     }
 
-    public String getPaymentType() {
-        return paymentType;
+    public List<Discount> getAppliedDiscounts() {
+        return appliedDiscounts;
     }
 
-    public void setPaymentType(String paymentType) {
-        this.paymentType = paymentType;
+    public void setAppliedDiscounts(List<Discount> appliedDiscounts) {
+        this.appliedDiscounts = appliedDiscounts;
     }
 }

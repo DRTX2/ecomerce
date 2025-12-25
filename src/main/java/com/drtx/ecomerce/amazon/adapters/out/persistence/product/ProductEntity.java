@@ -27,17 +27,14 @@ public class ProductEntity {
     @Column(nullable = false)
     private String description;
 
-    @Column(precision=19, scale=2)
+    @Column(precision = 19, scale = 2)
     private BigDecimal price;
 
-    @Column(nullable = false)
-    private Integer stock;
-
     @ManyToOne
-    @JoinColumn(name="category_id")
+    @JoinColumn(name = "category_id")
     private CategoryEntity category;
 
-    @Column(precision=3, scale=2)
+    @Column(precision = 3, scale = 2)
     private BigDecimal averageRating;
 
     @OneToMany

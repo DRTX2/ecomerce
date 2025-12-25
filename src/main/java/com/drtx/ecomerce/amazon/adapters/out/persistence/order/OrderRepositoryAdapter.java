@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
 public class OrderRepositoryAdapter implements OrderRepositoryPort {
     private final OrderPersistenceRepository repository;
     private final OrderPersistenceMapper orderMapper;
-    private final ProductPersistenceMapper productMapper;
 
     @Override
     public Order save(Order order) {
@@ -38,21 +37,26 @@ public class OrderRepositoryAdapter implements OrderRepositoryPort {
 
     @Override
     public Order updateById(Order order) {
-        OrderEntity orderToUpdate = repository.findById(order.getId()).orElseThrow(
+        final OrderEntity orderToUpdate = repository.findById(order.getId()).orElseThrow(
                 () -> new EntityNotFoundException("Order not found with id: " + order.getId()));
-        List<ProductEntity> products = order.getProducts()
-                .stream()
-                .map(productMapper::toEntity)
-                .collect(Collectors.toList()); // Fixed: ensure mutable list
 
-        orderToUpdate.setProducts(products);
-        orderToUpdate.setOrderState(order.getState());
+        // We update the entity with domain values
+        orderToUpdate.setOrderState(order.getOrderState());
         orderToUpdate.setDeliveredAt(order.getDeliveredAt());
         orderToUpdate.setTotal(order.getTotal());
-        orderToUpdate.setPaymentType(order.getPaymentType());
 
-        orderToUpdate = repository.save(orderToUpdate);
-        return orderMapper.toDomain(orderToUpdate);
+        // Update items if provided (simplified for now, ideally careful merge)
+        if (order.getItems() != null) {
+            List<OrderItemEntity> itemEntities = order.getItems().stream()
+                    .map(orderMapper::toEntity)
+                    .peek(item -> item.setOrder(orderToUpdate))
+                    .collect(Collectors.toList());
+            orderToUpdate.getItems().clear();
+            orderToUpdate.getItems().addAll(itemEntities);
+        }
+
+        OrderEntity saved = repository.save(orderToUpdate);
+        return orderMapper.toDomain(saved);
     }
 
     @Override

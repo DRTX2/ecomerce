@@ -11,12 +11,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public record OrderRequest(
-                Long id,
-                @NotNull User user,
-                @NotEmpty List<Product> products,
+
+                @NotEmpty List<OrderItemDto> items,
                 @NotNull BigDecimal total,
                 @NotNull OrderState orderState,
                 LocalDateTime createdAt,
-                LocalDateTime deliveredAt,
-                String paymentType) {
+                LocalDateTime deliveredAt) {
 }

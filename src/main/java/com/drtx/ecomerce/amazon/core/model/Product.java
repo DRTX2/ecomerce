@@ -10,7 +10,6 @@ public class Product {
     private String name;
     private String description;
     private BigDecimal price;
-    private Integer stock;
     private Category category;
     private BigDecimal averageRating;
     private List<String> images;
@@ -18,12 +17,13 @@ public class Product {
     public Product() {
     }
 
-    public Product(Long id, String name, String description, BigDecimal price, Integer stock, Category category, BigDecimal averageRating, List<String> images) {
+    public Product(Long id, String name, String description, BigDecimal price, Category category,
+            BigDecimal averageRating, List<String> images) {
         this.id = id;
         this.name = name;
         this.description = description;
         this.price = price;
-        this.stock = stock;
+        this.price = price;
         this.category = category;
         this.averageRating = averageRating;
         this.images = images;
@@ -61,14 +61,6 @@ public class Product {
         this.price = price;
     }
 
-    public Integer getStock() {
-        return stock;
-    }
-
-    public void setStock(Integer stock) {
-        this.stock = stock;
-    }
-
     public Category getCategory() {
         return category;
     }
@@ -93,11 +85,11 @@ public class Product {
         this.images = images;
     }
 
-    public void validate(){
-        if(this.name == null || this.name.isBlank()){
+    public void validate() {
+        if (this.name == null || this.name.isBlank()) {
             throw new DomainException("Product name cannot be null or blank");
         }
-        if(price.compareTo(BigDecimal.ZERO) < 0){
+        if (price.compareTo(BigDecimal.ZERO) < 0) {
             throw new DomainException("Product price cannot be negative");
         }
     }

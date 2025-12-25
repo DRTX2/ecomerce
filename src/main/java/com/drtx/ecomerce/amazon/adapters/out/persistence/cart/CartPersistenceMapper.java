@@ -4,21 +4,25 @@ import com.drtx.ecomerce.amazon.adapters.out.persistence.product.ProductMapperHe
 import com.drtx.ecomerce.amazon.adapters.out.persistence.product.ProductPersistenceMapper;
 import com.drtx.ecomerce.amazon.adapters.out.persistence.user.UserPersistenceMapper;
 import com.drtx.ecomerce.amazon.core.model.Cart;
+import com.drtx.ecomerce.amazon.core.model.CartItem;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import java.util.List;
-
-@Mapper(
-        componentModel = "spring",
-        uses = {
-            ProductPersistenceMapper.class,
-                ProductMapperHelper.class,
-            UserPersistenceMapper.class
-        })
+@Mapper(componentModel = "spring", uses = {
+        ProductPersistenceMapper.class,
+        ProductMapperHelper.class,
+        UserPersistenceMapper.class
+})
 public interface CartPersistenceMapper {
-    @Mapping(source = "products", target = "products", qualifiedByName = "mapToProducts")
+    @Mapping(target = "items", source = "items")
     Cart toDomain(CartEntity entity);
-    @Mapping(source = "products", target = "products", qualifiedByName = "mapToProductEntities")
+
+    @Mapping(target = "items", source = "items")
     CartEntity toEntity(Cart domain);
+
+    @Mapping(target = "cart", ignore = true)
+    CartItem toDomain(CartItemEntity entity);
+
+    @Mapping(target = "cart", ignore = true)
+    CartItemEntity toEntity(CartItem domain);
 }

@@ -7,8 +7,7 @@ import com.drtx.ecomerce.amazon.adapters.out.persistence.product.ProductPersiste
 import com.drtx.ecomerce.amazon.adapters.out.persistence.user.UserEntity;
 import com.drtx.ecomerce.amazon.adapters.out.persistence.user.UserPersistenceRepository;
 import com.drtx.ecomerce.amazon.core.model.Cart;
-import com.drtx.ecomerce.amazon.core.model.Product;
-import jakarta.persistence.EntityNotFoundException;
+import com.drtx.ecomerce.amazon.core.model.Cart;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +22,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -68,8 +67,8 @@ class CartRepositoryAdapterTest {
         userEntity = userRepository.save(userEntity);
 
         CategoryEntity cat = categoryRepository.save(new CategoryEntity(null, "C", null, null));
-        ProductEntity prod = productRepository
-                .save(new ProductEntity(null, "P", "D", BigDecimal.ONE, 1, cat, BigDecimal.ONE, null));
+        productRepository
+                .save(new ProductEntity(null, "P", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null));
 
         Cart cart = new Cart();
 
@@ -77,7 +76,7 @@ class CartRepositoryAdapterTest {
         entity.setUser(userEntity);
         // Important: Cart entity cascade logic.
         // If we set prod in CartEntity, ID must be managed.
-        entity.setProducts(Collections.singletonList(prod));
+        entity.setItems(Collections.emptyList());
 
         when(mapper.toEntity(cart)).thenReturn(entity);
         when(mapper.toDomain(any(CartEntity.class))).thenAnswer(inv -> {
@@ -94,7 +93,7 @@ class CartRepositoryAdapterTest {
         assertThat(savedCart.getId()).isNotNull();
         CartEntity fromDb = cartRepository.findById(savedCart.getId()).orElseThrow();
         assertThat(fromDb.getUser().getEmail()).isEqualTo("cartuser@example.com");
-        assertThat(fromDb.getProducts()).hasSize(1);
+        assertThat(fromDb.getItems()).isEmpty();
     }
 
     @Test

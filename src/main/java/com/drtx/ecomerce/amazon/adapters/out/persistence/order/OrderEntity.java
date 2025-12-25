@@ -1,9 +1,9 @@
 package com.drtx.ecomerce.amazon.adapters.out.persistence.order;
 
-import com.drtx.ecomerce.amazon.adapters.out.persistence.product.ProductEntity;
+import com.drtx.ecomerce.amazon.adapters.out.persistence.discount.DiscountEntity;
+
 import com.drtx.ecomerce.amazon.adapters.out.persistence.user.UserEntity;
 import com.drtx.ecomerce.amazon.core.model.OrderState;
-import com.drtx.ecomerce.amazon.core.model.Product;
 import com.drtx.ecomerce.amazon.core.model.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Table(name="orders")
+@Table(name = "orders")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -30,13 +30,12 @@ public class OrderEntity {
     @JoinColumn(name = "user_id")
     private UserEntity user;
 
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OrderItemEntity> items;
+
     @ManyToMany
-    @JoinTable( //intermediate table
-            name = "order_products",
-            joinColumns = @JoinColumn(name="order_id"),//column that map this entity(foreign key)
-            inverseJoinColumns = @JoinColumn(name = "product_id")//columdn that points to the another entity(products)
-    )
-    private List<ProductEntity> products;
+    @JoinTable(name = "order_discounts", joinColumns = @JoinColumn(name = "order_id"), inverseJoinColumns = @JoinColumn(name = "discount_id"))
+    private List<DiscountEntity> discounts;
 
     @Column(precision = 19, scale = 2)
     private BigDecimal total;
@@ -50,6 +49,4 @@ public class OrderEntity {
 
     private LocalDateTime deliveredAt;
 
-    @Column(nullable = false)
-    private String paymentType;
 }

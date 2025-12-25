@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+
 @Entity
 @Table(name = "carts")
 @Getter
@@ -22,7 +23,6 @@ public class CartEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private UserEntity user;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "cart_id")
-    private List<ProductEntity> products;
+    @OneToMany(mappedBy = "cart", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<CartItemEntity> items;
 }

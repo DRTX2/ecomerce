@@ -6,7 +6,6 @@ import jakarta.validation.constraints.NotEmpty;
 import java.util.List;
 
 public record CartResponse(
-        Long id,
-        @NotEmpty List<Product> products
-) {
+                Long id,
+                @NotEmpty List<CartItemDto> items) {
 }

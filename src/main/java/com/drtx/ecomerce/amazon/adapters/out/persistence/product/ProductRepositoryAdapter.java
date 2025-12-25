@@ -43,15 +43,13 @@ public class ProductRepositoryAdapter implements ProductRepositoryPort {
         productToUpdate.setName(product.getName());
         productToUpdate.setDescription(product.getDescription());
         productToUpdate.setPrice(product.getPrice());
-        productToUpdate.setStock(product.getStock());
         productToUpdate.setAverageRating(product.getAverageRating());
 
         List<ProductImageEntity> images = mapperHelper.mapToEntities(product.getImages());
         productToUpdate.setImages(images);
 
         CategoryEntity categoryEntity = categoryPersistenceRepository.findById(
-                    product.getCategory().getId()
-                )
+                product.getCategory().getId())
                 .orElseThrow(() -> new EntityNotFoundException("Category not found"));
         productToUpdate.setCategory(categoryEntity);// categoryEntity!=Category
         return mapper.toDomain(productPersistenceRepository.save(productToUpdate));

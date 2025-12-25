@@ -69,7 +69,6 @@ class ProductRepositoryAdapterTest {
         ProductEntity entity = new ProductEntity();
         entity.setName("Laptop");
         entity.setPrice(new BigDecimal("999.99"));
-        entity.setStock(10);
         entity.setDescription("Desc");
         entity.setCategory(categoryEntity);
 
@@ -104,7 +103,6 @@ class ProductRepositoryAdapterTest {
         entity.setName("Clean Code");
         entity.setDescription("Book");
         entity.setPrice(BigDecimal.TEN);
-        entity.setStock(5);
         entity.setCategory(categoryEntity);
         entity = productRepository.save(entity);
 
@@ -129,7 +127,7 @@ class ProductRepositoryAdapterTest {
         CategoryEntity cat1 = categoryRepository.save(new CategoryEntity(null, "Cat1", null, null));
         CategoryEntity cat2 = categoryRepository.save(new CategoryEntity(null, "Cat2", null, null));
 
-        ProductEntity entity = new ProductEntity(null, "Old Name", "Desc", BigDecimal.ONE, 1, cat1,
+        ProductEntity entity = new ProductEntity(null, "Old Name", "Desc", BigDecimal.ONE, cat1,
                 BigDecimal.valueOf(5), null);
         entity = productRepository.save(entity);
 
@@ -137,7 +135,6 @@ class ProductRepositoryAdapterTest {
         updateData.setName("New Name");
         updateData.setDescription("New Desc");
         updateData.setPrice(BigDecimal.TEN);
-        updateData.setStock(20);
         updateData.setAverageRating(BigDecimal.valueOf(4.5));
         updateData.setImages(Collections.emptyList());
 
@@ -171,7 +168,7 @@ class ProductRepositoryAdapterTest {
         // Given
         CategoryEntity cat = categoryRepository.save(new CategoryEntity(null, "Cat", null, null));
         ProductEntity entity = productRepository
-                .save(new ProductEntity(null, "ToDel", "D", BigDecimal.ONE, 1, cat, BigDecimal.ONE, null));
+                .save(new ProductEntity(null, "ToDel", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null));
 
         // When
         adapter.delete(entity.getId());

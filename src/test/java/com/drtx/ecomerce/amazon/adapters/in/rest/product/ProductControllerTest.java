@@ -63,7 +63,6 @@ class ProductControllerTest {
         testProduct.setName("Laptop");
         testProduct.setDescription("High-performance laptop");
         testProduct.setPrice(new BigDecimal("999.99"));
-        testProduct.setStock(10);
         testProduct.setCategory(testCategory);
         testProduct.setAverageRating(new BigDecimal("4.5"));
         testProduct.setImages(Arrays.asList("image1.jpg", "image2.jpg"));
@@ -72,7 +71,6 @@ class ProductControllerTest {
                 "Laptop",
                 "High-performance laptop",
                 999.99,
-                10,
                 1,
                 4.5,
                 Arrays.asList("image1.jpg", "image2.jpg"));
@@ -82,7 +80,6 @@ class ProductControllerTest {
                 "Laptop",
                 "High-performance laptop",
                 999.99,
-                10,
                 testCategory,
                 4.5,
                 Arrays.asList("image1.jpg", "image2.jpg"));
@@ -103,8 +100,7 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$", hasSize(1)))
                 .andExpect(jsonPath("$[0].id", is(1)))
                 .andExpect(jsonPath("$[0].name", is("Laptop")))
-                .andExpect(jsonPath("$[0].price", is(999.99)))
-                .andExpect(jsonPath("$[0].stock", is(10)));
+                .andExpect(jsonPath("$[0].price", is(999.99)));
 
         verify(productUseCasePort, times(1)).getAllProducts();
     }

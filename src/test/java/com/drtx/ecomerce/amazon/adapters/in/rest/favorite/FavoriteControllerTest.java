@@ -99,7 +99,7 @@ class FavoriteControllerTest {
 
         // Constructor ProductResponse: Long id, String name, String description,
         // BigDecimal price, Integer stock, Category category, Double rating, List image
-        testProductResponse = new ProductResponse(1L, "Laptop", "Description", 999.99, 10, testCategory, 4.5,
+        testProductResponse = new ProductResponse(1L, "Laptop", "Description", 999.99, testCategory, 4.5,
                 Collections.emptyList());
 
         testFavoriteResponse = new FavoriteResponse(1L, userResponse, testProductResponse, LocalDateTime.now());

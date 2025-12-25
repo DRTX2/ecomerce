@@ -40,19 +40,16 @@ class ProductUseCaseImplTest {
                 1L,
                 "Electronics",
                 "Electronic devices",
-                List.of()
-        );
+                List.of());
 
         testProduct = new Product(
                 1L,
                 "Laptop",
                 "High-performance laptop",
                 new BigDecimal("999.99"),
-                50,
                 testCategory,
                 new BigDecimal("4.5"),
-                List.of("image1.jpg", "image2.jpg")
-        );
+                List.of("image1.jpg", "image2.jpg"));
     }
 
     @Test
@@ -64,22 +61,18 @@ class ProductUseCaseImplTest {
                 "Smartphone",
                 "Latest smartphone model",
                 new BigDecimal("699.99"),
-                100,
                 testCategory,
                 new BigDecimal("0.0"),
-                List.of("phone1.jpg")
-        );
+                List.of("phone1.jpg"));
 
         Product savedProduct = new Product(
                 2L,
                 "Smartphone",
                 "Latest smartphone model",
                 new BigDecimal("699.99"),
-                100,
                 testCategory,
                 new BigDecimal("0.0"),
-                List.of("phone1.jpg")
-        );
+                List.of("phone1.jpg"));
 
         when(productRepositoryPort.save(any(Product.class))).thenReturn(savedProduct);
 
@@ -91,7 +84,6 @@ class ProductUseCaseImplTest {
         assertThat(result.getId()).isEqualTo(2L);
         assertThat(result.getName()).isEqualTo("Smartphone");
         assertThat(result.getPrice()).isEqualByComparingTo(new BigDecimal("699.99"));
-        assertThat(result.getStock()).isEqualTo(100);
         verify(productRepositoryPort, times(1)).save(newProduct);
     }
 
@@ -110,7 +102,6 @@ class ProductUseCaseImplTest {
         assertThat(result.get().getId()).isEqualTo(productId);
         assertThat(result.get().getName()).isEqualTo("Laptop");
         assertThat(result.get().getPrice()).isEqualByComparingTo(new BigDecimal("999.99"));
-        assertThat(result.get().getStock()).isEqualTo(50);
         assertThat(result.get().getAverageRating()).isEqualByComparingTo(new BigDecimal("4.5"));
         verify(productRepositoryPort, times(1)).findById(productId);
     }
@@ -139,22 +130,18 @@ class ProductUseCaseImplTest {
                 "Tablet",
                 "Portable tablet device",
                 new BigDecimal("499.99"),
-                75,
                 testCategory,
                 new BigDecimal("4.2"),
-                List.of("tablet1.jpg")
-        );
+                List.of("tablet1.jpg"));
 
         Product product3 = new Product(
                 3L,
                 "Headphones",
                 "Wireless headphones",
                 new BigDecimal("149.99"),
-                200,
                 testCategory,
                 new BigDecimal("4.7"),
-                List.of("headphones1.jpg")
-        );
+                List.of("headphones1.jpg"));
 
         List<Product> products = Arrays.asList(testProduct, product2, product3);
         when(productRepositoryPort.findAll()).thenReturn(products);
@@ -192,11 +179,9 @@ class ProductUseCaseImplTest {
                 "Laptop Pro",
                 "Updated high-performance laptop",
                 new BigDecimal("1199.99"),
-                30,
                 testCategory,
                 new BigDecimal("4.8"),
-                List.of("laptop_pro1.jpg", "laptop_pro2.jpg")
-        );
+                List.of("laptop_pro1.jpg", "laptop_pro2.jpg"));
 
         when(productRepositoryPort.updateById(eq(productId), any(Product.class)))
                 .thenReturn(updatedProduct);
@@ -209,7 +194,6 @@ class ProductUseCaseImplTest {
         assertThat(result.getId()).isEqualTo(productId);
         assertThat(result.getName()).isEqualTo("Laptop Pro");
         assertThat(result.getPrice()).isEqualByComparingTo(new BigDecimal("1199.99"));
-        assertThat(result.getStock()).isEqualTo(30);
         assertThat(result.getAverageRating()).isEqualByComparingTo(new BigDecimal("4.8"));
         verify(productRepositoryPort, times(1)).updateById(productId, updatedProduct);
     }
@@ -243,32 +227,6 @@ class ProductUseCaseImplTest {
     }
 
     @Test
-    @DisplayName("Should handle product with zero stock")
-    void shouldHandleProductWithZeroStock() {
-        // Given
-        Product outOfStockProduct = new Product(
-                4L,
-                "Out of Stock Item",
-                "This item is out of stock",
-                new BigDecimal("99.99"),
-                0,
-                testCategory,
-                new BigDecimal("3.5"),
-                List.of("outofstock.jpg")
-        );
-
-        when(productRepositoryPort.save(any(Product.class))).thenReturn(outOfStockProduct);
-
-        // When
-        Product result = productUseCase.createProduct(outOfStockProduct);
-
-        // Then
-        assertThat(result).isNotNull();
-        assertThat(result.getStock()).isEqualTo(0);
-        verify(productRepositoryPort, times(1)).save(outOfStockProduct);
-    }
-
-    @Test
     @DisplayName("Should handle product with no rating")
     void shouldHandleProductWithNoRating() {
         // Given
@@ -277,11 +235,9 @@ class ProductUseCaseImplTest {
                 "New Product",
                 "Brand new product with no reviews",
                 new BigDecimal("199.99"),
-                25,
                 testCategory,
                 new BigDecimal("0.0"),
-                List.of("newproduct.jpg")
-        );
+                List.of("newproduct.jpg"));
 
         when(productRepositoryPort.save(any(Product.class))).thenReturn(noRatingProduct);
 

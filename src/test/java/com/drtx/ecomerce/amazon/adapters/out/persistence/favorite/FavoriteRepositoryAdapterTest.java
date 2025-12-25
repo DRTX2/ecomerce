@@ -35,124 +35,124 @@ import static org.mockito.Mockito.when;
 @DisplayName("Favorite Repository Adapter Integration Tests")
 class FavoriteRepositoryAdapterTest {
 
-    @SpringBootConfiguration
-    @EnableAutoConfiguration
-    @EntityScan(basePackages = "com.drtx.ecomerce.amazon.adapters.out.persistence")
-    @EnableJpaRepositories(basePackages = "com.drtx.ecomerce.amazon.adapters.out.persistence")
-    static class TestConfig {
-    }
+        @SpringBootConfiguration
+        @EnableAutoConfiguration
+        @EntityScan(basePackages = "com.drtx.ecomerce.amazon.adapters.out.persistence")
+        @EnableJpaRepositories(basePackages = "com.drtx.ecomerce.amazon.adapters.out.persistence")
+        static class TestConfig {
+        }
 
-    @Autowired
-    private FavoriteRepositoryAdapter adapter;
+        @Autowired
+        private FavoriteRepositoryAdapter adapter;
 
-    @Autowired
-    private FavoritePersistenceRepository favoriteRepository;
+        @Autowired
+        private FavoritePersistenceRepository favoriteRepository;
 
-    @Autowired
-    private UserPersistenceRepository userRepository;
+        @Autowired
+        private UserPersistenceRepository userRepository;
 
-    @Autowired
-    private ProductPersistenceRepository productRepository;
+        @Autowired
+        private ProductPersistenceRepository productRepository;
 
-    @Autowired
-    private CategoryPersistenceRepository categoryRepository;
+        @Autowired
+        private CategoryPersistenceRepository categoryRepository;
 
-    @Autowired
-    private EntityManager entityManager;
+        @Autowired
+        private EntityManager entityManager;
 
-    @MockitoBean
-    private FavoritePersistenceMapper mapper;
+        @MockitoBean
+        private FavoritePersistenceMapper mapper;
 
-    @Test
-    @DisplayName("Should save a new favorite")
-    void testSave() {
-        // Given
-        UserEntity user = userRepository
-                .save(new UserEntity(null, "User", "email@test.com", "pass", "addr", "123", null));
-        CategoryEntity cat = categoryRepository.save(new CategoryEntity(null, "C", null, null));
-        ProductEntity prod = productRepository
-                .save(new ProductEntity(null, "P", "D", BigDecimal.ONE, 1, cat, BigDecimal.ONE, null));
+        @Test
+        @DisplayName("Should save a new favorite")
+        void testSave() {
+                // Given
+                UserEntity user = userRepository
+                                .save(new UserEntity(null, "User", "email@test.com", "pass", "addr", "123", null));
+                CategoryEntity cat = categoryRepository.save(new CategoryEntity(null, "C", null, null));
+                ProductEntity prod = productRepository
+                                .save(new ProductEntity(null, "P", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null));
 
-        Favorite favorite = new Favorite(); // Domain object
+                Favorite favorite = new Favorite(); // Domain object
 
-        FavoriteEntity entity = new FavoriteEntity();
-        entity.setUser(user);
-        entity.setProduct(prod);
+                FavoriteEntity entity = new FavoriteEntity();
+                entity.setUser(user);
+                entity.setProduct(prod);
 
-        when(mapper.toEntity(favorite)).thenReturn(entity);
-        when(mapper.toDomain(any(FavoriteEntity.class))).thenAnswer(inv -> {
-            FavoriteEntity e = inv.getArgument(0);
-            Favorite f = new Favorite();
-            f.setId(e.getId());
-            return f;
-        });
+                when(mapper.toEntity(favorite)).thenReturn(entity);
+                when(mapper.toDomain(any(FavoriteEntity.class))).thenAnswer(inv -> {
+                        FavoriteEntity e = inv.getArgument(0);
+                        Favorite f = new Favorite();
+                        f.setId(e.getId());
+                        return f;
+                });
 
-        // When
-        Favorite saved = adapter.save(favorite);
+                // When
+                Favorite saved = adapter.save(favorite);
 
-        // Then
-        assertThat(saved.getId()).isNotNull();
-        assertThat(favoriteRepository.findByUserIdAndProductId(user.getId(), prod.getId())).isPresent();
-    }
+                // Then
+                assertThat(saved.getId()).isNotNull();
+                assertThat(favoriteRepository.findByUserIdAndProductId(user.getId(), prod.getId())).isPresent();
+        }
 
-    @Test
-    @DisplayName("Should find favorites by User ID")
-    void testFindFavoritesByUserId() {
-        // Given
-        UserEntity user = userRepository
-                .save(new UserEntity(null, "User2", "email2@test.com", "pass", "addr", "123", null));
-        CategoryEntity cat = categoryRepository.save(new CategoryEntity(null, "C2", null, null));
-        ProductEntity prod = productRepository
-                .save(new ProductEntity(null, "P2", "D", BigDecimal.ONE, 1, cat, BigDecimal.ONE, null));
+        @Test
+        @DisplayName("Should find favorites by User ID")
+        void testFindFavoritesByUserId() {
+                // Given
+                UserEntity user = userRepository
+                                .save(new UserEntity(null, "User2", "email2@test.com", "pass", "addr", "123", null));
+                CategoryEntity cat = categoryRepository.save(new CategoryEntity(null, "C2", null, null));
+                ProductEntity prod = productRepository
+                                .save(new ProductEntity(null, "P2", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null));
 
-        FavoriteEntity favEntity = new FavoriteEntity();
-        favEntity.setUser(user);
-        favEntity.setProduct(prod);
-        favoriteRepository.save(favEntity);
+                FavoriteEntity favEntity = new FavoriteEntity();
+                favEntity.setUser(user);
+                favEntity.setProduct(prod);
+                favoriteRepository.save(favEntity);
 
-        Favorite domainFav = new Favorite();
-        Product domainProd = new Product();
-        domainProd.setId(prod.getId());
-        domainFav.setProduct(domainProd);
+                Favorite domainFav = new Favorite();
+                Product domainProd = new Product();
+                domainProd.setId(prod.getId());
+                domainFav.setProduct(domainProd);
 
-        // Mock list mapping
-        when(mapper.toDomainList(anyList())).thenReturn(Collections.singletonList(domainFav));
-        when(mapper.toDomain(any(FavoriteEntity.class))).thenReturn(domainFav);
+                // Mock list mapping
+                when(mapper.toDomainList(anyList())).thenReturn(Collections.singletonList(domainFav));
+                when(mapper.toDomain(any(FavoriteEntity.class))).thenReturn(domainFav);
 
-        // When
-        List<Favorite> favorites = adapter.findAllByUserId(user.getId());
-        List<Product> products = adapter.findFavoritesByUserId(user.getId());
+                // When
+                List<Favorite> favorites = adapter.findAllByUserId(user.getId());
+                List<Product> products = adapter.findFavoritesByUserId(user.getId());
 
-        // Then
-        assertThat(favorites).hasSize(1);
-        assertThat(products).hasSize(1);
-        assertThat(products.get(0).getId()).isEqualTo(prod.getId());
-    }
+                // Then
+                assertThat(favorites).hasSize(1);
+                assertThat(products).hasSize(1);
+                assertThat(products.get(0).getId()).isEqualTo(prod.getId());
+        }
 
-    @Test
-    @DisplayName("Should delete favorite by User ID and Product ID")
-    void testDelete() {
-        // Given
-        UserEntity user = userRepository
-                .save(new UserEntity(null, "User3", "email3@test.com", "pass", "addr", "123", null));
-        CategoryEntity cat = categoryRepository.save(new CategoryEntity(null, "C3", null, null));
-        ProductEntity prod = productRepository
-                .save(new ProductEntity(null, "P3", "D", BigDecimal.ONE, 1, cat, BigDecimal.ONE, null));
+        @Test
+        @DisplayName("Should delete favorite by User ID and Product ID")
+        void testDelete() {
+                // Given
+                UserEntity user = userRepository
+                                .save(new UserEntity(null, "User3", "email3@test.com", "pass", "addr", "123", null));
+                CategoryEntity cat = categoryRepository.save(new CategoryEntity(null, "C3", null, null));
+                ProductEntity prod = productRepository
+                                .save(new ProductEntity(null, "P3", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null));
 
-        FavoriteEntity fav = new FavoriteEntity();
-        fav.setUser(user);
-        fav.setProduct(prod);
-        favoriteRepository.save(fav);
+                FavoriteEntity fav = new FavoriteEntity();
+                fav.setUser(user);
+                fav.setProduct(prod);
+                favoriteRepository.save(fav);
 
-        // Flush to ensure persist before delete
-        entityManager.flush();
-        entityManager.clear();
+                // Flush to ensure persist before delete
+                entityManager.flush();
+                entityManager.clear();
 
-        // When
-        adapter.deleteByUserIdAndProductId(user.getId(), prod.getId());
-        entityManager.flush();
+                // When
+                adapter.deleteByUserIdAndProductId(user.getId(), prod.getId());
+                entityManager.flush();
 
-        // Then
-        assertThat(favoriteRepository.findByUserIdAndProductId(user.getId(), prod.getId())).isEmpty();
-    }
+                // Then
+                assertThat(favoriteRepository.findByUserIdAndProductId(user.getId(), prod.getId())).isEmpty();
+        }
 }

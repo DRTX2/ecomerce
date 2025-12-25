@@ -1,0 +1,46 @@
+> Task :compileJava UP-TO-DATE
+> Task :processResources UP-TO-DATE
+> Task :classes UP-TO-DATE
+> Task :compileTestJava UP-TO-DATE
+> Task :processTestResources UP-TO-DATE
+> Task :testClasses UP-TO-DATE
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+
+> Task :test
+
+User Repository Adapter Integration Tests > Should throw exception when saving existing email FAILED
+    java.lang.IllegalStateException at DefaultCacheAwareContextLoaderDelegate.java:180
+        Caused by: org.springframework.beans.factory.BeanCreationException at ConstructorResolver.java:657
+            Caused by: org.springframework.beans.BeanInstantiationException at SimpleInstantiationStrategy.java:199
+                Caused by: java.lang.IllegalArgumentException at WebSecurity.java:320
+
+User Repository Adapter Integration Tests > Should save a new user FAILED
+    java.lang.IllegalStateException at DefaultCacheAwareContextLoaderDelegate.java:145
+
+User Repository Adapter Integration Tests > Should update existing user FAILED
+    java.lang.IllegalStateException at DefaultCacheAwareContextLoaderDelegate.java:145
+
+User Repository Adapter Integration Tests > Should find user by ID FAILED
+    java.lang.IllegalStateException at DefaultCacheAwareContextLoaderDelegate.java:145
+
+User Repository Adapter Integration Tests > Should find user by Email FAILED
+    java.lang.IllegalStateException at DefaultCacheAwareContextLoaderDelegate.java:145
+
+User Repository Adapter Integration Tests > Should delete user FAILED
+    java.lang.IllegalStateException at DefaultCacheAwareContextLoaderDelegate.java:145
+
+6 tests completed, 6 failed
+
+> Task :test FAILED
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':test'.
+> There were failing tests. See the report at: file:///home/david/Desktop/personal/ecomerce-project/back/build/reports/tests/test/index.html
+
+* Try:
+> Run with --scan to generate a Build Scan (powered by Develocity).
+
+BUILD FAILED in 18s
+5 actionable tasks: 1 executed, 4 up-to-date
