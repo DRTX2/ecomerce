@@ -1,11 +1,8 @@
 package com.drtx.ecomerce.amazon.adapters.out.persistence.product;
 
-import com.drtx.ecomerce.amazon.core.model.Product;
+import com.drtx.ecomerce.amazon.core.model.product.Product;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Named;
-
-import java.util.List;
 
 @Mapper(componentModel = "spring", uses = ProductMapperHelper.class)
 public interface ProductPersistenceMapper {

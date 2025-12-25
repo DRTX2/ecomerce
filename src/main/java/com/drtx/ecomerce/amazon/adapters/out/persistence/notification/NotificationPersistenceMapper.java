@@ -1,7 +1,7 @@
 package com.drtx.ecomerce.amazon.adapters.out.persistence.notification;
 
 import com.drtx.ecomerce.amazon.adapters.out.persistence.user.UserPersistenceMapper;
-import com.drtx.ecomerce.amazon.core.model.Notification;
+import com.drtx.ecomerce.amazon.core.model.notifications.Notification;
 import org.mapstruct.Mapper;
 
 import java.util.List;

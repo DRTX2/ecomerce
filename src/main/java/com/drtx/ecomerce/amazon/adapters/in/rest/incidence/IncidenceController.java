@@ -4,8 +4,8 @@ import com.drtx.ecomerce.amazon.adapters.in.rest.incidence.dto.IncidenceResponse
 import com.drtx.ecomerce.amazon.adapters.in.rest.incidence.dto.ReportRequest;
 import com.drtx.ecomerce.amazon.adapters.in.rest.incidence.dto.ResolveIncidenceRequest;
 import com.drtx.ecomerce.amazon.adapters.in.rest.incidence.mappers.IncidenceRestMapper;
-import com.drtx.ecomerce.amazon.core.model.Incidence;
-import com.drtx.ecomerce.amazon.core.model.Report;
+import com.drtx.ecomerce.amazon.core.model.issues.Incidence;
+import com.drtx.ecomerce.amazon.core.model.issues.Report;
 import com.drtx.ecomerce.amazon.core.ports.in.rest.IncidenceUseCasePort;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

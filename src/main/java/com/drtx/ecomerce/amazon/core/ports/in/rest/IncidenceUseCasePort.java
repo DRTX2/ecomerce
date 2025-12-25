@@ -1,8 +1,8 @@
 package com.drtx.ecomerce.amazon.core.ports.in.rest;
 
-import com.drtx.ecomerce.amazon.core.model.Incidence;
-import com.drtx.ecomerce.amazon.core.model.IncidenceDecision;
-import com.drtx.ecomerce.amazon.core.model.Report;
+import com.drtx.ecomerce.amazon.core.model.issues.Incidence;
+import com.drtx.ecomerce.amazon.core.model.issues.IncidenceDecision;
+import com.drtx.ecomerce.amazon.core.model.issues.Report;
 
 import java.util.List;
 import java.util.Optional;

@@ -1,7 +1,7 @@
 package com.drtx.ecomerce.amazon.adapters.in.security.dto;
 
 
-import com.drtx.ecomerce.amazon.core.model.UserRole;
+import com.drtx.ecomerce.amazon.core.model.user.UserRole;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

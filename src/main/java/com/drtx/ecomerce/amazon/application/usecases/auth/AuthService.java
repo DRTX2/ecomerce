@@ -4,7 +4,7 @@ import com.drtx.ecomerce.amazon.adapters.in.security.dto.AuthRequest;
 import com.drtx.ecomerce.amazon.adapters.in.security.dto.AuthResponse;
 import com.drtx.ecomerce.amazon.adapters.in.security.mappers.AuthResponseMapper;
 import com.drtx.ecomerce.amazon.adapters.in.security.mappers.SecurityUserMapper;
-import com.drtx.ecomerce.amazon.core.model.User;
+import com.drtx.ecomerce.amazon.core.model.user.User;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.UserRepositoryPort;
 import com.drtx.ecomerce.amazon.core.ports.out.security.AuthenticationFacade;
 import com.drtx.ecomerce.amazon.core.ports.out.security.PasswordService;

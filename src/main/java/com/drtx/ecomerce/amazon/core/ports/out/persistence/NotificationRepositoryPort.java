@@ -1,6 +1,6 @@
 package com.drtx.ecomerce.amazon.core.ports.out.persistence;
 
-import com.drtx.ecomerce.amazon.core.model.Notification;
+import com.drtx.ecomerce.amazon.core.model.notifications.Notification;
 
 import java.util.List;
 import java.util.Optional;

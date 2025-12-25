@@ -1,13 +1,11 @@
 package com.drtx.ecomerce.amazon.adapters.in.security;
 
-import com.drtx.ecomerce.amazon.adapters.in.rest.user.dto.UserRequest;
-import com.drtx.ecomerce.amazon.adapters.in.rest.user.mappers.UserRestMapper;
 import com.drtx.ecomerce.amazon.adapters.in.security.dto.AuthRequest;
 import com.drtx.ecomerce.amazon.adapters.in.security.dto.AuthResponse;
 import com.drtx.ecomerce.amazon.adapters.in.security.dto.RegisterRequest;
 import com.drtx.ecomerce.amazon.adapters.in.security.mappers.UserSecurityMapper;
 import com.drtx.ecomerce.amazon.application.usecases.auth.AuthService;
-import com.drtx.ecomerce.amazon.core.model.User;
+import com.drtx.ecomerce.amazon.core.model.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

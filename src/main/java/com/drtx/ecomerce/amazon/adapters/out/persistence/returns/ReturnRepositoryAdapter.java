@@ -1,6 +1,6 @@
 package com.drtx.ecomerce.amazon.adapters.out.persistence.returns;
 
-import com.drtx.ecomerce.amazon.core.model.Return;
+import com.drtx.ecomerce.amazon.core.model.returns.Return;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.ReturnRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

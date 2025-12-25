@@ -1,6 +1,6 @@
 package com.drtx.ecomerce.amazon.adapters.out.persistence.appeal;
 
-import com.drtx.ecomerce.amazon.core.model.Appeal;
+import com.drtx.ecomerce.amazon.core.model.issues.Appeal;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.AppealRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

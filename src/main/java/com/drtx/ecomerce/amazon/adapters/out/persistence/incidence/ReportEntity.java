@@ -1,7 +1,7 @@
 package com.drtx.ecomerce.amazon.adapters.out.persistence.incidence;
 
 import com.drtx.ecomerce.amazon.adapters.out.persistence.user.UserEntity;
-import com.drtx.ecomerce.amazon.core.model.ReportSource;
+import com.drtx.ecomerce.amazon.core.model.issues.ReportSource;
 import jakarta.persistence.*;
 import lombok.*;
 

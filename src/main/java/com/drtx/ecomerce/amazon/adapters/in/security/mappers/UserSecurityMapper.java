@@ -2,7 +2,7 @@ package com.drtx.ecomerce.amazon.adapters.in.security.mappers;
 
 import com.drtx.ecomerce.amazon.adapters.in.security.dto.AuthResponse;
 import com.drtx.ecomerce.amazon.adapters.in.security.dto.RegisterRequest;
-import com.drtx.ecomerce.amazon.core.model.User;
+import com.drtx.ecomerce.amazon.core.model.user.User;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

@@ -3,8 +3,7 @@ package com.drtx.ecomerce.amazon.adapters.out.persistence.order;
 import com.drtx.ecomerce.amazon.adapters.out.persistence.discount.DiscountEntity;
 
 import com.drtx.ecomerce.amazon.adapters.out.persistence.user.UserEntity;
-import com.drtx.ecomerce.amazon.core.model.OrderState;
-import com.drtx.ecomerce.amazon.core.model.User;
+import com.drtx.ecomerce.amazon.core.model.order.OrderState;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;

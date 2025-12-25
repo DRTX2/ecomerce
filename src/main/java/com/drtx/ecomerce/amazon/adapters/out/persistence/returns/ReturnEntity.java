@@ -2,7 +2,7 @@ package com.drtx.ecomerce.amazon.adapters.out.persistence.returns;
 
 import com.drtx.ecomerce.amazon.adapters.out.persistence.order.OrderEntity;
 
-import com.drtx.ecomerce.amazon.core.model.ReturnStatus;
+import com.drtx.ecomerce.amazon.core.model.returns.ReturnStatus;
 import jakarta.persistence.*;
 import lombok.*;
 

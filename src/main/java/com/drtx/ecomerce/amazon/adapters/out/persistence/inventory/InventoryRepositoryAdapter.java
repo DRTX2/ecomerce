@@ -1,6 +1,6 @@
 package com.drtx.ecomerce.amazon.adapters.out.persistence.inventory;
 
-import com.drtx.ecomerce.amazon.core.model.Inventory;
+import com.drtx.ecomerce.amazon.core.model.product.Inventory;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.InventoryRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

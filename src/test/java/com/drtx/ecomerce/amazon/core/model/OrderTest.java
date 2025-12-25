@@ -1,5 +1,11 @@
 package com.drtx.ecomerce.amazon.core.model;
 
+import com.drtx.ecomerce.amazon.core.model.order.Order;
+import com.drtx.ecomerce.amazon.core.model.order.OrderItem;
+import com.drtx.ecomerce.amazon.core.model.order.OrderState;
+import com.drtx.ecomerce.amazon.core.model.product.Product;
+import com.drtx.ecomerce.amazon.core.model.user.User;
+import com.drtx.ecomerce.amazon.core.model.user.UserRole;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

@@ -2,17 +2,12 @@ package com.drtx.ecomerce.amazon.adapters.in.rest.cart.mappers;
 
 import com.drtx.ecomerce.amazon.adapters.in.rest.cart.dtos.CartRequest;
 import com.drtx.ecomerce.amazon.adapters.in.rest.cart.dtos.CartResponse;
-import com.drtx.ecomerce.amazon.adapters.out.persistence.product.ProductPersistenceMapper;
-import com.drtx.ecomerce.amazon.core.model.Cart;
-import com.drtx.ecomerce.amazon.core.model.Product;
+import com.drtx.ecomerce.amazon.core.model.order.Cart;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Named;
-
-import java.util.List;
 
 import com.drtx.ecomerce.amazon.adapters.in.rest.cart.dtos.CartItemDto;
-import com.drtx.ecomerce.amazon.core.model.CartItem;
+import com.drtx.ecomerce.amazon.core.model.order.CartItem;
 
 @Mapper(componentModel = "spring")
 public interface CartRestMapper {

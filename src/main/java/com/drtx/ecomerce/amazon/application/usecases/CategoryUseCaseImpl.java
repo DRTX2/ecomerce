@@ -1,6 +1,6 @@
 package com.drtx.ecomerce.amazon.application.usecases;
 
-import com.drtx.ecomerce.amazon.core.model.Category;
+import com.drtx.ecomerce.amazon.core.model.product.Category;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.CategoryRepositoryPort;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;

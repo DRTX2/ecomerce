@@ -1,8 +1,6 @@
 package com.drtx.ecomerce.amazon.adapters.out.persistence.order;
 
-import com.drtx.ecomerce.amazon.adapters.out.persistence.product.ProductEntity;
-import com.drtx.ecomerce.amazon.adapters.out.persistence.product.ProductPersistenceMapper;
-import com.drtx.ecomerce.amazon.core.model.Order;
+import com.drtx.ecomerce.amazon.core.model.order.Order;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.OrderRepositoryPort;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.AllArgsConstructor;

@@ -2,7 +2,7 @@ package com.drtx.ecomerce.amazon.adapters.in.rest.user.mappers;
 
 import com.drtx.ecomerce.amazon.adapters.in.rest.user.dto.UserRequest;
 import com.drtx.ecomerce.amazon.adapters.in.rest.user.dto.UserResponse;
-import com.drtx.ecomerce.amazon.core.model.User;
+import com.drtx.ecomerce.amazon.core.model.user.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

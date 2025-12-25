@@ -2,8 +2,8 @@ package com.drtx.ecomerce.amazon.adapters.out.persistence.appeal;
 
 import com.drtx.ecomerce.amazon.adapters.out.persistence.incidence.IncidenceEntity;
 import com.drtx.ecomerce.amazon.adapters.out.persistence.user.UserEntity;
-import com.drtx.ecomerce.amazon.core.model.AppealDecision;
-import com.drtx.ecomerce.amazon.core.model.AppealStatus;
+import com.drtx.ecomerce.amazon.core.model.issues.AppealDecision;
+import com.drtx.ecomerce.amazon.core.model.issues.AppealStatus;
 import jakarta.persistence.*;
 import lombok.*;
 

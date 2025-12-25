@@ -7,10 +7,9 @@ import com.drtx.ecomerce.amazon.adapters.out.persistence.product.ProductPersiste
 import com.drtx.ecomerce.amazon.adapters.out.persistence.product.ProductPersistenceRepository;
 import com.drtx.ecomerce.amazon.adapters.out.persistence.user.UserEntity;
 import com.drtx.ecomerce.amazon.adapters.out.persistence.user.UserPersistenceRepository;
-import com.drtx.ecomerce.amazon.core.model.Order;
-import com.drtx.ecomerce.amazon.core.model.OrderState;
-import com.drtx.ecomerce.amazon.core.model.Product;
-import jakarta.persistence.EntityNotFoundException;
+import com.drtx.ecomerce.amazon.core.model.order.Order;
+import com.drtx.ecomerce.amazon.core.model.order.OrderState;
+import com.drtx.ecomerce.amazon.core.model.product.Product;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

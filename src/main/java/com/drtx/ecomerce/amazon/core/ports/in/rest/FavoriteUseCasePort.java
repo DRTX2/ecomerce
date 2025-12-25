@@ -1,7 +1,7 @@
 package com.drtx.ecomerce.amazon.core.ports.in.rest;
 
-import com.drtx.ecomerce.amazon.core.model.Favorite;
-import com.drtx.ecomerce.amazon.core.model.Product;
+import com.drtx.ecomerce.amazon.core.model.user.Favorite;
+import com.drtx.ecomerce.amazon.core.model.product.Product;
 
 import java.util.List;
 

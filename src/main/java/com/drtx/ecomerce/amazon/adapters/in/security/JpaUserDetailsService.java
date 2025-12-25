@@ -3,7 +3,7 @@ package com.drtx.ecomerce.amazon.adapters.in.security;
 import com.drtx.ecomerce.amazon.adapters.out.persistence.user.UserEntity;
 import com.drtx.ecomerce.amazon.adapters.out.persistence.user.UserPersistenceMapper;
 import com.drtx.ecomerce.amazon.adapters.out.persistence.user.UserPersistenceRepository;
-import com.drtx.ecomerce.amazon.core.model.User;
+import com.drtx.ecomerce.amazon.core.model.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

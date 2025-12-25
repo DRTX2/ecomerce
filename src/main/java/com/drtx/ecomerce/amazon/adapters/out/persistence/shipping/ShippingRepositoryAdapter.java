@@ -1,6 +1,6 @@
 package com.drtx.ecomerce.amazon.adapters.out.persistence.shipping;
 
-import com.drtx.ecomerce.amazon.core.model.Shipping;
+import com.drtx.ecomerce.amazon.core.model.shipping.Shipping;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.ShippingRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

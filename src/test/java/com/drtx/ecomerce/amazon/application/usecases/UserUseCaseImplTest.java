@@ -1,7 +1,7 @@
 package com.drtx.ecomerce.amazon.application.usecases;
 
-import com.drtx.ecomerce.amazon.core.model.User;
-import com.drtx.ecomerce.amazon.core.model.UserRole;
+import com.drtx.ecomerce.amazon.core.model.user.User;
+import com.drtx.ecomerce.amazon.core.model.user.UserRole;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.UserRepositoryPort;
 import com.drtx.ecomerce.amazon.core.ports.out.security.PasswordService;
 import org.junit.jupiter.api.BeforeEach;

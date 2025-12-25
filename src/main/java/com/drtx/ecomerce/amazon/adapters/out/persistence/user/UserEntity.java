@@ -1,6 +1,6 @@
 package com.drtx.ecomerce.amazon.adapters.out.persistence.user;
 
-import com.drtx.ecomerce.amazon.core.model.UserRole;
+import com.drtx.ecomerce.amazon.core.model.user.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
 

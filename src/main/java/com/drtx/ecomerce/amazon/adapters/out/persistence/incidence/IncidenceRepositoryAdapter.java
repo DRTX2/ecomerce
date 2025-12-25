@@ -1,7 +1,7 @@
 package com.drtx.ecomerce.amazon.adapters.out.persistence.incidence;
 
-import com.drtx.ecomerce.amazon.core.model.Incidence;
-import com.drtx.ecomerce.amazon.core.model.IncidenceStatus;
+import com.drtx.ecomerce.amazon.core.model.issues.Incidence;
+import com.drtx.ecomerce.amazon.core.model.issues.IncidenceStatus;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.IncidenceRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

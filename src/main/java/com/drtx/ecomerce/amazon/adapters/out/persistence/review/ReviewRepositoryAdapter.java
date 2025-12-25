@@ -1,6 +1,6 @@
 package com.drtx.ecomerce.amazon.adapters.out.persistence.review;
 
-import com.drtx.ecomerce.amazon.core.model.Review;
+import com.drtx.ecomerce.amazon.core.model.product.Review;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.ReviewRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

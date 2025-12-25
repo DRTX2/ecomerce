@@ -1,8 +1,8 @@
 package com.drtx.ecomerce.amazon.application.usecases;
 
-import com.drtx.ecomerce.amazon.core.model.Favorite;
-import com.drtx.ecomerce.amazon.core.model.Product;
-import com.drtx.ecomerce.amazon.core.model.User;
+import com.drtx.ecomerce.amazon.core.model.user.Favorite;
+import com.drtx.ecomerce.amazon.core.model.product.Product;
+import com.drtx.ecomerce.amazon.core.model.user.User;
 import com.drtx.ecomerce.amazon.core.ports.in.rest.FavoriteUseCasePort;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.FavoriteRepositoryPort;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.ProductRepositoryPort;
@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor

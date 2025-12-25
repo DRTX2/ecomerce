@@ -1,8 +1,8 @@
 package com.drtx.ecomerce.amazon.adapters.out.persistence.payment;
 
 import com.drtx.ecomerce.amazon.adapters.out.persistence.order.OrderEntity;
-import com.drtx.ecomerce.amazon.core.model.PaymentMethod;
-import com.drtx.ecomerce.amazon.core.model.PaymentStatus;
+import com.drtx.ecomerce.amazon.core.model.payment.PaymentMethod;
+import com.drtx.ecomerce.amazon.core.model.payment.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.*;
 

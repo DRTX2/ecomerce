@@ -1,7 +1,7 @@
 package com.drtx.ecomerce.amazon.adapters.out.persistence.inventory;
 
 import com.drtx.ecomerce.amazon.adapters.out.persistence.product.ProductPersistenceMapper;
-import com.drtx.ecomerce.amazon.core.model.Inventory;
+import com.drtx.ecomerce.amazon.core.model.product.Inventory;
 import org.mapstruct.Mapper;
 
 import java.util.List;

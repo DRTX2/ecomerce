@@ -1,10 +1,9 @@
 package com.drtx.ecomerce.amazon.application.usecases;
 
-import com.drtx.ecomerce.amazon.core.model.User;
+import com.drtx.ecomerce.amazon.core.model.user.User;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.UserRepositoryPort;
 import com.drtx.ecomerce.amazon.core.ports.out.security.PasswordService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import com.drtx.ecomerce.amazon.core.ports.in.rest.UserUseCasePort;
 

@@ -1,6 +1,6 @@
 package com.drtx.ecomerce.amazon.core.ports.out.persistence;
 
-import com.drtx.ecomerce.amazon.core.model.Payment;
+import com.drtx.ecomerce.amazon.core.model.payment.Payment;
 
 import java.util.Optional;
 

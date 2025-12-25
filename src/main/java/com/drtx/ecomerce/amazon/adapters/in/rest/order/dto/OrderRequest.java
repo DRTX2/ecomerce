@@ -1,8 +1,6 @@
 package com.drtx.ecomerce.amazon.adapters.in.rest.order.dto;
 
-import com.drtx.ecomerce.amazon.core.model.OrderState;
-import com.drtx.ecomerce.amazon.core.model.Product;
-import com.drtx.ecomerce.amazon.core.model.User;
+import com.drtx.ecomerce.amazon.core.model.order.OrderState;
 
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;

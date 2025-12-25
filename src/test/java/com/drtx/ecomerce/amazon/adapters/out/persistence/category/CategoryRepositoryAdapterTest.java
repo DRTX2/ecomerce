@@ -1,7 +1,6 @@
 package com.drtx.ecomerce.amazon.adapters.out.persistence.category;
 
-import com.drtx.ecomerce.amazon.core.model.Category;
-import jakarta.persistence.EntityNotFoundException;
+import com.drtx.ecomerce.amazon.core.model.product.Category;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +12,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 

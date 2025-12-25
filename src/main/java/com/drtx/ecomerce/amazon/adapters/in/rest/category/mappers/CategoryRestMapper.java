@@ -2,7 +2,7 @@ package com.drtx.ecomerce.amazon.adapters.in.rest.category.mappers;
 
 import com.drtx.ecomerce.amazon.adapters.in.rest.category.dto.CategoryRequest;
 import com.drtx.ecomerce.amazon.adapters.in.rest.category.dto.CategoryResponse;
-import com.drtx.ecomerce.amazon.core.model.Category;
+import com.drtx.ecomerce.amazon.core.model.product.Category;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

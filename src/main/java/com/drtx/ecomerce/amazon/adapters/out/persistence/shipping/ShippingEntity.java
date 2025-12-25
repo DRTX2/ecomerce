@@ -1,7 +1,7 @@
 package com.drtx.ecomerce.amazon.adapters.out.persistence.shipping;
 
 import com.drtx.ecomerce.amazon.adapters.out.persistence.order.OrderEntity;
-import com.drtx.ecomerce.amazon.core.model.ShippingStatus;
+import com.drtx.ecomerce.amazon.core.model.shipping.ShippingStatus;
 import jakarta.persistence.*;
 import lombok.*;
 

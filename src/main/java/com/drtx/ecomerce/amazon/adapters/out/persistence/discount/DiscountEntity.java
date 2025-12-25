@@ -1,7 +1,7 @@
 package com.drtx.ecomerce.amazon.adapters.out.persistence.discount;
 
 import com.drtx.ecomerce.amazon.adapters.out.persistence.product.ProductEntity;
-import com.drtx.ecomerce.amazon.core.model.DiscountType;
+import com.drtx.ecomerce.amazon.core.model.discount.DiscountType;
 import jakarta.persistence.*;
 import lombok.*;
 

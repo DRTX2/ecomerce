@@ -4,7 +4,7 @@ import com.drtx.ecomerce.amazon.adapters.in.rest.cart.dtos.CartRequest;
 import com.drtx.ecomerce.amazon.adapters.in.rest.cart.dtos.CartResponse;
 import com.drtx.ecomerce.amazon.adapters.in.rest.cart.mappers.CartRestMapper;
 
-import com.drtx.ecomerce.amazon.core.model.Cart;
+import com.drtx.ecomerce.amazon.core.model.order.Cart;
 import com.drtx.ecomerce.amazon.core.ports.in.rest.CartUseCasePort;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;

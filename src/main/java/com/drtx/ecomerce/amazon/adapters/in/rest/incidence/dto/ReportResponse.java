@@ -1,7 +1,7 @@
 package com.drtx.ecomerce.amazon.adapters.in.rest.incidence.dto;
 
 import com.drtx.ecomerce.amazon.adapters.in.rest.user.dto.UserResponse;
-import com.drtx.ecomerce.amazon.core.model.ReportSource;
+import com.drtx.ecomerce.amazon.core.model.issues.ReportSource;
 
 import java.time.LocalDateTime;
 

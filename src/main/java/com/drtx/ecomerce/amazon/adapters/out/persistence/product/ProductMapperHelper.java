@@ -1,6 +1,6 @@
 package com.drtx.ecomerce.amazon.adapters.out.persistence.product;
 
-import com.drtx.ecomerce.amazon.core.model.Product;
+import com.drtx.ecomerce.amazon.core.model.product.Product;
 import org.mapstruct.Named;
 import org.springframework.stereotype.Component;
 

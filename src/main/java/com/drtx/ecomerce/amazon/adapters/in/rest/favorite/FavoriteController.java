@@ -4,7 +4,7 @@ import com.drtx.ecomerce.amazon.adapters.in.rest.favorite.dto.FavoriteResponse;
 import com.drtx.ecomerce.amazon.adapters.in.rest.favorite.mappers.FavoriteRestMapper;
 import com.drtx.ecomerce.amazon.adapters.in.rest.product.dto.ProductResponse;
 import com.drtx.ecomerce.amazon.adapters.in.rest.product.mappers.ProductRestMapper;
-import com.drtx.ecomerce.amazon.core.model.Favorite;
+import com.drtx.ecomerce.amazon.core.model.user.Favorite;
 import com.drtx.ecomerce.amazon.core.ports.in.rest.FavoriteUseCasePort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

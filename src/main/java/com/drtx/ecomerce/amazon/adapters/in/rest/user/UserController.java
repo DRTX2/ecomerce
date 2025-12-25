@@ -3,7 +3,7 @@ package com.drtx.ecomerce.amazon.adapters.in.rest.user;
 import com.drtx.ecomerce.amazon.adapters.in.rest.user.dto.UserRequest;
 import com.drtx.ecomerce.amazon.adapters.in.rest.user.dto.UserResponse;
 import com.drtx.ecomerce.amazon.adapters.in.rest.user.mappers.UserRestMapper;
-import com.drtx.ecomerce.amazon.core.model.User;
+import com.drtx.ecomerce.amazon.core.model.user.User;
 import com.drtx.ecomerce.amazon.core.ports.in.rest.UserUseCasePort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

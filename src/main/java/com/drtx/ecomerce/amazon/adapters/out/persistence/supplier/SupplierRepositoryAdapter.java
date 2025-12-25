@@ -1,6 +1,6 @@
 package com.drtx.ecomerce.amazon.adapters.out.persistence.supplier;
 
-import com.drtx.ecomerce.amazon.core.model.Supplier;
+import com.drtx.ecomerce.amazon.core.model.supplier.Supplier;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.SupplierRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

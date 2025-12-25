@@ -1,6 +1,6 @@
 package com.drtx.ecomerce.amazon.adapters.out.persistence.payment;
 
-import com.drtx.ecomerce.amazon.core.model.Payment;
+import com.drtx.ecomerce.amazon.core.model.payment.Payment;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.PaymentRepositoryPort;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;

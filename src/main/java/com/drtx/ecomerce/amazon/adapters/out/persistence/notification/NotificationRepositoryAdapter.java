@@ -1,7 +1,7 @@
 package com.drtx.ecomerce.amazon.adapters.out.persistence.notification;
 
-import com.drtx.ecomerce.amazon.core.model.Notification;
-import com.drtx.ecomerce.amazon.core.model.NotificationStatus;
+import com.drtx.ecomerce.amazon.core.model.notifications.Notification;
+import com.drtx.ecomerce.amazon.core.model.notifications.NotificationStatus;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.NotificationRepositoryPort;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;

@@ -1,6 +1,6 @@
 package com.drtx.ecomerce.amazon.core.ports.out.persistence;
 
-import com.drtx.ecomerce.amazon.core.model.Inventory;
+import com.drtx.ecomerce.amazon.core.model.product.Inventory;
 
 import java.util.List;
 import java.util.Optional;

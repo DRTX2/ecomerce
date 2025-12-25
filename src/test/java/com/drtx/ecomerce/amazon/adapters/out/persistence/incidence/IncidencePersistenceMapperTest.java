@@ -2,15 +2,13 @@ package com.drtx.ecomerce.amazon.adapters.out.persistence.incidence;
 
 import com.drtx.ecomerce.amazon.adapters.out.persistence.product.ProductPersistenceMapper;
 import com.drtx.ecomerce.amazon.adapters.out.persistence.user.UserPersistenceMapper;
-import com.drtx.ecomerce.amazon.core.model.Incidence;
-import com.drtx.ecomerce.amazon.core.model.IncidenceDecision;
-import com.drtx.ecomerce.amazon.core.model.IncidenceStatus;
+import com.drtx.ecomerce.amazon.core.model.issues.Incidence;
+import com.drtx.ecomerce.amazon.core.model.issues.IncidenceDecision;
+import com.drtx.ecomerce.amazon.core.model.issues.IncidenceStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

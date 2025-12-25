@@ -1,5 +1,6 @@
 package com.drtx.ecomerce.amazon.core.model;
 
+import com.drtx.ecomerce.amazon.core.model.product.Category;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

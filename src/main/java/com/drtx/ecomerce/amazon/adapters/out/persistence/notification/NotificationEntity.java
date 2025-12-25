@@ -1,8 +1,8 @@
 package com.drtx.ecomerce.amazon.adapters.out.persistence.notification;
 
 import com.drtx.ecomerce.amazon.adapters.out.persistence.user.UserEntity;
-import com.drtx.ecomerce.amazon.core.model.NotificationStatus;
-import com.drtx.ecomerce.amazon.core.model.NotificationType;
+import com.drtx.ecomerce.amazon.core.model.notifications.NotificationStatus;
+import com.drtx.ecomerce.amazon.core.model.notifications.NotificationType;
 import jakarta.persistence.*;
 import lombok.*;
 

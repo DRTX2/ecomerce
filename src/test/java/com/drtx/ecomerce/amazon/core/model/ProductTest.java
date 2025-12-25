@@ -1,5 +1,7 @@
 package com.drtx.ecomerce.amazon.core.model;
 
+import com.drtx.ecomerce.amazon.core.model.product.Category;
+import com.drtx.ecomerce.amazon.core.model.product.Product;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;

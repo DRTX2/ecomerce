@@ -4,7 +4,7 @@ import com.drtx.ecomerce.amazon.adapters.in.rest.appeal.dto.AppealRequest;
 import com.drtx.ecomerce.amazon.adapters.in.rest.appeal.dto.AppealResponse;
 import com.drtx.ecomerce.amazon.adapters.in.rest.appeal.dto.ResolveAppealRequest;
 import com.drtx.ecomerce.amazon.adapters.in.rest.appeal.mappers.AppealRestMapper;
-import com.drtx.ecomerce.amazon.core.model.Appeal;
+import com.drtx.ecomerce.amazon.core.model.issues.Appeal;
 import com.drtx.ecomerce.amazon.core.ports.in.rest.AppealUseCasePort;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -39,8 +39,7 @@ public class AppealController {
     @PutMapping("/{id}/resolve")
     public ResponseEntity<AppealResponse> resolveAppeal(
             @PathVariable Long id,
-            @Valid @RequestBody ResolveAppealRequest request
-    ) {
+            @Valid @RequestBody ResolveAppealRequest request) {
         String moderatorEmail = getAuthenticatedUserEmail();
         Appeal appeal = appealUseCase.resolveAppeal(id, request.decision(), moderatorEmail);
         return ResponseEntity.ok(mapper.toResponse(appeal));
@@ -48,8 +47,9 @@ public class AppealController {
 
     private String getAuthenticatedUserEmail() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated() && !authentication.getPrincipal().equals("anonymousUser")) {
-             return authentication.getName();
+        if (authentication != null && authentication.isAuthenticated()
+                && !authentication.getPrincipal().equals("anonymousUser")) {
+            return authentication.getName();
         }
         return null;
     }

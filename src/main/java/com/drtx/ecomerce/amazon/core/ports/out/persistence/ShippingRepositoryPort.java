@@ -1,6 +1,6 @@
 package com.drtx.ecomerce.amazon.core.ports.out.persistence;
 
-import com.drtx.ecomerce.amazon.core.model.Shipping;
+import com.drtx.ecomerce.amazon.core.model.shipping.Shipping;
 
 import java.util.Optional;
 

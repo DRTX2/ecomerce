@@ -1,6 +1,6 @@
 package com.drtx.ecomerce.amazon.core.ports.in.rest;
 
-import com.drtx.ecomerce.amazon.core.model.Category;
+import com.drtx.ecomerce.amazon.core.model.product.Category;
 
 import java.util.List;
 import java.util.Optional;

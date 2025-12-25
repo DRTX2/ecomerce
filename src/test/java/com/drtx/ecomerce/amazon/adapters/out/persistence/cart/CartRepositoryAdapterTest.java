@@ -6,8 +6,7 @@ import com.drtx.ecomerce.amazon.adapters.out.persistence.product.ProductEntity;
 import com.drtx.ecomerce.amazon.adapters.out.persistence.product.ProductPersistenceRepository;
 import com.drtx.ecomerce.amazon.adapters.out.persistence.user.UserEntity;
 import com.drtx.ecomerce.amazon.adapters.out.persistence.user.UserPersistenceRepository;
-import com.drtx.ecomerce.amazon.core.model.Cart;
-import com.drtx.ecomerce.amazon.core.model.Cart;
+import com.drtx.ecomerce.amazon.core.model.order.Cart;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.math.BigDecimal;
 import java.util.Collections;
-import java.util.List;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;

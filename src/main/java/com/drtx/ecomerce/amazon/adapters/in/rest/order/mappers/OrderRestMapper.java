@@ -2,13 +2,13 @@ package com.drtx.ecomerce.amazon.adapters.in.rest.order.mappers;
 
 import com.drtx.ecomerce.amazon.adapters.in.rest.order.dto.OrderRequest;
 import com.drtx.ecomerce.amazon.adapters.in.rest.order.dto.OrderResponse;
-import com.drtx.ecomerce.amazon.core.model.Order;
+import com.drtx.ecomerce.amazon.core.model.order.Order;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import com.drtx.ecomerce.amazon.adapters.in.rest.order.dto.OrderItemDto;
-import com.drtx.ecomerce.amazon.core.model.OrderItem;
+import com.drtx.ecomerce.amazon.core.model.order.OrderItem;
 
 @Mapper(componentModel = "spring")
 public interface OrderRestMapper {

@@ -1,6 +1,6 @@
 package com.drtx.ecomerce.amazon.core.ports.in.rest;
 
-import com.drtx.ecomerce.amazon.core.model.Cart;
+import com.drtx.ecomerce.amazon.core.model.order.Cart;
 
 import java.util.List;
 import java.util.Optional;

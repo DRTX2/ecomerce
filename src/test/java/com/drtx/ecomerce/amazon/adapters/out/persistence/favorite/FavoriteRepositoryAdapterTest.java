@@ -6,8 +6,8 @@ import com.drtx.ecomerce.amazon.adapters.out.persistence.product.ProductEntity;
 import com.drtx.ecomerce.amazon.adapters.out.persistence.product.ProductPersistenceRepository;
 import com.drtx.ecomerce.amazon.adapters.out.persistence.user.UserEntity;
 import com.drtx.ecomerce.amazon.adapters.out.persistence.user.UserPersistenceRepository;
-import com.drtx.ecomerce.amazon.core.model.Favorite;
-import com.drtx.ecomerce.amazon.core.model.Product;
+import com.drtx.ecomerce.amazon.core.model.user.Favorite;
+import com.drtx.ecomerce.amazon.core.model.product.Product;
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,7 +23,6 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;

@@ -1,6 +1,6 @@
 package com.drtx.ecomerce.amazon.core.ports.out.persistence;
 
-import com.drtx.ecomerce.amazon.core.model.Return;
+import com.drtx.ecomerce.amazon.core.model.returns.Return;
 
 import java.util.Optional;
 

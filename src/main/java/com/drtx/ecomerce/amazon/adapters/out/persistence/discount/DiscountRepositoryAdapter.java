@@ -1,6 +1,6 @@
 package com.drtx.ecomerce.amazon.adapters.out.persistence.discount;
 
-import com.drtx.ecomerce.amazon.core.model.Discount;
+import com.drtx.ecomerce.amazon.core.model.discount.Discount;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.DiscountRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

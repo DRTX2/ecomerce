@@ -1,6 +1,6 @@
 package com.drtx.ecomerce.amazon.core.ports.out.persistence;
 
-import com.drtx.ecomerce.amazon.core.model.Discount;
+import com.drtx.ecomerce.amazon.core.model.discount.Discount;
 
 import java.util.Optional;
 

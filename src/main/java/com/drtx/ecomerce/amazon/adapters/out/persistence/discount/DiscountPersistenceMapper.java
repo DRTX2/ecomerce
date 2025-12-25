@@ -1,7 +1,7 @@
 package com.drtx.ecomerce.amazon.adapters.out.persistence.discount;
 
 import com.drtx.ecomerce.amazon.adapters.out.persistence.product.ProductPersistenceMapper;
-import com.drtx.ecomerce.amazon.core.model.Discount;
+import com.drtx.ecomerce.amazon.core.model.discount.Discount;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring", uses = { ProductPersistenceMapper.class })

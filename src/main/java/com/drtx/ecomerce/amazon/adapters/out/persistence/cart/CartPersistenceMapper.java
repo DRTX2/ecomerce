@@ -3,8 +3,8 @@ package com.drtx.ecomerce.amazon.adapters.out.persistence.cart;
 import com.drtx.ecomerce.amazon.adapters.out.persistence.product.ProductMapperHelper;
 import com.drtx.ecomerce.amazon.adapters.out.persistence.product.ProductPersistenceMapper;
 import com.drtx.ecomerce.amazon.adapters.out.persistence.user.UserPersistenceMapper;
-import com.drtx.ecomerce.amazon.core.model.Cart;
-import com.drtx.ecomerce.amazon.core.model.CartItem;
+import com.drtx.ecomerce.amazon.core.model.order.Cart;
+import com.drtx.ecomerce.amazon.core.model.order.CartItem;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

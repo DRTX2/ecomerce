@@ -1,7 +1,7 @@
 package com.drtx.ecomerce.amazon.adapters.in.security.mappers;
 
 import com.drtx.ecomerce.amazon.adapters.in.security.SecurityUserDetails;
-import com.drtx.ecomerce.amazon.core.model.User;
+import com.drtx.ecomerce.amazon.core.model.user.User;
 import org.springframework.stereotype.Component;
 
 @Component

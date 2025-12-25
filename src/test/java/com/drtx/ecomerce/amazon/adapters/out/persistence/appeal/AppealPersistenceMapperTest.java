@@ -2,8 +2,8 @@ package com.drtx.ecomerce.amazon.adapters.out.persistence.appeal;
 
 import com.drtx.ecomerce.amazon.adapters.out.persistence.incidence.IncidencePersistenceMapper;
 import com.drtx.ecomerce.amazon.adapters.out.persistence.user.UserPersistenceMapper;
-import com.drtx.ecomerce.amazon.core.model.Appeal;
-import com.drtx.ecomerce.amazon.core.model.AppealStatus;
+import com.drtx.ecomerce.amazon.core.model.issues.Appeal;
+import com.drtx.ecomerce.amazon.core.model.issues.AppealStatus;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;

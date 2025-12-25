@@ -1,6 +1,11 @@
 package com.drtx.ecomerce.amazon.application.usecases;
 
-import com.drtx.ecomerce.amazon.core.model.*;
+import com.drtx.ecomerce.amazon.core.model.issues.Incidence;
+import com.drtx.ecomerce.amazon.core.model.issues.IncidenceStatus;
+import com.drtx.ecomerce.amazon.core.model.issues.Appeal;
+import com.drtx.ecomerce.amazon.core.model.issues.AppealStatus;
+import com.drtx.ecomerce.amazon.core.model.user.User;
+import com.drtx.ecomerce.amazon.core.model.user.UserRole;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.AppealRepositoryPort;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.IncidenceRepositoryPort;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.UserRepositoryPort;

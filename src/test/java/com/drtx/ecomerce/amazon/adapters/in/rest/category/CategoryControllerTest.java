@@ -3,7 +3,7 @@ package com.drtx.ecomerce.amazon.adapters.in.rest.category;
 import com.drtx.ecomerce.amazon.adapters.in.rest.category.dto.CategoryRequest;
 import com.drtx.ecomerce.amazon.adapters.in.rest.category.dto.CategoryResponse;
 import com.drtx.ecomerce.amazon.adapters.in.rest.category.mappers.CategoryRestMapper;
-import com.drtx.ecomerce.amazon.core.model.Category;
+import com.drtx.ecomerce.amazon.core.model.product.Category;
 import com.drtx.ecomerce.amazon.core.ports.in.rest.CategoryUseCasePort;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;

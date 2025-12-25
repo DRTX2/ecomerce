@@ -2,8 +2,8 @@ package com.drtx.ecomerce.amazon.adapters.in.rest.incidence.dto;
 
 import com.drtx.ecomerce.amazon.adapters.in.rest.product.dto.ProductResponse;
 import com.drtx.ecomerce.amazon.adapters.in.rest.user.dto.UserResponse;
-import com.drtx.ecomerce.amazon.core.model.IncidenceDecision;
-import com.drtx.ecomerce.amazon.core.model.IncidenceStatus;
+import com.drtx.ecomerce.amazon.core.model.issues.IncidenceDecision;
+import com.drtx.ecomerce.amazon.core.model.issues.IncidenceStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;

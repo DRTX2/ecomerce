@@ -1,6 +1,11 @@
 package com.drtx.ecomerce.amazon.application.usecases;
 
-import com.drtx.ecomerce.amazon.core.model.*;
+import com.drtx.ecomerce.amazon.core.model.issues.Incidence;
+import com.drtx.ecomerce.amazon.core.model.issues.IncidenceStatus;
+import com.drtx.ecomerce.amazon.core.model.issues.Appeal;
+import com.drtx.ecomerce.amazon.core.model.issues.AppealDecision;
+import com.drtx.ecomerce.amazon.core.model.issues.AppealStatus;
+import com.drtx.ecomerce.amazon.core.model.user.User;
 import com.drtx.ecomerce.amazon.core.ports.in.rest.AppealUseCasePort;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.AppealRepositoryPort;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.IncidenceRepositoryPort;
@@ -43,9 +48,9 @@ public class AppealUseCaseImpl implements AppealUseCasePort {
                 .seller(seller)
                 .reason(reason)
                 .build();
-        
+
         appeal.initializeDefaults();
-        
+
         // Update Incidence status
         incidence.setStatus(IncidenceStatus.APPEALED);
         incidenceRepository.save(incidence);
@@ -63,15 +68,15 @@ public class AppealUseCaseImpl implements AppealUseCasePort {
     public Appeal resolveAppeal(Long id, AppealDecision decision, String moderatorEmail) {
         Appeal appeal = appealRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Appeal not found with id " + id));
-        
+
         User moderator = userRepository.findByEmail(moderatorEmail)
                 .orElseThrow(() -> new RuntimeException("Moderator not found"));
-        
+
         appeal.setNewModerator(moderator);
         appeal.setFinalDecision(decision);
         appeal.setFinalDecisionAt(LocalDateTime.now());
         appeal.setStatus(AppealStatus.RESOLVED);
-        
+
         return appealRepository.save(appeal);
     }
 }

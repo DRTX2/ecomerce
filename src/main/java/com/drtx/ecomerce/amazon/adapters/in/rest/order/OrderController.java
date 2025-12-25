@@ -3,7 +3,7 @@ package com.drtx.ecomerce.amazon.adapters.in.rest.order;
 import com.drtx.ecomerce.amazon.adapters.in.rest.order.dto.OrderRequest;
 import com.drtx.ecomerce.amazon.adapters.in.rest.order.dto.OrderResponse;
 import com.drtx.ecomerce.amazon.adapters.in.rest.order.mappers.OrderRestMapper;
-import com.drtx.ecomerce.amazon.core.model.Order;
+import com.drtx.ecomerce.amazon.core.model.order.Order;
 import com.drtx.ecomerce.amazon.core.ports.in.rest.OrderUseCasePort;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;

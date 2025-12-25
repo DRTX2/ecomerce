@@ -1,6 +1,6 @@
 package com.drtx.ecomerce.amazon.adapters.out.persistence.incidence;
 
-import com.drtx.ecomerce.amazon.core.model.IncidenceStatus;
+import com.drtx.ecomerce.amazon.core.model.issues.IncidenceStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

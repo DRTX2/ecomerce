@@ -1,6 +1,6 @@
 package com.drtx.ecomerce.amazon.adapters.in.rest.product.dto;
 
-import com.drtx.ecomerce.amazon.core.model.Category;
+import com.drtx.ecomerce.amazon.core.model.product.Category;
 
 import java.util.List;
 

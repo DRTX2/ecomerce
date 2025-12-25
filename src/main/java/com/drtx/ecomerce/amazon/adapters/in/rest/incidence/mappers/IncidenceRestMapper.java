@@ -5,8 +5,8 @@ import com.drtx.ecomerce.amazon.adapters.in.rest.incidence.dto.ReportRequest;
 import com.drtx.ecomerce.amazon.adapters.in.rest.incidence.dto.ReportResponse;
 import com.drtx.ecomerce.amazon.adapters.in.rest.product.mappers.ProductRestMapper;
 import com.drtx.ecomerce.amazon.adapters.in.rest.user.mappers.UserRestMapper;
-import com.drtx.ecomerce.amazon.core.model.Incidence;
-import com.drtx.ecomerce.amazon.core.model.Report;
+import com.drtx.ecomerce.amazon.core.model.issues.Incidence;
+import com.drtx.ecomerce.amazon.core.model.issues.Report;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

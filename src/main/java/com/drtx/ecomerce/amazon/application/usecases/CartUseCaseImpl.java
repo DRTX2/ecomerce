@@ -1,6 +1,6 @@
 package com.drtx.ecomerce.amazon.application.usecases;
 
-import com.drtx.ecomerce.amazon.core.model.Cart;
+import com.drtx.ecomerce.amazon.core.model.order.Cart;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.CartRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
