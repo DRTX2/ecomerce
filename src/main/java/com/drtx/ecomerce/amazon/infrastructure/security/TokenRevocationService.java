@@ -1,6 +1,6 @@
 package com.drtx.ecomerce.amazon.infrastructure.security;
 
-import com.drtx.ecomerce.amazon.core.ports.in.rest.security.RevokedTokenPort;
+import com.drtx.ecomerce.amazon.core.ports.out.security.RevokedTokenPort;
 import com.drtx.ecomerce.amazon.core.ports.out.security.TokenRevocationPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
