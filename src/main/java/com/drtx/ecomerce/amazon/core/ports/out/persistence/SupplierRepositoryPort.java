@@ -6,6 +6,5 @@ import java.util.Optional;
 
 public interface SupplierRepositoryPort {
     Supplier save(Supplier supplier);
-
     Optional<Supplier> findById(Long id);
 }

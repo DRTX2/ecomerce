@@ -53,11 +53,7 @@ public class AppealEntity {
     @PrePersist
     protected void prePersist() {
         this.createdAt = LocalDateTime.now();
-        if (status == null) {
-            status = AppealStatus.PENDING;
-        }
-        if (finalDecision == null) {
-            finalDecision = AppealDecision.PENDING;
-        }
+        if (status == null) status = AppealStatus.PENDING;
+        if (finalDecision == null) finalDecision = AppealDecision.PENDING;
     }
 }

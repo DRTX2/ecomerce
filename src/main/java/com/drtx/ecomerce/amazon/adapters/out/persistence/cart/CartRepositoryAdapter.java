@@ -2,7 +2,7 @@ package com.drtx.ecomerce.amazon.adapters.out.persistence.cart;
 
 import com.drtx.ecomerce.amazon.core.model.order.Cart;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.CartRepositoryPort;
-import jakarta.persistence.EntityNotFoundException;
+import com.drtx.ecomerce.amazon.core.model.exceptions.EntityNotFoundException;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 

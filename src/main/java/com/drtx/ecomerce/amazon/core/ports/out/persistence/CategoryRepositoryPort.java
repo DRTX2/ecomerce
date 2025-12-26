@@ -1,7 +1,7 @@
 package com.drtx.ecomerce.amazon.core.ports.out.persistence;
 
 import com.drtx.ecomerce.amazon.core.model.product.Category;
-import jakarta.persistence.EntityNotFoundException;
+import com.drtx.ecomerce.amazon.core.model.exceptions.EntityNotFoundException;
 
 import java.util.List;
 import java.util.Optional;

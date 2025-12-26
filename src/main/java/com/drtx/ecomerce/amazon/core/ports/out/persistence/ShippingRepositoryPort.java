@@ -6,8 +6,6 @@ import java.util.Optional;
 
 public interface ShippingRepositoryPort {
     Shipping save(Shipping shipping);
-
     Optional<Shipping> findById(Long id);
-
     Optional<Shipping> findByOrderId(Long orderId);
 }

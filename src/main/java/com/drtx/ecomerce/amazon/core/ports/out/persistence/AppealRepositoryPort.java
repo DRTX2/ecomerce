@@ -6,8 +6,6 @@ import java.util.Optional;
 
 public interface AppealRepositoryPort {
     Appeal save(Appeal appeal);
-
     Optional<Appeal> findById(Long id);
-
     Optional<Appeal> findByIncidenceId(Long incidenceId);
 }

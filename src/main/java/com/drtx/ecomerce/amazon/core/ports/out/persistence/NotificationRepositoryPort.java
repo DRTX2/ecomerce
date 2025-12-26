@@ -7,10 +7,7 @@ import java.util.Optional;
 
 public interface NotificationRepositoryPort {
     Notification save(Notification notification);
-
     List<Notification> findByUserId(Long userId);
-
     Optional<Notification> findById(Long id);
-
     void markAsRead(Long id);
 }

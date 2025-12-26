@@ -8,6 +8,5 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring", uses = { IncidencePersistenceMapper.class, UserPersistenceMapper.class })
 public interface AppealPersistenceMapper {
     Appeal toDomain(AppealEntity entity);
-
     AppealEntity toEntity(Appeal appeal);
 }

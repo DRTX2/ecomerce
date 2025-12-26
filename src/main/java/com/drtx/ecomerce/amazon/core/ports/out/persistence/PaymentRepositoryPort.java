@@ -6,8 +6,6 @@ import java.util.Optional;
 
 public interface PaymentRepositoryPort {
     Payment save(Payment payment);
-
     Optional<Payment> findById(Long id);
-
     Payment update(Payment payment);
 }

@@ -10,7 +10,6 @@ public interface FavoriteRepositoryPort {
     Favorite save(Favorite favorite);
     void deleteByUserIdAndProductId(Long userId, Long productId);
     List<Product> findFavoritesByUserId(Long userId); // Returns Products directly or Favorites? Typically Favorites, but UseCase wants Products. 
-    // Let's return Favorites to be pure
     List<Favorite> findAllByUserId(Long userId);
     Optional<Favorite> findByUserIdAndProductId(Long userId, Long productId);
 }
