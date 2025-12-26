@@ -1,4 +1,4 @@
-package com.drtx.ecomerce.amazon.adapters.in.security;
+package com.drtx.ecomerce.amazon.adapters.out.persistence.security;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

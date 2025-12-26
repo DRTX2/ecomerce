@@ -1,4 +1,4 @@
-package com.drtx.ecomerce.amazon.adapters.in.security;
+package com.drtx.ecomerce.amazon.adapters.out.persistence.security;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
