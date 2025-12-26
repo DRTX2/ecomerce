@@ -7,7 +7,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-
+// refactorizar posteriormente
 public class Incidence {
     private Long id;
     private UUID publicUi;
@@ -123,24 +123,12 @@ public class Incidence {
     }
 
     public void initializeDefaults() {
-        if (this.publicUi == null) {
-            this.publicUi = UUID.randomUUID();
-        }
-        if (this.createdAt == null) {
-            this.createdAt = LocalDateTime.now();
-        }
-        if (this.status == null) {
-            this.status = IncidenceStatus.OPEN;
-        }
-        if (this.decision == null) {
-            this.decision = IncidenceDecision.PENDING;
-        }
-        if (this.autoclosed == null) {
-            this.autoclosed = false;
-        }
-        if (this.reports == null) {
-            this.reports = new ArrayList<>();
-        }
+        if (this.publicUi == null) this.publicUi = UUID.randomUUID();
+        if (this.createdAt == null) this.createdAt = LocalDateTime.now();
+        if (this.status == null) this.status = IncidenceStatus.OPEN;
+        if (this.decision == null) this.decision = IncidenceDecision.PENDING;
+        if (this.autoclosed == null) this.autoclosed = false;
+        if (this.reports == null) this.reports = new ArrayList<>();
     }
 
     public static class IncidenceBuilder {

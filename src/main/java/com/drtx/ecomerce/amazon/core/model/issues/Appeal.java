@@ -3,7 +3,7 @@ package com.drtx.ecomerce.amazon.core.model.issues;
 import com.drtx.ecomerce.amazon.core.model.user.User;
 
 import java.time.LocalDateTime;
-
+// refactorizar
 public class Appeal {
     private Long id;
     private Incidence incidence;
