@@ -64,7 +64,6 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 authToken.setDetails(// to get more details, pe ip, connection port, browser....
                         new WebAuthenticationDetailsSource().buildDetails(request)
                 );
-
                 SecurityContextHolder.getContext().setAuthentication(authToken);
         }
 

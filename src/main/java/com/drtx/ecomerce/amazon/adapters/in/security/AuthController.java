@@ -6,6 +6,7 @@ import com.drtx.ecomerce.amazon.adapters.in.security.dto.RegisterRequest;
 import com.drtx.ecomerce.amazon.adapters.in.security.mappers.UserSecurityMapper;
 import com.drtx.ecomerce.amazon.application.usecases.auth.AuthService;
 import com.drtx.ecomerce.amazon.core.model.user.User;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,13 +19,13 @@ public class AuthController {
     private final UserSecurityMapper userSecurityMapper;
 
     @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@RequestBody @jakarta.validation.Valid RegisterRequest request) {
+    public ResponseEntity<AuthResponse> register(@RequestBody @Valid RegisterRequest request) {
         User user = userSecurityMapper.registerRequestToDomain(request);
         return ResponseEntity.ok(userSecurityMapper.entityToResponse(authService.register(user)));
     }
 
     @PostMapping("/login")
-    public ResponseEntity<AuthResponse> login(@RequestBody @jakarta.validation.Valid AuthRequest request) {
+    public ResponseEntity<AuthResponse> login(@RequestBody @Valid AuthRequest request) {
         return ResponseEntity.ok(authService.login(request));
     }
 
