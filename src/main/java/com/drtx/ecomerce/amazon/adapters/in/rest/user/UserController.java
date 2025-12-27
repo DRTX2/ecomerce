@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/users/")
+@RequestMapping("/users")
 @RequiredArgsConstructor
 public class UserController {
     private final UserUseCasePort userUseCasePort;

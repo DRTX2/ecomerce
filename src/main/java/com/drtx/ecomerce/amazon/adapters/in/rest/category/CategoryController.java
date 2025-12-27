@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/categories/")
+@RequestMapping("/categories")
 @AllArgsConstructor
 public class CategoryController {
     private final CategoryUseCasePort categoryUseCasePort;
