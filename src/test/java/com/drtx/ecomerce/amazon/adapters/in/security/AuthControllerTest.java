@@ -57,7 +57,10 @@ class AuthControllerTest {
         testUser.setAddress("123 Main St");
         testUser.setPhone("555-1234");
 
-        testAuthResponse = new AuthResponse("mock-jwt-token");
+        testAuthResponse = new AuthResponse(
+                new com.drtx.ecomerce.amazon.adapters.in.security.dto.UserResponse(1L, "John Doe", "john@example.com",
+                        UserRole.USER),
+                new com.drtx.ecomerce.amazon.adapters.in.security.dto.AuthTokens("mock-jwt-token", "", 86400000L));
 
         testRegisterRequest = new RegisterRequest(
                 "John Doe",
@@ -75,15 +78,14 @@ class AuthControllerTest {
     void testRegister() throws Exception {
         // Given
         when(userSecurityMapper.registerRequestToDomain(any(RegisterRequest.class))).thenReturn(testUser);
-        when(authService.register(any(User.class))).thenReturn(testUser);
-        when(userSecurityMapper.entityToResponse(testUser)).thenReturn(testAuthResponse);
+        when(authService.register(any(User.class))).thenReturn(testAuthResponse);
 
         // When & Then
         mockMvc.perform(post("/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testRegisterRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token", is("mock-jwt-token")));
+                .andExpect(jsonPath("$.tokens.accessToken", is("mock-jwt-token")));
 
         verify(authService, times(1)).register(any(User.class));
     }
@@ -120,7 +122,7 @@ class AuthControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testAuthRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.token", is("mock-jwt-token")));
+                .andExpect(jsonPath("$.tokens.accessToken", is("mock-jwt-token")));
 
         verify(authService, times(1)).login(any(AuthRequest.class));
     }
