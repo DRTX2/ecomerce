@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/auth/")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
     private final AuthService authService;
@@ -21,11 +21,12 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody @Valid RegisterRequest request) {
         User user = userSecurityMapper.registerRequestToDomain(request);
-        return ResponseEntity.ok(userSecurityMapper.entityToResponse(authService.register(user)));
+        return ResponseEntity.ok(authService.register(user));
     }
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody @Valid AuthRequest request) {
+        System.out.println("AuthController - Login request received for: " + request.email());
         return ResponseEntity.ok(authService.login(request));
     }
 
