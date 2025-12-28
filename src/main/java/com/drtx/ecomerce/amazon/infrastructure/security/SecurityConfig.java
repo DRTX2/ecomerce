@@ -1,7 +1,6 @@
 package com.drtx.ecomerce.amazon.infrastructure.security;
 
 import com.drtx.ecomerce.amazon.adapters.in.security.JwtAuthFilter;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -39,6 +38,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> {
                         System.out.println("SecurityConfig - Configuring authorization");
                         auth.requestMatchers(
+                                "/auth/**",
                                 "/auth/register",
                                 "/auth/login"
                         ).permitAll()
@@ -46,16 +46,6 @@ public class SecurityConfig {
                 })
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-                .exceptionHandling(exception -> exception
-                    .authenticationEntryPoint((request, response, authException) -> {
-                        System.out.println("Authentication failed for: " + request.getRequestURI());
-                        System.out.println("Exception: " + authException.getMessage());
-                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                        response.setContentType("application/json");
-                        response.setCharacterEncoding("UTF-8");
-                        response.getWriter().write("{\"error\":\"" + authException.getMessage() + "\",\"path\":\"" + request.getRequestURI() + "\"}");
-                    })
-                )
                 .build();
     }
 
