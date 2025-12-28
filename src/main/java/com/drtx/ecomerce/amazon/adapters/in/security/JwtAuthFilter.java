@@ -29,22 +29,16 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        String contextPath = request.getContextPath();
-
         System.out.println("JwtAuthFilter - Request URI: " + path);
-        System.out.println("JwtAuthFilter - Context Path: " + contextPath);
-
-        // Remove context path to get the actual endpoint path
-        String endpoint = path;
+        // Remover el context-path si existe
+        String contextPath = request.getContextPath();
         if (contextPath != null && !contextPath.isEmpty() && path.startsWith(contextPath)) {
-            endpoint = path.substring(contextPath.length());
+            path = path.substring(contextPath.length());
         }
-
-        System.out.println("JwtAuthFilter - Endpoint: " + endpoint);
-
-        boolean skip = endpoint.equals("/auth/login") ||
-                       endpoint.equals("/auth/register") ||
-                       endpoint.startsWith("/auth/");
+        System.out.println("JwtAuthFilter - Path without context: " + path);
+        boolean skip = path.equals("/auth/login") || 
+                       path.equals("/auth/register") ||
+                       path.startsWith("/auth/");
         System.out.println("JwtAuthFilter - Should skip: " + skip);
         return skip;
     }
