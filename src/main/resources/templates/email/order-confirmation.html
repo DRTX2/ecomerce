@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background-color: #232f3e; color: white; padding: 20px; text-align: center; }
+        .content { background-color: #f8f8f8; padding: 30px; }
+        .order-number { background-color: #fff; border-left: 4px solid #ff9900; padding: 15px; 
+                       margin: 20px 0; font-size: 18px; }
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>¡Pedido Confirmado!</h1>
+        </div>
+        <div class="content">
+            <h2>Hola {{name}},</h2>
+            <p>Tu pedido ha sido confirmado y está siendo procesado.</p>
+            <div class="order-number">
+                <strong>Número de pedido:</strong> {{orderNumber}}
+            </div>
+            <p>Te notificaremos cuando tu pedido sea enviado.</p>
+            <p>Gracias por tu compra.</p>
+        </div>
+        <div class="footer">
+            <p>© 2024 Amazon Clone. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>
