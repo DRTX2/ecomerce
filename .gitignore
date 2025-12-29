@@ -37,3 +37,8 @@ build/
 .vscode/
 
 notes.md
+
+### Environment Variables ###
+.env
+.env.local
+.env.*.local

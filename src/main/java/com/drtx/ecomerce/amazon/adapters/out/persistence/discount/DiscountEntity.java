@@ -28,7 +28,7 @@ public class DiscountEntity {
     @Column(nullable = false)
     private DiscountType type;
 
-    @Column(nullable = false)
+    @Column(name = "discount_value", nullable = false)  // Renombrar columna para evitar conflicto con palabra reservada 'value'
     private BigDecimal value;
 
     @ManyToMany

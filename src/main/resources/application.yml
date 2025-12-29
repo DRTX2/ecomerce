@@ -15,6 +15,32 @@ spring:
     show-sql: true
     database-platform: org.hibernate.dialect.PostgreSQLDialect
 
+  mail:
+    host: smtp.office365.com
+    port: 587
+    username: ${MAIL_USERNAME:tu_correo@outlook.com}
+    password: ${MAIL_PASSWORD:CONTRASEÑA_DE_APLICACIÓN}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+# Configuración de email para testing
+email:
+  provider: azure # Opciones: javamail, azure
+  test:
+    recipient: ${TEST_EMAIL:test@example.com}
+
+azure:
+  communication:
+    connection-string: ${AZURE_COMMUNICATION_CONNECTION_STRING}
+    sender-address: ${AZURE_SENDER_ADDRESS:DoNotReply@domain.com}
+
 server:
   port: 8080
   servlet:
@@ -26,6 +52,9 @@ security:
     expiration: 86400000
 
 management:
+  health:
+    mail:
+      enabled: false
   endpoints:
     web:
       exposure:
