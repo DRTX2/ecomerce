@@ -9,17 +9,23 @@ import java.util.Properties;
 
 /**
  * Test ULTRA SIMPLE para probar envío de correos SIN Spring Boot
- * Esto nos ayuda a identificar si el problema es de configuración o de credenciales
+ * Esto nos ayuda a identificar si el problema es de configuración o de
+ * credenciales
  */
 public class EmailSimpleTest {
 
     @Test
-//    @Disabled("Elimina @Disabled para ejecutar")
+    // @Disabled("Elimina @Disabled para ejecutar")
     void testEmailConOutlook() {
         // Configuración directa desde tu .env
-        String username = "dave-man5432@outlook.com";
-        String password = "fufuxrditzrijkuq";  // Tu contraseña del .env
-        String destinatario = "davidmanjarres2004@gmail.com";
+        // Configuración directa desde variables de entorno o valores por defecto
+        // seguros
+        String username = System.getenv("MAIL_USERNAME") != null ? System.getenv("MAIL_USERNAME")
+                : "tu_correo@outlook.com";
+        String password = System.getenv("MAIL_PASSWORD") != null ? System.getenv("MAIL_PASSWORD")
+                : "tu_contraseña_de_aplicacion";
+        String destinatario = System.getenv("TEST_EMAIL") != null ? System.getenv("TEST_EMAIL")
+                : "destinatario@ejemplo.com";
 
         System.out.println("\n═══════════════════════════════════════════");
         System.out.println("🧪 TEST SIMPLE DE EMAIL - OUTLOOK");
@@ -40,7 +46,7 @@ public class EmailSimpleTest {
             props.put("mail.smtp.auth", "true");
             props.put("mail.smtp.starttls.enable", "true");
             props.put("mail.smtp.ssl.trust", "smtp.office365.com");
-            props.put("mail.debug", "true");  // Activar debug para ver detalles
+            props.put("mail.debug", "true"); // Activar debug para ver detalles
 
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(username);
@@ -58,7 +64,7 @@ public class EmailSimpleTest {
             System.err.println("Tipo: " + e.getClass().getSimpleName());
             System.err.println("Mensaje: " + e.getMessage());
             e.printStackTrace();
-            
+
             System.out.println("\n💡 POSIBLES SOLUCIONES:");
             System.out.println("1. ⚠️  La contraseña NO es válida para Outlook");
             System.out.println("   → Genera una nueva en: https://account.microsoft.com/security");
@@ -69,18 +75,21 @@ public class EmailSimpleTest {
             System.out.println("   → Es más simple y confiable para desarrollo");
             System.out.println("   → Cambia MAIL_USERNAME a tu Gmail");
             System.out.println("   → Genera contraseña en: https://myaccount.google.com/apppasswords");
-            
+
             throw new RuntimeException("Test falló. Lee las soluciones arriba.", e);
         }
     }
 
     @Test
-//    @Disabled("Elimina @Disabled para ejecutar")
+    // @Disabled("Elimina @Disabled para ejecutar")
     void testEmailConGmail() {
         // ALTERNATIVA CON GMAIL - MÁS FÁCIL
-        String username = "davidmanjarres2004@gmail.com";  // TU GMAIL
-        String password = "PON_AQUI_CONTRASEÑA_DE_APLICACION";  // Genera en https://myaccount.google.com/apppasswords
-        String destinatario = "dave-man5432@outlook.com";
+        String username = System.getenv("GMAIL_USERNAME") != null ? System.getenv("GMAIL_USERNAME")
+                : "tu_gmail@gmail.com"; // TU GMAIL
+        String password = System.getenv("GMAIL_PASSWORD") != null ? System.getenv("GMAIL_PASSWORD")
+                : "PON_AQUI_CONTRASEÑA_DE_APLICACION";
+        String destinatario = System.getenv("TEST_EMAIL") != null ? System.getenv("TEST_EMAIL")
+                : "destinatario@outlook.com";
 
         System.out.println("\n═══════════════════════════════════════════");
         System.out.println("🧪 TEST SIMPLE DE EMAIL - GMAIL");

@@ -5,7 +5,7 @@ spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/ecomerce
     username: david
-    password: root
+    password: ${DB_PASSWORD:root}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -18,8 +18,8 @@ spring:
   mail:
     host: smtp.office365.com
     port: 587
-    username: ${MAIL_USERNAME:tu_correo@outlook.com}
-    password: ${MAIL_PASSWORD:CONTRASEÑA_DE_APLICACIÓN}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
     properties:
       mail:
         smtp:
@@ -48,7 +48,7 @@ server:
 
 security:
   jwt:
-    secret-key: TWlTdXBlckNsYXZlSldUZGVDb2RpbmcyNTZCaXRzMTIzNDU2
+    secret-key: ${JWT_SECRET_KEY}
     expiration: 86400000
 
 management:
