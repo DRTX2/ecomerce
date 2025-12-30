@@ -1,0 +1,41 @@
+services:
+  backend:
+    build: .
+    container_name: ecomerce-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/ecomerce
+      - SPRING_DATASOURCE_USERNAME=david
+      - DB_PASSWORD=${DB_PASSWORD:-root}
+      - MAIL_USERNAME=${MAIL_USERNAME}
+      - MAIL_PASSWORD=${MAIL_PASSWORD}
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY}
+      - AZURE_COMMUNICATION_CONNECTION_STRING=${AZURE_COMMUNICATION_CONNECTION_STRING}
+      - AZURE_SENDER_ADDRESS=${AZURE_SENDER_ADDRESS}
+    depends_on:
+      - db
+    networks:
+      - ecomerce-network
+
+  db:
+    image: postgres:16-alpine
+    container_name: ecomerce-db
+    restart: always
+    environment:
+      - POSTGRES_USER=david
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-root}
+      - POSTGRES_DB=ecomerce
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - ecomerce-network
+
+networks:
+  ecomerce-network:
+    driver: bridge
+
+volumes:
+  db_data:
