@@ -1,242 +1,103 @@
-Entidades con sus propiedades y métodos clave:
+# E-commerce Backend API
 
-### 1. **Usuario (User)**
-**Atributos:**
-- `id` (UUID)
-- `nombre` (String)
-- `email` (String)
-- `contraseña` (String, encriptada)
-- `dirección` (String)
-- `teléfono` (String)
-- `rol` (Enum: Cliente, Administrador)
-- `historial_pedidos` (Lista de Órdenes)
+Robust and scalable backend for a modern e-commerce platform. Built with **Java 21** and **Spring Boot 3**, this project implements a pure **Hexagonal Architecture** to ensure separation of concerns, maintainability, and framework independence.
 
-**Métodos:**
-- `registrarse(nombre, email, contraseña)`
-- `iniciar_sesion(email, contraseña)`
-- `actualizar_perfil(datos)`
-- `cambiar_contraseña(antigua, nueva)`
-- `ver_historial_pedidos()`
-- `cerrar_sesion()`
+## 📝 Description
 
----  
+This project provides the business logic and infrastructure services required to operate a full-fledged e-commerce system. It manages everything from the product catalog and user authentication to complex order processing and hybrid customer support systems.
 
-### 2. **Producto (Product)**
-**Atributos:**
-- `id` (UUID)
-- `nombre` (String)
-- `descripción` (String)
-- `precio` (Decimal)
-- `stock` (Entero)
-- `categoría` (Categoría)
-- `calificación_promedio` (Float)
-- `imágenes` (Lista de URLs)
+It is designed for developers looking for a solid reference in DDD (Domain-Driven Design) and Ports & Adapters Architecture implementations within the Spring ecosystem.
 
-**Métodos:**
-- `actualizar_precio(nuevo_precio)`
-- `actualizar_stock(nueva_cantidad)`
-- `asignar_categoría(categoría)`
-- `obtener_reseñas()`
+## ✨ Features
 
----  
+- **Authentication & Security**: Complete login/registration system with JWT and Spring Security.
+- **Product Catalog**: Full CRUD for products and categories with inventory management.
+- **Order Management**: Persistent shopping cart, wishlists, and order processing.
+- **Hybrid Support**:
+  - **REST**: For standard e-commerce operations.
+  - **GraphQL**: Optimized API for the Incidence and Appeals module.
+- **Notifications**: Integration with Azure Communication Services for transactional emails.
+- **Efficient Mapping**: Uses MapStruct for type-safe DTO-Domain-Entity transformations with zero performance overhead.
 
-### 3. **Orden (Order)**
-**Atributos:**
-- `id` (UUID)
-- `usuario` (Usuario)
-- `productos` (Lista de Productos con cantidad)
-- `total` (Decimal)
-- `estado` (Enum: Pendiente, Enviado, Entregado, Cancelado)
-- `fecha_creación` (Fecha)
-- `fecha_entrega` (Fecha)
-- `método_pago` (Pago)
+## 🛠️ Technologies
 
-**Métodos:**
-- `calcular_total()`
-- `cambiar_estado(nuevo_estado)`
-- `cancelar_orden()`
-- `generar_factura()`
+### Core
+- **Language**: Java 21
+- **Framework**: Spring Boot 3.4.4
+- **Build Tool**: Gradle
 
----  
+### Infrastructure & Data
+- **Database**: PostgreSQL 16
+- **Cache/Session**: (Ready for Redis/In-memory)
+- **Containerization**: Docker & Docker Compose
 
-### 4. **Carrito de Compras (Cart)**
-**Atributos:**
-- `id` (UUID)
-- `usuario` (Usuario)
-- `productos` (Lista de Productos con cantidad)
+### APIs
+- **REST**: Spring Web MVC
+- **GraphQL**: Spring for GraphQL
 
-**Métodos:**
-- `agregar_producto(producto, cantidad)`
-- `eliminar_producto(producto)`
-- `vaciar_carrito()`
-- `calcular_total()`
-- `convertir_a_orden()`
+## 🔧 Key Tools & Dependencies
 
----  
+- **Lombok**: To reduce boilerplate code.
+- **MapStruct**: High-performance, type-safe object mapping.
+- **JJWT**: JSON Web Tokens implementation.
+- **Azure Communication Email**: Cloud messaging service.
+- **Hibernate Validator**: Input validation.
 
-### 5. **Pago (Payment)**
-**Atributos:**
-- `id` (UUID)
-- `orden` (Orden)
-- `monto` (Decimal)
-- `estado` (Enum: Pendiente, Completado, Fallido)
-- `método` (Enum: Tarjeta, PayPal, Transferencia)
-- `fecha_pago` (Fecha)
+## 🧱 Architecture
 
-**Métodos:**
-- `procesar_pago()`
-- `reembolsar_pago()`
+This project strictly follows **Hexagonal Architecture (Ports & Adapters)**:
 
----  
+- **Core (Domain)**: Pure entities and business rules (no Spring dependencies).
+- **Application (Use Cases)**: Business logic orchestration implementing input ports.
+- **Adapters (Infrastructure)**:
+  - **In**: REST Controllers and GraphQL Resolvers.
+  - **Out**: JPA Repositories and external service adapters (Email).
 
-### 6. **Envío (Shipping)**
-**Atributos:**
-- `id` (UUID)
-- `orden` (Orden)
-- `dirección_entrega` (String)
-- `estado_envío` (Enum: Preparando, Enviado, Entregado)
-- `empresa_transportista` (String)
-- `número_seguimiento` (String)
+```mermaid
+graph TD
+    Client[Web/Mobile Client] --> REST[REST Adapter]
+    Client --> GQL[GraphQL Adapter]
+    REST --> InputPort[Input Port (UseCase)]
+    GQL --> InputPort
+    InputPort --> Domain[Domain Logic]
+    Domain --> OutputPort[Output Port]
+    OutputPort --> Persistence[Persistence Adapter (JPA)]
+    OutputPort --> Email[Email Adapter (Azure)]
+```
 
-**Métodos:**
-- `actualizar_estado(nuevo_estado)`
-- `obtener_detalles_envío()`
+## 🚀 Installation & Execution
 
----  
+### Prerequisites
+- Docker and Docker Compose
+- Java 21 (optional if using Docker)
 
-### 7. **Inventario (Inventory)**
-**Atributos:**
-- `id` (UUID)
-- `producto` (Producto)
-- `cantidad_disponible` (Entero)
-- `ubicación_almacén` (String)
+### Quick Start (Recommended)
 
-**Métodos:**
-- `actualizar_stock(nueva_cantidad)`
-- `verificar_disponibilidad()`
+1. **Clone the repository**:
+   ```bash
+   git clone <repo-url>
+   cd back
+   ```
 
----  
+2. **Configure environment**:
+   Create a `.env` file in the root directory based on `.env.example` (or define environment variables in your system).
 
-### 8. **Reseñas y Calificaciones (Review & Rating)**
-**Atributos:**
-- `id` (UUID)
-- `usuario` (Usuario)
-- `producto` (Producto)
-- `calificación` (Entero de 1 a 5)
-- `comentario` (String)
-- `fecha` (Fecha)
+3. **Run with Docker Compose**:
+   ```bash
+   docker-compose up --build
+   ```
+   The API will be available at `http://localhost:8080/api/v1`.
 
-**Métodos:**
-- `agregar_reseña(calificación, comentario)`
-- `editar_reseña(nueva_calificación, nuevo_comentario)`
-- `eliminar_reseña()`
+## 📚 Documentation
 
----  
+For full project documentation (detailed guides, architecture decisions, and API reference):
 
-### 9. **Categoría (Category)**
-**Atributos:**
-- `id` (UUID)
-- `nombre` (String)
-- `descripción` (String)
-- `productos` (Lista de Productos)
+| 📚 Documentation |
+|------------------|
+| ➡️ **[Explore Technical Documentation](./Docs/README.md)** |
 
-**Métodos:**
-- `agregar_producto(producto)`
-- `eliminar_producto(producto)`
+## 👤 Author
 
----  
+**David** - *Backend Engineer*
 
-### 10. **Proveedor (Supplier/Vendor)**
-**Atributos:**
-- `id` (UUID)
-- `nombre` (String)
-- `contacto` (String)
-- `productos_suministrados` (Lista de Productos)
-
-**Métodos:**
-- `agregar_producto(producto)`
-- `actualizar_información(contacto_nuevo)`
-
----  
-
-### 11. **Descuentos y Promociones (Discounts & Promotions)**
-**Atributos:**
-- `id` (UUID)
-- `código` (String)
-- `tipo` (Enum: Porcentaje, Fijo)
-- `valor` (Decimal)
-- `productos_aplicables` (Lista de Productos)
-- `fecha_expiración` (Fecha)
-
-**Métodos:**
-- `validar_descuento()`
-- `aplicar_descuento(precio_original)`
-
----  
-
-### 12. **Autenticación y Autorización (Auth & Roles)**
-**Atributos:**
-- `usuario` (Usuario)
-- `token_sesión` (String)
-- `rol` (Enum: Cliente, Administrador)
-
-**Métodos:**
-- `generar_token(usuario)`
-- `verificar_credenciales(email, contraseña)`
-- `revocar_token(usuario)`
-
----  
-
-### 13. **Historial de Compras (Order History)**
-**Atributos:**
-- `usuario` (Usuario)
-- `pedidos` (Lista de Órdenes)
-
-**Métodos:**
-- `obtener_historial()`
-- `buscar_pedido(id_pedido)`
-
----  
-
-### 14. **Notificaciones (Notifications)**
-**Atributos:**
-- `id` (UUID)
-- `usuario` (Usuario)
-- `mensaje` (String)
-- `fecha` (Fecha)
-- `tipo` (Enum: Pedido, Envío, Promoción)
-- `estado` (Enum: Leído, No Leído)
-
-**Métodos:**
-- `enviar_notificación(usuario, mensaje, tipo)`
-- `marcar_como_leído()`
-
----  
-
-### 15. **Soporte y Devoluciones (Support & Returns)**
-**Atributos:**
-- `id` (UUID)
-- `usuario` (Usuario)
-- `orden` (Orden)
-- `motivo` (String)
-- `estado` (Enum: En revisión, Aprobado, Rechazado)
-
-**Métodos:**
-- `solicitar_devolución(motivo)`
-- `actualizar_estado(nuevo_estado)`
-
----
-
-## Proximamente
-
-Colas de mensajes
-
-Contadores atómicos
-
-Rate limiters
-
-Sesiones de usuario
-
-Caches de búsqueda
-
-Notificaciones en tiempo real
+🌐 Portfolio: [https://drtx2.github.io/portfolio/](https://drtx2.github.io/portfolio/)
