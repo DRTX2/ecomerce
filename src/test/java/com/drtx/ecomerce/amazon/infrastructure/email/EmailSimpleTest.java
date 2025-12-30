@@ -17,8 +17,6 @@ public class EmailSimpleTest {
     @Test
     // @Disabled("Elimina @Disabled para ejecutar")
     void testEmailConOutlook() {
-        // Configuración directa desde tu .env
-        // Configuración directa desde variables de entorno o valores por defecto
         // seguros
         String username = System.getenv("MAIL_USERNAME") != null ? System.getenv("MAIL_USERNAME")
                 : "tu_correo@outlook.com";
