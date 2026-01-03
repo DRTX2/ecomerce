@@ -28,6 +28,10 @@ public class AuthService {
 
     // se q son tipos distintos, luego usare un mapper
     public AuthResponse register(User user) {
+        if (user.getPassword().toLowerCase().contains(user.getEmail().toLowerCase())) {
+            throw new com.drtx.ecomerce.amazon.core.model.exceptions.DomainException(
+                    "Password cannot contain the email address.");
+        }
         String encodedPassword = passwordService.encode(user.getPassword());
         user.setPassword(encodedPassword);
         User savedUser = repository.save(user);
