@@ -31,10 +31,15 @@ public class AzureBlobStorageAdapter implements ImageStoragePort {
 
     @Override
     public String uploadImage(String fileName, InputStream content, long length, String contentType) {
-        String path = "products/" + fileName;
-        BlobClient blobClient = containerClient.getBlobClient(path);
-        blobClient.upload(content, length, true);
-        // We could set http headers/content type if needed
-        return blobClient.getBlobUrl();
+        try {
+            String path = "products/" + fileName;
+            BlobClient blobClient = containerClient.getBlobClient(path);
+            blobClient.upload(content, length, true);
+            // We could set http headers/content type if needed
+            return blobClient.getBlobUrl();
+        } catch (Exception e) {
+            throw new com.drtx.ecomerce.amazon.core.model.exceptions.StorageException(
+                    "Failed to upload image to Azure Storage", e);
+        }
     }
 }
