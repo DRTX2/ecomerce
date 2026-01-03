@@ -21,6 +21,6 @@ public class CategoryEntity {
     private Long id;
     private String name;
     private String description;
-    @OneToMany
+    @OneToMany(mappedBy = "category")
     private List<ProductEntity> products;
 }

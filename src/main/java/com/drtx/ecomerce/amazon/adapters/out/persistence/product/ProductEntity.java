@@ -37,6 +37,6 @@ public class ProductEntity {
     @Column(precision = 3, scale = 2)
     private BigDecimal averageRating;
 
-    @OneToMany
+    @OneToMany(mappedBy = "product")
     private List<ProductImageEntity> images;
 }
