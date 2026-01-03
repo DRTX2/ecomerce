@@ -3,8 +3,8 @@ spring:
     name: amazon
 
   datasource:
-    url: jdbc:postgresql://localhost:5432/ecomerce
-    username: david
+    url: ${DB_URL}
+    username: ${DB_USERNAME:postgres}
     password: ${DB_PASSWORD:root}
     driver-class-name: org.postgresql.Driver
 
@@ -61,3 +61,13 @@ management:
         include: health,info,mappings
     mappings:
       enabled: true
+
+storage:
+  azure:
+    connection-string: ${AZURE_STORAGE_CONNECTION_STRING:DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://localhost:10000/devstoreaccount1;}
+    container-name: ${STORAGE_CONTAINER_NAME:uploads}
+  image:
+    max-file-size: ${STORAGE_MAX_FILE_SIZE:5242880} # Default 5MB
+    max-files-count: ${STORAGE_MAX_FILES_COUNT:5}
+    max-total-size: ${STORAGE_MAX_TOTAL_SIZE:20971520} # Default 20MB
+    allowed-content-types: ${STORAGE_ALLOWED_CONTENT_TYPES:image/jpeg,image/png,image/webp}
