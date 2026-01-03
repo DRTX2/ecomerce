@@ -40,6 +40,9 @@ class ProductControllerTest {
     private ProductUseCasePort productUseCasePort;
 
     @Mock
+    private com.drtx.ecomerce.amazon.application.usecases.product.UploadProductImageUseCase uploadImageUseCase;
+
+    @Mock
     private ProductRestMapper productMapper;
 
     private Product testProduct;
@@ -49,7 +52,7 @@ class ProductControllerTest {
 
     @BeforeEach
     void setUp() {
-        ProductController controller = new ProductController(productUseCasePort, productMapper);
+        ProductController controller = new ProductController(productUseCasePort, uploadImageUseCase, productMapper);
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         objectMapper = new ObjectMapper();
 
