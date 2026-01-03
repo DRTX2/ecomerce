@@ -72,7 +72,8 @@ public class ProductController {
         return service.getProductById(id)
                 .map(mapper::toResponse)
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .orElseThrow(() -> new com.drtx.ecomerce.amazon.core.model.exceptions.EntityNotFoundException(
+                        "Product not found with id: " + id));
     }
 
     @PutMapping("/{id}")
