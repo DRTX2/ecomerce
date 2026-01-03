@@ -98,7 +98,53 @@ classDiagram
 
 ---
 
-## 3. 🔒 Applied Security
+## 3. 💾 Database Schema (ERD)
+
+This diagram represents the persistent state of the system in PostgreSQL, designed to support the domain models.
+
+```mermaid
+erDiagram
+    USERS ||--o{ ORDERS : places
+    USERS ||--o{ REVIEWS : writes
+    USERS ||--o{ ADDRESSES : has
+    
+    PRODUCTS ||--o{ ORDER_ITEMS : contains
+    PRODUCTS ||--o{ REVIEWS : receives
+    PRODUCTS }|--|| CATEGORIES : belongs_to
+    PRODUCTS ||--o{ PRODUCT_IMAGES : has
+
+    ORDERS ||--|{ ORDER_ITEMS : includes
+    
+    CART ||--|| USERS : belongs_to
+    CART ||--|{ CART_ITEMS : contains
+    CART_ITEMS }|--|| PRODUCTS : references
+
+    USERS {
+        Long id
+        String email
+        String password_hash
+        String role
+    }
+
+    PRODUCTS {
+        Long id
+        String name
+        BigDecimal price
+        Integer stock
+        Boolean active
+    }
+
+    ORDERS {
+        Long id
+        String status
+        BigDecimal total_amount
+        Timestamp created_at
+    }
+```
+
+---
+
+## 4. 🔒 Applied Security
 
 ### **Authentication Strategy**
 - **Mechanism**: JWT (JSON Web Token).

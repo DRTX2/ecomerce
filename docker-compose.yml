@@ -13,6 +13,12 @@ services:
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - AZURE_COMMUNICATION_CONNECTION_STRING=${AZURE_COMMUNICATION_CONNECTION_STRING}
       - AZURE_SENDER_ADDRESS=${AZURE_SENDER_ADDRESS}
+      - STORAGE_CONTAINER_NAME=${STORAGE_CONTAINER_NAME}
+      - STORAGE_MAX_FILE_SIZE=${STORAGE_MAX_FILE_SIZE}
+      - STORAGE_MAX_FILES_COUNT=${STORAGE_MAX_FILES_COUNT}
+      - STORAGE_MAX_TOTAL_SIZE=${STORAGE_MAX_TOTAL_SIZE}
+      - STORAGE_ALLOWED_CONTENT_TYPES=${STORAGE_ALLOWED_CONTENT_TYPES}
+      - AZURE_STORAGE_CONNECTION_STRING=${AZURE_STORAGE_CONNECTION_STRING:-DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;}
     depends_on:
       - db
     networks:
@@ -33,9 +39,23 @@ services:
     networks:
       - ecomerce-network
 
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    container_name: ecomerce-azurite
+    restart: always
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
+    volumes:
+      - azurite_data:/data
+    networks:
+      - ecomerce-network
+
 networks:
   ecomerce-network:
     driver: bridge
 
 volumes:
   db_data:
+  azurite_data:

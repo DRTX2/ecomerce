@@ -96,7 +96,23 @@ For full project documentation (detailed guides, architecture decisions, and API
 |------------------|
 | ➡️ **[Explore Technical Documentation](./Docs/README.md)** |
 
-## 👤 Author
+<!-- esto se agrego -->
+## � Roadmap & Future Improvements
+
+This project is in continuous evolution. Here is the strategic plan for upcoming versions:
+
+- **Performance**:
+  - [ ] Implement Redis for caching frequent product queries.
+  - [ ] Add Database Indexing optimization.
+- **Features**:
+  - [ ] Multi-vendor support (Marketplace model).
+  - [ ] Payment Gateway Integration (Stripe/PayPal).
+  - [ ] AI-powered product recommendations.
+- **DevOps**:
+  - [ ] CI/CD Pipeline with GitHub Actions.
+  - [ ] Kubernetes (K8s) manifests for scalable deployment.
+
+## �👤 Author
 
 **David** - *Backend Engineer*
 

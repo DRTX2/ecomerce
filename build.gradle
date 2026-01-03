@@ -37,6 +37,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-graphql'
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	implementation 'com.azure:azure-communication-email:1.0.15'
+	implementation 'com.azure:azure-storage-blob:12.25.1'
 	
 	// Commons
 	implementation 'org.apache.commons:commons-lang3:3.14.0'
@@ -79,4 +80,47 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+    
+    // Load .env variables for tests
+    doFirst {
+        def envFile = file("${project.rootDir}/.env")
+        if (envFile.exists()) {
+            envFile.eachLine { line ->
+                if (line.trim() && !line.startsWith('#') && line.contains('=')) {
+                    def parts = line.split('=', 2)
+                    def key = parts[0].trim()
+                    def value = parts[1].trim()
+
+                     // Handle quoted values
+                    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+                        value = value.substring(1, value.length() - 1)
+                    }
+                    environment key, value
+                }
+            }
+        }
+    }
+}
+
+tasks.named('bootRun') {
+    // Load .env variables for application run
+    doFirst {
+        if (file("${project.rootDir}/.env").exists()) {
+            file("${project.rootDir}/.env").readLines().each { line ->
+                if (line.trim() && !line.startsWith('#') && line.contains('=')) {
+                    // Split only on the first equals sign
+                    def parts = line.split('=', 2)
+                    def key = parts[0].trim()
+                    def value = parts[1].trim()
+                    
+                    // Handle quoted values
+                    if ((value.startsWith('"') && value.endsWith('"')) || (value.startsWith("'") && value.endsWith("'"))) {
+                        value = value.substring(1, value.length() - 1)
+                    }
+                    
+                    environment key, value
+                }
+            }
+        }
+    }
 }
