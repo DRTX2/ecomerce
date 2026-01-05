@@ -42,6 +42,9 @@ dependencies {
 	// Commons
 	implementation 'org.apache.commons:commons-lang3:3.14.0'
 	
+	// Redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	
 	// MapStruct
 	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
 	
