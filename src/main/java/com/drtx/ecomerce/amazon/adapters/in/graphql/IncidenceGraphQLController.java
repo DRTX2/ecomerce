@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -22,11 +23,13 @@ public class IncidenceGraphQLController {
     private final IncidenceUseCasePort incidenceUseCase;
 
     @QueryMapping
+    @PreAuthorize("hasRole('MODERATOR')")
     public List<Incidence> getAllIncidences() {
         return incidenceUseCase.getAllIncidences();
     }
 
     @QueryMapping
+    @PreAuthorize("hasRole('MODERATOR')")
     public Optional<Incidence> getIncidenceById(@Argument Long id) {
         return incidenceUseCase.getIncidenceById(id);
     }
@@ -42,6 +45,7 @@ public class IncidenceGraphQLController {
     }
 
     @MutationMapping
+    @PreAuthorize("hasRole('MODERATOR')")
     public Incidence resolveIncidence(@Argument Long id, @Argument ResolveIncidenceInput input) {
         String moderatorEmail = getAuthenticatedUserEmail();
         return incidenceUseCase.resolveIncidence(id, input.decision(), input.moderatorComment(), moderatorEmail);
@@ -49,12 +53,16 @@ public class IncidenceGraphQLController {
 
     private String getAuthenticatedUserEmail() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.isAuthenticated() && !authentication.getPrincipal().equals("anonymousUser")) {
+        if (authentication != null && authentication.isAuthenticated()
+                && !authentication.getPrincipal().equals("anonymousUser")) {
             return authentication.getName();
         }
         return null;
     }
 
-    record ReportInput(String reason, String comment) {}
-    record ResolveIncidenceInput(IncidenceDecision decision, String moderatorComment) {}
+    record ReportInput(String reason, String comment) {
+    }
+
+    record ResolveIncidenceInput(IncidenceDecision decision, String moderatorComment) {
+    }
 }

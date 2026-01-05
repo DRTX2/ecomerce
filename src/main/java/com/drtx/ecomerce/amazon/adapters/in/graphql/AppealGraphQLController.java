@@ -6,6 +6,7 @@ import com.drtx.ecomerce.amazon.core.ports.in.rest.AppealUseCasePort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -23,6 +24,7 @@ public class AppealGraphQLController {
     }
 
     @MutationMapping
+    @PreAuthorize("hasRole('MODERATOR')")
     public Appeal resolveAppeal(@Argument Long id, @Argument AppealDecision decision) {
         String moderatorEmail = getAuthenticatedUserEmail();
         return appealUseCase.resolveAppeal(id, decision, moderatorEmail);

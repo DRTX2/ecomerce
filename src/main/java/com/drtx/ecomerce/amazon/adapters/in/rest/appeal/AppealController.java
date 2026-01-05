@@ -9,6 +9,7 @@ import com.drtx.ecomerce.amazon.core.ports.in.rest.AppealUseCasePort;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -37,6 +38,7 @@ public class AppealController {
     }
 
     @PutMapping("/{id}/resolve")
+    @PreAuthorize("hasRole('MODERATOR')")
     public ResponseEntity<AppealResponse> resolveAppeal(
             @PathVariable Long id,
             @Valid @RequestBody ResolveAppealRequest request) {

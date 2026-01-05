@@ -8,6 +8,7 @@ import com.drtx.ecomerce.amazon.core.ports.in.rest.OrderUseCasePort;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,6 +21,7 @@ public class OrderController {
     private final OrderRestMapper mapper;
 
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<OrderResponse>> getAllOrders() {
         return ResponseEntity.ok(
                 orderUseCasePort.getAllOrders()
@@ -44,6 +46,7 @@ public class OrderController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<OrderResponse> updateOrder(@PathVariable Long id,
             @RequestBody @Valid OrderRequest orderRequest) {
         Order orderToUpdate = mapper.toDomain(orderRequest);
@@ -53,6 +56,7 @@ public class OrderController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteOrderById(@PathVariable Long id) {
         orderUseCasePort.deleteOrder(id);
         return ResponseEntity.noContent().build();
