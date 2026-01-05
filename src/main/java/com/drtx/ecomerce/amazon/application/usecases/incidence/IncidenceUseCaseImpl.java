@@ -1,4 +1,4 @@
-package com.drtx.ecomerce.amazon.application.usecases;
+package com.drtx.ecomerce.amazon.application.usecases.incidence;
 
 import com.drtx.ecomerce.amazon.core.model.issues.Incidence;
 import com.drtx.ecomerce.amazon.core.model.issues.IncidenceDecision;

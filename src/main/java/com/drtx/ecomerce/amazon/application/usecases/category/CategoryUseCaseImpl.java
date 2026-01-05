@@ -1,4 +1,4 @@
-package com.drtx.ecomerce.amazon.application.usecases;
+package com.drtx.ecomerce.amazon.application.usecases.category;
 
 import com.drtx.ecomerce.amazon.core.model.product.Category;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.CategoryRepositoryPort;
