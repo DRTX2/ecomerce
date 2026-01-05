@@ -1,18 +1,19 @@
 package com.drtx.ecomerce.amazon.application.usecases.product;
 
+import com.drtx.ecomerce.amazon.core.model.exceptions.DomainExceptionFactory;
+import com.drtx.ecomerce.amazon.core.model.product.ImageFile;
+import com.drtx.ecomerce.amazon.core.ports.in.rest.UploadProductImageUseCasePort;
 import com.drtx.ecomerce.amazon.core.ports.out.ImageStoragePort;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.Arrays;
 
 @Service
-public class UploadProductImageUseCase {
+public class UploadProductImageUseCase implements UploadProductImageUseCasePort {
 
     private final ImageStoragePort imageStoragePort;
     private final long maxFileSize;
@@ -33,50 +34,55 @@ public class UploadProductImageUseCase {
         this.allowedContentTypes = Arrays.asList(allowedContentTypes.split(","));
     }
 
-    public List<String> uploadImages(Long userId, String userRole, List<MultipartFile> files) {
-        // 1. Check Role
+    @Override
+    public List<String> uploadImages(Long userId, String userRole, List<ImageFile> files) {
+        // 1. Check Role - This should ideally be done at controller level with
+        // @PreAuthorize
+        // but keeping validation here for defense in depth
         if (!"SELLER".equals(userRole)) {
-            throw new RuntimeException("Access Denied: Only SELLER can upload product images"); // Should be a custom
-                                                                                                // Exception
+            throw new org.springframework.security.access.AccessDeniedException(
+                    "Only SELLER can upload product images");
         }
 
         // 2. Validate Count
         if (files.size() > maxFilesCount) {
-            throw new RuntimeException("Too many files. Max allowed: " + maxFilesCount);
+            throw DomainExceptionFactory.tooManyImages(files.size(), maxFilesCount);
         }
 
         long totalSize = 0;
         List<String> uploadedUrls = new ArrayList<>();
 
-        for (MultipartFile file : files) {
+        for (ImageFile file : files) {
             // 3. Validate Individual Size
             if (file.getSize() > maxFileSize) {
-                throw new RuntimeException(
-                        "File too large: " + file.getOriginalFilename() + ". Max allowed: " + maxFileSize);
+                throw DomainExceptionFactory.imageTooLarge(file.getSize(), maxFileSize);
             }
             totalSize += file.getSize();
 
             // 4. Validate Content Type
             if (!allowedContentTypes.contains(file.getContentType())) {
-                throw new RuntimeException("Invalid file type: " + file.getContentType());
+                throw DomainExceptionFactory.invalidImageFormat(file.getContentType());
             }
 
             // 5. Check Total Size (accumulated)
             if (totalSize > maxTotalSize) {
-                throw new RuntimeException("Total size limit exceeded. Max allowed: " + maxTotalSize);
+                throw DomainExceptionFactory.imageTooLarge(totalSize, maxTotalSize);
             }
         }
 
         // 6. Upload
-        for (MultipartFile file : files) {
+        for (ImageFile file : files) {
             try {
-                String extension = getExtension(file.getOriginalFilename());
+                String extension = getExtension(file.getFileName());
                 String fileName = UUID.randomUUID().toString() + "." + extension;
-                String url = imageStoragePort.uploadImage(fileName, file.getInputStream(), file.getSize(),
+                String url = imageStoragePort.uploadImage(
+                        fileName,
+                        file.getContent(),
+                        file.getSize(),
                         file.getContentType());
                 uploadedUrls.add(url);
-            } catch (IOException e) {
-                throw new RuntimeException("Failed to upload file", e);
+            } catch (Exception e) {
+                throw DomainExceptionFactory.imageUploadFailed(file.getFileName(), e);
             }
         }
 
@@ -84,6 +90,9 @@ public class UploadProductImageUseCase {
     }
 
     private String getExtension(String filename) {
-        return filename.substring(filename.lastIndexOf(".") + 1);
+        if (filename == null)
+            return "";
+        int lastIndex = filename.lastIndexOf(".");
+        return (lastIndex == -1) ? "" : filename.substring(lastIndex + 1);
     }
 }
