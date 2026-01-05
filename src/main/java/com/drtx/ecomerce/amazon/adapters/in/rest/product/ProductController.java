@@ -1,11 +1,15 @@
 package com.drtx.ecomerce.amazon.adapters.in.rest.product;
 
+import com.drtx.ecomerce.amazon.adapters.in.rest.product.dto.ImageUploadResponse;
 import com.drtx.ecomerce.amazon.adapters.in.rest.product.dto.ProductRequest;
 import com.drtx.ecomerce.amazon.adapters.in.rest.product.dto.ProductResponse;
 import com.drtx.ecomerce.amazon.adapters.in.rest.product.mappers.ProductRestMapper;
+import com.drtx.ecomerce.amazon.application.usecases.product.UploadProductImageUseCase;
+import com.drtx.ecomerce.amazon.core.model.exceptions.EntityNotFoundException;
 import com.drtx.ecomerce.amazon.core.model.product.Product;
 import com.drtx.ecomerce.amazon.core.ports.in.rest.ProductUseCasePort;
 import lombok.AllArgsConstructor;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,11 +20,11 @@ import java.util.List;
 @AllArgsConstructor
 public class ProductController {
     private final ProductUseCasePort service;
-    private final com.drtx.ecomerce.amazon.application.usecases.product.UploadProductImageUseCase uploadImageUseCase;
+    private final UploadProductImageUseCase uploadImageUseCase;
     private final ProductRestMapper mapper;
 
-    @PostMapping(value = "/images", consumes = org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<com.drtx.ecomerce.amazon.adapters.in.rest.product.dto.ImageUploadResponse> uploadImages(
+    @PostMapping(value = "/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ImageUploadResponse> uploadImages(
             @RequestParam("files") List<org.springframework.web.multipart.MultipartFile> files,
             org.springframework.security.core.Authentication authentication) {
 
@@ -46,7 +50,7 @@ public class ProductController {
 
         List<String> urls = uploadImageUseCase.uploadImages(userId, role, files);
 
-        return ResponseEntity.ok(com.drtx.ecomerce.amazon.adapters.in.rest.product.dto.ImageUploadResponse.builder()
+        return ResponseEntity.ok(ImageUploadResponse.builder()
                 .imageUrls(urls)
                 .build());
     }
@@ -72,7 +76,7 @@ public class ProductController {
         return service.getProductById(id)
                 .map(mapper::toResponse)
                 .map(ResponseEntity::ok)
-                .orElseThrow(() -> new com.drtx.ecomerce.amazon.core.model.exceptions.EntityNotFoundException(
+                .orElseThrow(() -> new EntityNotFoundException(
                         "Product not found with id: " + id));
     }
 
