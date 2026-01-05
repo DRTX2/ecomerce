@@ -19,6 +19,9 @@ services:
       - STORAGE_MAX_TOTAL_SIZE=${STORAGE_MAX_TOTAL_SIZE}
       - STORAGE_ALLOWED_CONTENT_TYPES=${STORAGE_ALLOWED_CONTENT_TYPES}
       - AZURE_STORAGE_CONNECTION_STRING=${AZURE_STORAGE_CONNECTION_STRING:-DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azurite:10000/devstoreaccount1;}
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-http://localhost:3000}
+      - REDIS_HOST=${REDIS_HOST:-db}
+      - REDIS_PORT=${REDIS_PORT:-6379}
     depends_on:
       - db
     networks:
@@ -33,7 +36,7 @@ services:
       - POSTGRES_PASSWORD=${DB_PASSWORD:-root}
       - POSTGRES_DB=ecomerce
     ports:
-      - "5432:5432"
+      - "${DB_PORT:-5432}:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
     networks:
@@ -49,6 +52,15 @@ services:
       - "10002:10002"
     volumes:
       - azurite_data:/data
+    networks:
+      - ecomerce-network
+
+  redis:
+    image: redis:alpine
+    container_name: ecomerce-redis
+    restart: always
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
     networks:
       - ecomerce-network
 
