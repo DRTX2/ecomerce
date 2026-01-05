@@ -4,92 +4,105 @@ import com.drtx.ecomerce.amazon.adapters.in.rest.product.dto.ImageUploadResponse
 import com.drtx.ecomerce.amazon.adapters.in.rest.product.dto.ProductRequest;
 import com.drtx.ecomerce.amazon.adapters.in.rest.product.dto.ProductResponse;
 import com.drtx.ecomerce.amazon.adapters.in.rest.product.mappers.ProductRestMapper;
-import com.drtx.ecomerce.amazon.application.usecases.product.UploadProductImageUseCase;
 import com.drtx.ecomerce.amazon.core.model.exceptions.EntityNotFoundException;
+import com.drtx.ecomerce.amazon.core.model.product.ImageFile;
 import com.drtx.ecomerce.amazon.core.model.product.Product;
 import com.drtx.ecomerce.amazon.core.ports.in.rest.ProductUseCasePort;
+import com.drtx.ecomerce.amazon.core.ports.in.rest.UploadProductImageUseCasePort;
 import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/products")
 @AllArgsConstructor
 public class ProductController {
-    private final ProductUseCasePort service;
-    private final UploadProductImageUseCase uploadImageUseCase;
-    private final ProductRestMapper mapper;
+        private final ProductUseCasePort service;
+        private final UploadProductImageUseCasePort uploadImageUseCase;
+        private final ProductRestMapper mapper;
 
-    @PostMapping(value = "/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ImageUploadResponse> uploadImages(
-            @RequestParam("files") List<org.springframework.web.multipart.MultipartFile> files,
-            org.springframework.security.core.Authentication authentication) {
+        @PostMapping(value = "/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+        @PreAuthorize("hasRole('SELLER')")
+        public ResponseEntity<ImageUploadResponse> uploadImages(
+                        @RequestParam("files") List<MultipartFile> files,
+                        org.springframework.security.core.Authentication authentication) {
 
-        // Extract User Role and ID from Authentication
-        // Assuming CustomUserDetails or similar structure, or standard checking
-        // For simplicity, we assume we can get role from authorities
+                String role = authentication.getAuthorities().stream()
+                                .findFirst()
+                                .map(auth -> auth.getAuthority().replace("ROLE_", ""))
+                                .orElse("USER");
 
-        String role = authentication.getAuthorities().stream()
-                .findFirst()
-                .map(auth -> auth.getAuthority().replace("ROLE_", ""))
-                .orElse("USER");
+                Long userId = 1L; // Placeholder as in original
 
-        // We might need to fetch userId too if needed, but the current usecase
-        // signature asks for it.
-        // Let's assume a dummy userId or extract from principal if possible.
-        // Long userId = ((CustomUserDetails) authentication.getPrincipal()).getId();
-        // For now, let's pass 1L or modify usecase to not strictly need userId if not
-        // logged.
-        // But the requirement said "SELLER".
+                List<ImageFile> imageFiles = files.stream()
+                                .map(this::toImageFile)
+                                .collect(Collectors.toList());
 
-        Long userId = 1L; // Placeholder or extracting from Token if I had the security utils handy.
-        // Let's rely on the fact that the usecase checks "SELLER" string for now.
+                List<String> urls = uploadImageUseCase.uploadImages(userId, role, imageFiles);
 
-        List<String> urls = uploadImageUseCase.uploadImages(userId, role, files);
+                return ResponseEntity.ok(ImageUploadResponse.builder()
+                                .imageUrls(urls)
+                                .build());
+        }
 
-        return ResponseEntity.ok(ImageUploadResponse.builder()
-                .imageUrls(urls)
-                .build());
-    }
+        private ImageFile toImageFile(MultipartFile file) {
+                try {
+                        return ImageFile.builder()
+                                        .fileName(file.getOriginalFilename())
+                                        .contentType(file.getContentType())
+                                        .size(file.getSize())
+                                        .content(file.getInputStream())
+                                        .build();
+                } catch (IOException e) {
+                        throw new RuntimeException("Error processing file upload", e);
+                }
+        }
 
-    @GetMapping
-    public ResponseEntity<List<ProductResponse>> getAllProducts() {
-        return ResponseEntity.ok(
-                this.service.getAllProducts()
-                        .stream()
-                        .map(mapper::toResponse)
-                        .toList());
-    }
+        @GetMapping
+        public ResponseEntity<List<ProductResponse>> getAllProducts() {
+                return ResponseEntity.ok(
+                                this.service.getAllProducts()
+                                                .stream()
+                                                .map(mapper::toResponse)
+                                                .toList());
+        }
 
-    @PostMapping
-    public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest req) {
-        Product newProduct = mapper.toDomain(req);
-        return ResponseEntity.ok(mapper.toResponse(
-                this.service.createProduct(newProduct)));
-    }
+        @PostMapping
+        @PreAuthorize("hasRole('SELLER')")
+        public ResponseEntity<ProductResponse> createProduct(@RequestBody ProductRequest req) {
+                Product newProduct = mapper.toDomain(req);
+                return ResponseEntity.ok(mapper.toResponse(
+                                this.service.createProduct(newProduct)));
+        }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ProductResponse> findProductById(@PathVariable Long id) {
-        return service.getProductById(id)
-                .map(mapper::toResponse)
-                .map(ResponseEntity::ok)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "Product not found with id: " + id));
-    }
+        @GetMapping("/{id}")
+        public ResponseEntity<ProductResponse> findProductById(@PathVariable Long id) {
+                return service.getProductById(id)
+                                .map(mapper::toResponse)
+                                .map(ResponseEntity::ok)
+                                .orElseThrow(() -> new EntityNotFoundException(
+                                                "Product not found with id: " + id));
+        }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id, @RequestBody ProductRequest req) {
-        Product product = mapper.toDomain(req);
-        return ResponseEntity.ok(mapper.toResponse(
-                service.updateProduct(id, product)));
-    }
+        @PutMapping("/{id}")
+        @PreAuthorize("hasRole('SELLER')")
+        public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id, @RequestBody ProductRequest req) {
+                Product product = mapper.toDomain(req);
+                return ResponseEntity.ok(mapper.toResponse(
+                                service.updateProduct(id, product)));
+        }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
-        service.deleteProduct(id);
-        return ResponseEntity.noContent().build();
-    }
+        @DeleteMapping("/{id}")
+        @PreAuthorize("hasRole('SELLER')")
+        public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
+                service.deleteProduct(id);
+                return ResponseEntity.noContent().build();
+        }
 }
