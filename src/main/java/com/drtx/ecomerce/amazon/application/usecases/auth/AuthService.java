@@ -1,33 +1,28 @@
 package com.drtx.ecomerce.amazon.application.usecases.auth;
 
-import com.drtx.ecomerce.amazon.adapters.in.security.dto.AuthRequest;
-import com.drtx.ecomerce.amazon.adapters.in.security.dto.AuthResponse;
-
-import com.drtx.ecomerce.amazon.adapters.in.security.dto.AuthTokens;
-import com.drtx.ecomerce.amazon.adapters.in.security.dto.UserResponse;
-import com.drtx.ecomerce.amazon.adapters.in.security.mappers.SecurityUserMapper;
+import com.drtx.ecomerce.amazon.core.model.security.AuthResult;
+import com.drtx.ecomerce.amazon.core.model.security.LoginCommand;
 import com.drtx.ecomerce.amazon.core.model.user.User;
+import com.drtx.ecomerce.amazon.core.ports.in.rest.security.AuthUseCasePort;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.UserRepositoryPort;
 import com.drtx.ecomerce.amazon.core.ports.out.security.AuthenticationFacade;
 import com.drtx.ecomerce.amazon.core.ports.out.security.PasswordService;
 import com.drtx.ecomerce.amazon.core.ports.out.security.TokenProvider;
 import com.drtx.ecomerce.amazon.core.ports.out.security.TokenRevocationPort;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AuthService {
+public class AuthService implements AuthUseCasePort {
     private final UserRepositoryPort repository;
     private final PasswordService passwordService;
     private final TokenProvider tokenProvider;
     private final AuthenticationFacade authenticationFacade;
-    private final SecurityUserMapper securityUserMapper;
     private final TokenRevocationPort tokenRevocationPort;
 
-    // se q son tipos distintos, luego usare un mapper
-    public AuthResponse register(User user) {
+    @Override
+    public AuthResult register(User user) {
         if (user.getPassword().toLowerCase().contains(user.getEmail().toLowerCase())) {
             throw new com.drtx.ecomerce.amazon.core.model.exceptions.DomainException(
                     "Password cannot contain the email address.");
@@ -36,33 +31,27 @@ public class AuthService {
         user.setPassword(encodedPassword);
         User savedUser = repository.save(user);
 
-        var userDetails = securityUserMapper.toUserDetails(savedUser);
-        var jwt = tokenProvider.generateToken(userDetails);
+        var jwt = tokenProvider.generateToken(savedUser);
 
-        UserResponse userResponse = securityUserMapper.toUserResponse(savedUser);
-        AuthTokens tokens = new AuthTokens(jwt, "", 86400000L);
-
-        return new AuthResponse(userResponse, tokens);
-
+        // Assuming refresh tokens are implemented or placeholder as before
+        return new AuthResult(savedUser, jwt, "", 86400000L);
     }
 
-    public AuthResponse login(AuthRequest request) {
-        authenticationFacade.authenticate(request.email(), request.password());
+    @Override
+    public AuthResult login(LoginCommand command) {
+        authenticationFacade.authenticate(command.email(), command.password());
 
-        var user = repository.findByEmail(request.email())
+        var user = repository.findByEmail(command.email())
                 .orElseThrow(
-                        () -> new UsernameNotFoundException("User not found with email: " + request.email()));
-        var userDetails = securityUserMapper.toUserDetails(user);
-        var jwt = tokenProvider.generateToken(userDetails);
+                        () -> new RuntimeException("User not found with email: " + command.email()));
 
-        UserResponse userResponse = securityUserMapper.toUserResponse(user);
-        AuthTokens tokens = new AuthTokens(jwt, "", 86400000L);
+        var jwt = tokenProvider.generateToken(user);
 
-        return new AuthResponse(userResponse, tokens);
+        return new AuthResult(user, jwt, "", 86400000L);
     }
 
-    public void logout(String authHeader) {
-        String token = authHeader.replace("Bearer ", "");
+    @Override
+    public void logout(String token) {
         tokenRevocationPort.invalidate(token);
     }
 }
