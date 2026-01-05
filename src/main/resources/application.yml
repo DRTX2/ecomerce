@@ -94,3 +94,12 @@ storage:
     max-files-count: ${STORAGE_MAX_FILES_COUNT:5}
     max-total-size: ${STORAGE_MAX_TOTAL_SIZE:20971520} # Default 20MB
     allowed-content-types: ${STORAGE_ALLOWED_CONTENT_TYPES:image/jpeg,image/png,image/webp}
+
+cors:
+  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000}
+
+spring:
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
