@@ -1,5 +1,6 @@
 package com.drtx.ecomerce.amazon.adapters.in.security;
 
+import com.drtx.ecomerce.amazon.core.model.user.User;
 import com.drtx.ecomerce.amazon.core.ports.out.security.TokenProvider;
 import com.drtx.ecomerce.amazon.core.ports.out.security.TokenRevocationPort;
 import com.drtx.ecomerce.amazon.infrastructure.security.JwtService;
@@ -36,9 +37,9 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             path = path.substring(contextPath.length());
         }
         System.out.println("JwtAuthFilter - Path without context: " + path);
-        boolean skip = path.equals("/auth/login") || 
-                       path.equals("/auth/register") ||
-                       path.startsWith("/auth/");
+        boolean skip = path.equals("/auth/login") ||
+                path.equals("/auth/register") ||
+                path.startsWith("/auth/");
         System.out.println("JwtAuthFilter - Should skip: " + skip);
         return skip;
     }
@@ -47,8 +48,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(
             HttpServletRequest request,
             HttpServletResponse response,
-            FilterChain filterChain
-    ) throws ServletException, IOException {
+            FilterChain filterChain) throws ServletException, IOException {
 
         final String authHeader = request.getHeader("Authorization");
 
@@ -60,11 +60,10 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         final String token;
         final String username;
 
-
         token = authHeader.substring(7);
         username = tokenProvider.extractUsername(token);
 
-        if(tokenRevocationPort.isInvalidated(token)){
+        if (tokenRevocationPort.isInvalidated(token)) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             return;
         }
@@ -72,16 +71,22 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
 
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(
-                                userDetails,
-                                null,
-                                userDetails.getAuthorities()
-                        );
-                authToken.setDetails(// to get more details, pe ip, connection port, browser....
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
+            User userDomain = new User();
+            userDomain.setEmail(userDetails.getUsername());
+            // Map other fields if necessary for isTokenValid, but currently only email is
+            // used.
+            // Role mapping if strict validation is needed, but let's stick to email for
+            // identity match.
+
+            if (tokenProvider.isTokenValid(token, userDomain)) {
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                        userDetails,
+                        null,
+                        userDetails.getAuthorities());
+                authToken.setDetails(
+                        new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
         }
 
         filterChain.doFilter(request, response);
