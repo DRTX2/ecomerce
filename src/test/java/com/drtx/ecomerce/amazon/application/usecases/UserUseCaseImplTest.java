@@ -1,4 +1,5 @@
 package com.drtx.ecomerce.amazon.application.usecases;
+import com.drtx.ecomerce.amazon.application.usecases.user.UserUseCaseImpl;
 
 import com.drtx.ecomerce.amazon.core.model.user.User;
 import com.drtx.ecomerce.amazon.core.model.user.UserRole;

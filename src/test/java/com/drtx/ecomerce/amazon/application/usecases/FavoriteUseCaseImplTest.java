@@ -1,4 +1,5 @@
 package com.drtx.ecomerce.amazon.application.usecases;
+import com.drtx.ecomerce.amazon.application.usecases.favorite.FavoriteUseCaseImpl;
 
 import com.drtx.ecomerce.amazon.core.model.user.Favorite;
 import com.drtx.ecomerce.amazon.core.model.product.Product;

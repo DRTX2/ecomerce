@@ -1,4 +1,5 @@
 package com.drtx.ecomerce.amazon.application.usecases;
+import com.drtx.ecomerce.amazon.application.usecases.product.ProductUseCaseImpl;
 
 import com.drtx.ecomerce.amazon.core.model.product.Category;
 import com.drtx.ecomerce.amazon.core.model.product.Product;

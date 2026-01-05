@@ -1,5 +1,6 @@
 package com.drtx.ecomerce.amazon.application.usecases;
 
+import com.drtx.ecomerce.amazon.application.usecases.cart.CartUseCaseImpl;
 import com.drtx.ecomerce.amazon.core.model.order.Cart;
 import com.drtx.ecomerce.amazon.core.model.user.User;
 import com.drtx.ecomerce.amazon.core.model.user.UserRole;
@@ -42,8 +43,7 @@ class CartUseCaseImplTest {
                 "password123",
                 "123 Main St",
                 "555-0100",
-                UserRole.USER
-        );
+                UserRole.USER);
 
         testCart = new Cart(1L, testUser, List.of());
     }
