@@ -1,0 +1,49 @@
+package com.drtx.ecomerce.amazon.application.usecases.cart;
+
+import com.drtx.ecomerce.amazon.core.model.exceptions.DomainExceptionFactory;
+import com.drtx.ecomerce.amazon.core.model.order.Cart;
+import com.drtx.ecomerce.amazon.core.ports.out.persistence.CartRepositoryPort;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
+public class CartUseCaseImpl implements com.drtx.ecomerce.amazon.core.ports.in.rest.CartUseCasePort {
+    private final CartRepositoryPort repositort;
+
+    @Override
+    public Cart createCart(Cart cart) {
+        return repositort.save(cart);
+    }
+
+    @Override
+    public Optional<Cart> getCartById(Long id) {
+        return repositort.findById(id);
+    }
+
+    @Override
+    public List<Cart> getAllCarts(Long userId) {
+        return repositort.findAll(userId);
+    }
+
+    @Override
+    public Cart updateCart(Long id, Cart cart) {
+        // Verify cart exists
+        repositort.findById(id)
+                .orElseThrow(() -> DomainExceptionFactory.cartNotFound(id));
+
+        return repositort.update(cart);
+    }
+
+    @Override
+    public void deleteCart(Long id) {
+        // Verify cart exists before deleting
+        repositort.findById(id)
+                .orElseThrow(() -> DomainExceptionFactory.cartNotFound(id));
+
+        repositort.delete(id);
+    }
+}
