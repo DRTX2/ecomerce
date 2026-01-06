@@ -68,7 +68,10 @@ class AppealRepositoryAdapterTest {
         // Given
         CategoryEntity cat = categoryRepository.save(new CategoryEntity(null, "C", null, null));
         ProductEntity prod = productRepository
-                .save(new ProductEntity(null, "P", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null));
+                .save(new ProductEntity(null, "P", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null,
+                        "SKU-" + System.nanoTime(), 100,
+                        com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE, "slug-" + System.nanoTime(),
+                        null, null));
         UserEntity seller = userRepository.save(new UserEntity(null, "S", "s@mail.com", "p", "a", "1", null));
 
         IncidenceEntity incidence = new IncidenceEntity();
@@ -108,7 +111,8 @@ class AppealRepositoryAdapterTest {
         // Given
         CategoryEntity cat = categoryRepository.save(new CategoryEntity(null, "C2", null, null));
         ProductEntity prod = productRepository
-                .save(new ProductEntity(null, "P2", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null));
+                .save(new ProductEntity(null, "P2", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null,
+                        "SKU2-" + System.nanoTime(), 100, com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE, "slug2-" + System.nanoTime(), null, null));
         UserEntity seller = userRepository.save(new UserEntity(null, "S2", "s2@mail.com", "p", "a", "1", null));
 
         IncidenceEntity incidence = new IncidenceEntity();

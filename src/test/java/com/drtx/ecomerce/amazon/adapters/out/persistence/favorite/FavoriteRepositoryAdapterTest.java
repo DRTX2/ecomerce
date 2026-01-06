@@ -70,7 +70,10 @@ class FavoriteRepositoryAdapterTest {
                                 .save(new UserEntity(null, "User", "email@test.com", "pass", "addr", "123", null));
                 CategoryEntity cat = categoryRepository.save(new CategoryEntity(null, "C", null, null));
                 ProductEntity prod = productRepository
-                                .save(new ProductEntity(null, "P", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null));
+                                .save(new ProductEntity(null, "P", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null,
+                                                "SKU-FAV", 100,
+                                                com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE,
+                                                "slug-fav", null, null));
 
                 Favorite favorite = new Favorite(); // Domain object
 
@@ -102,7 +105,10 @@ class FavoriteRepositoryAdapterTest {
                                 .save(new UserEntity(null, "User2", "email2@test.com", "pass", "addr", "123", null));
                 CategoryEntity cat = categoryRepository.save(new CategoryEntity(null, "C2", null, null));
                 ProductEntity prod = productRepository
-                                .save(new ProductEntity(null, "P2", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null));
+                                .save(new ProductEntity(null, "P2", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null,
+                                                "SKU-FAV2", 100,
+                                                com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE,
+                                                "slug-fav2", null, null));
 
                 FavoriteEntity favEntity = new FavoriteEntity();
                 favEntity.setUser(user);
@@ -136,7 +142,10 @@ class FavoriteRepositoryAdapterTest {
                                 .save(new UserEntity(null, "User3", "email3@test.com", "pass", "addr", "123", null));
                 CategoryEntity cat = categoryRepository.save(new CategoryEntity(null, "C3", null, null));
                 ProductEntity prod = productRepository
-                                .save(new ProductEntity(null, "P3", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null));
+                                .save(new ProductEntity(null, "P3", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null,
+                                                "SKU-FAV3", 100,
+                                                com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE,
+                                                "slug-fav3", null, null));
 
                 FavoriteEntity fav = new FavoriteEntity();
                 fav.setUser(user);

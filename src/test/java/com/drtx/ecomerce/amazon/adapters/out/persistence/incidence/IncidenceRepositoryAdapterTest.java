@@ -65,7 +65,9 @@ class IncidenceRepositoryAdapterTest {
         // Given
         CategoryEntity cat = categoryRepository.save(new CategoryEntity(null, "C", null, null));
         ProductEntity prod = productRepository
-                .save(new ProductEntity(null, "P", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null));
+                .save(new ProductEntity(null, "P", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null,
+                        "SKU-INC", 100, com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE, "slug-inc",
+                        null, null));
         UserEntity reporter = userRepository.save(new UserEntity(null, "U", "e@mail.com", "p", "a", "1", null));
 
         Incidence incidence = new Incidence();
@@ -106,7 +108,9 @@ class IncidenceRepositoryAdapterTest {
         // Given
         CategoryEntity cat = categoryRepository.save(new CategoryEntity(null, "C2", null, null));
         ProductEntity prod = productRepository
-                .save(new ProductEntity(null, "P2", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null));
+                .save(new ProductEntity(null, "P2", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null,
+                        "SKU-INC2", 100, com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE, "slug-inc2",
+                        null, null));
 
         IncidenceEntity entity = new IncidenceEntity();
         entity.setProduct(prod);
@@ -130,7 +134,9 @@ class IncidenceRepositoryAdapterTest {
         // Given
         CategoryEntity cat = categoryRepository.save(new CategoryEntity(null, "C3", null, null));
         ProductEntity prod = productRepository
-                .save(new ProductEntity(null, "P3", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null));
+                .save(new ProductEntity(null, "P3", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null,
+                        "SKU-INC3", 100, com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE, "slug-inc3",
+                        null, null));
         IncidenceEntity entity = new IncidenceEntity();
         entity.setProduct(prod);
         entity.setStatus(IncidenceStatus.OPEN);

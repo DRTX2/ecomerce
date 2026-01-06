@@ -76,7 +76,11 @@ class ProductControllerTest {
                 999.99,
                 1,
                 4.5,
-                Arrays.asList("image1.jpg", "image2.jpg"));
+                Arrays.asList("image1.jpg", "image2.jpg"),
+                "LAPTOP-001",
+                100,
+                com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE,
+                "laptop-high-performance");
 
         testProductResponse = new ProductResponse(
                 1L,
@@ -85,7 +89,13 @@ class ProductControllerTest {
                 999.99,
                 testCategory,
                 4.5,
-                Arrays.asList("image1.jpg", "image2.jpg"));
+                Arrays.asList("image1.jpg", "image2.jpg"),
+                "LAPTOP-001",
+                100,
+                com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE,
+                "laptop-high-performance",
+                java.time.LocalDateTime.now(),
+                java.time.LocalDateTime.now());
     }
 
     @Test

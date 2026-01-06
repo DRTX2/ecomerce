@@ -1,8 +1,10 @@
 package com.drtx.ecomerce.amazon.application.usecases;
+
 import com.drtx.ecomerce.amazon.application.usecases.product.ProductUseCaseImpl;
 
 import com.drtx.ecomerce.amazon.core.model.product.Category;
 import com.drtx.ecomerce.amazon.core.model.product.Product;
+import com.drtx.ecomerce.amazon.core.model.product.ProductStatus;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.ProductRepositoryPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -50,7 +53,13 @@ class ProductUseCaseImplTest {
                 new BigDecimal("999.99"),
                 testCategory,
                 new BigDecimal("4.5"),
-                List.of("image1.jpg", "image2.jpg"));
+                List.of("image1.jpg", "image2.jpg"),
+                "LAPTOP-001",
+                50,
+                ProductStatus.ACTIVE,
+                "laptop",
+                LocalDateTime.now(),
+                LocalDateTime.now());
     }
 
     @Test
@@ -64,7 +73,13 @@ class ProductUseCaseImplTest {
                 new BigDecimal("699.99"),
                 testCategory,
                 new BigDecimal("0.0"),
-                List.of("phone1.jpg"));
+                List.of("phone1.jpg"),
+                "PHONE-001",
+                100,
+                ProductStatus.DRAFT,
+                "smartphone",
+                null,
+                null);
 
         Product savedProduct = new Product(
                 2L,
@@ -73,7 +88,13 @@ class ProductUseCaseImplTest {
                 new BigDecimal("699.99"),
                 testCategory,
                 new BigDecimal("0.0"),
-                List.of("phone1.jpg"));
+                List.of("phone1.jpg"),
+                "PHONE-001",
+                100,
+                ProductStatus.DRAFT,
+                "smartphone",
+                LocalDateTime.now(),
+                LocalDateTime.now());
 
         when(productRepositoryPort.save(any(Product.class))).thenReturn(savedProduct);
 
@@ -133,7 +154,13 @@ class ProductUseCaseImplTest {
                 new BigDecimal("499.99"),
                 testCategory,
                 new BigDecimal("4.2"),
-                List.of("tablet1.jpg"));
+                List.of("tablet1.jpg"),
+                "TABLET-001",
+                30,
+                ProductStatus.ACTIVE,
+                "tablet",
+                LocalDateTime.now(),
+                LocalDateTime.now());
 
         Product product3 = new Product(
                 3L,
@@ -142,7 +169,13 @@ class ProductUseCaseImplTest {
                 new BigDecimal("149.99"),
                 testCategory,
                 new BigDecimal("4.7"),
-                List.of("headphones1.jpg"));
+                List.of("headphones1.jpg"),
+                "HEADPHONES-001",
+                200,
+                ProductStatus.ACTIVE,
+                "headphones",
+                LocalDateTime.now(),
+                LocalDateTime.now());
 
         List<Product> products = Arrays.asList(testProduct, product2, product3);
         when(productRepositoryPort.findAll()).thenReturn(products);
@@ -182,7 +215,13 @@ class ProductUseCaseImplTest {
                 new BigDecimal("1199.99"),
                 testCategory,
                 new BigDecimal("4.8"),
-                List.of("laptop_pro1.jpg", "laptop_pro2.jpg"));
+                List.of("laptop_pro1.jpg", "laptop_pro2.jpg"),
+                "LAPTOP-PRO-001",
+                20,
+                ProductStatus.ACTIVE,
+                "laptop-pro",
+                LocalDateTime.now(),
+                LocalDateTime.now());
 
         when(productRepositoryPort.updateById(eq(productId), any(Product.class)))
                 .thenReturn(updatedProduct);
@@ -238,7 +277,13 @@ class ProductUseCaseImplTest {
                 new BigDecimal("199.99"),
                 testCategory,
                 new BigDecimal("0.0"),
-                List.of("newproduct.jpg"));
+                List.of("newproduct.jpg"),
+                "NEW-001",
+                10,
+                ProductStatus.DRAFT,
+                "new-product",
+                LocalDateTime.now(),
+                LocalDateTime.now());
 
         when(productRepositoryPort.save(any(Product.class))).thenReturn(noRatingProduct);
 

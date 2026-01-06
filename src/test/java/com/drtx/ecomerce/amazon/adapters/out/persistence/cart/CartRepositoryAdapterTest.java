@@ -66,7 +66,9 @@ class CartRepositoryAdapterTest {
 
         CategoryEntity cat = categoryRepository.save(new CategoryEntity(null, "C", null, null));
         productRepository
-                .save(new ProductEntity(null, "P", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null));
+                .save(new ProductEntity(null, "P", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null,
+                        "SKU-CART", 100, com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE, "slug-cart",
+                        null, null));
 
         Cart cart = new Cart();
 

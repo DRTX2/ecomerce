@@ -99,7 +99,9 @@ class FavoriteControllerTest {
         // Constructor ProductResponse: Long id, String name, String description,
         // BigDecimal price, Integer stock, Category category, Double rating, List image
         testProductResponse = new ProductResponse(1L, "Laptop", "Description", 999.99, testCategory, 4.5,
-                Collections.emptyList());
+                Collections.emptyList(), "LAPTOP-001", 100,
+                com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE,
+                "laptop", java.time.LocalDateTime.now(), java.time.LocalDateTime.now());
 
         testFavoriteResponse = new FavoriteResponse(1L, userResponse, testProductResponse, LocalDateTime.now());
     }
