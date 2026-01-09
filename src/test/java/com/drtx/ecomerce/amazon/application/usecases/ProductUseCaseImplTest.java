@@ -223,6 +223,7 @@ class ProductUseCaseImplTest {
                 LocalDateTime.now(),
                 LocalDateTime.now());
 
+        when(productRepositoryPort.findById(productId)).thenReturn(Optional.of(testProduct));
         when(productRepositoryPort.updateById(eq(productId), any(Product.class)))
                 .thenReturn(updatedProduct);
 
@@ -239,31 +240,64 @@ class ProductUseCaseImplTest {
     }
 
     @Test
-    @DisplayName("Should delete product successfully")
+    @DisplayName("Should delete product successfully (Soft Delete)")
     void shouldDeleteProductSuccessfully() {
         // Given
         Long productId = 1L;
-        doNothing().when(productRepositoryPort).delete(productId);
+        when(productRepositoryPort.findById(productId)).thenReturn(Optional.of(testProduct));
+        when(productRepositoryPort.updateById(eq(productId), any(Product.class))).thenReturn(testProduct);
 
         // When
         productUseCase.deleteProduct(productId);
 
         // Then
-        verify(productRepositoryPort, times(1)).delete(productId);
+        verify(productRepositoryPort, times(1)).findById(productId);
+        verify(productRepositoryPort, times(1)).updateById(eq(productId),
+                argThat(p -> p.getStatus() == ProductStatus.ARCHIVED));
+        verify(productRepositoryPort, never()).delete(productId);
     }
 
     @Test
-    @DisplayName("Should handle delete for non-existent product")
+    @DisplayName("Should throw exception when deleting non-existent product")
     void shouldHandleDeleteForNonExistentProduct() {
         // Given
         Long productId = 999L;
-        doNothing().when(productRepositoryPort).delete(productId);
+        when(productRepositoryPort.findById(productId)).thenReturn(Optional.empty());
+
+        // When/Then
+        org.junit.jupiter.api.Assertions.assertThrows(RuntimeException.class, () -> {
+            productUseCase.deleteProduct(productId);
+        });
+
+        verify(productRepositoryPort, times(1)).findById(productId);
+        verify(productRepositoryPort, never()).delete(productId);
+        verify(productRepositoryPort, never()).updateById(any(), any());
+    }
+
+    @Test
+    @DisplayName("Should auto-generate slug when creating product with missing slug")
+    void shouldAutoGenerateSlugWhenMissingInCreate() {
+        // Given
+        Product productWithoutSlug = new Product(
+                null, "My Cool Product", "Desc", new BigDecimal("10.00"),
+                testCategory, BigDecimal.ZERO, List.of(), "SKU-AUTO", 10,
+                ProductStatus.DRAFT, null, null, null); // Slug is null
+
+        when(productRepositoryPort.save(any(Product.class))).thenAnswer(inv -> {
+            Product p = inv.getArgument(0);
+            // Simulate DB save returning ID
+            return new Product(100L, p.getName(), p.getDescription(), p.getPrice(),
+                    p.getCategory(), p.getAverageRating(), p.getImages(),
+                    p.getSku(), p.getStockQuantity(), p.getStatus(),
+                    p.getSlug(), LocalDateTime.now(), LocalDateTime.now());
+        });
 
         // When
-        productUseCase.deleteProduct(productId);
+        Product result = productUseCase.createProduct(productWithoutSlug);
 
         // Then
-        verify(productRepositoryPort, times(1)).delete(productId);
+        assertThat(result.getSlug()).isEqualTo("my-cool-product");
+        verify(productRepositoryPort).save(argThat(p -> p.getSlug().equals("my-cool-product")));
     }
 
     @Test
