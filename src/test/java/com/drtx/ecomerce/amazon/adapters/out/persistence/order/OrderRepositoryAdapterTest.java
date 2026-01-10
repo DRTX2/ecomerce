@@ -72,7 +72,10 @@ class OrderRepositoryAdapterTest {
                                 .save(new UserEntity(null, "User", "email@test.com", "pass", "addr", "123", null));
                 CategoryEntity cat = categoryRepository.save(new CategoryEntity(null, "C", null, null));
                 ProductEntity prod = productRepository
-                                .save(new ProductEntity(null, "P", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null));
+                                .save(new ProductEntity(null, "P", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null,
+                                                "SKU-ORD", 100,
+                                                com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE,
+                                                "slug-ord", null, null));
 
                 Order order = new Order(null, null, List.of(), BigDecimal.TEN,
                                 OrderState.PENDING, LocalDateTime.now(), null, List.of());
@@ -156,7 +159,10 @@ class OrderRepositoryAdapterTest {
                                 .save(new UserEntity(null, "User4", "email4@test.com", "pass", "addr", "123", null));
                 CategoryEntity cat = categoryRepository.save(new CategoryEntity(null, "C2", null, null));
                 ProductEntity prod = productRepository
-                                .save(new ProductEntity(null, "P2", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null));
+                                .save(new ProductEntity(null, "P2", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null,
+                                                "SKU-ORD2", 100,
+                                                com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE,
+                                                "slug-ord2", null, null));
 
                 OrderEntity entity = orderRepository.save(new OrderEntity(null, user, Collections.emptyList(),
                                 Collections.emptyList(), BigDecimal.ONE, OrderState.PENDING, LocalDateTime.now(),

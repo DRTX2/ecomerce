@@ -1,7 +1,22 @@
+# =====================================================
+# CONFIGURACIÓN COMÚN (Todos los perfiles)
+# =====================================================
+# Este archivo contiene la configuración compartida
+# Los perfiles específicos (dev/prod) solo definen diferencias
+# =====================================================
+
 spring:
   application:
     name: amazon
 
+  # Perfil activo (configurable desde .env con SPRING_PROFILES_ACTIVE)
+  # Si no se especifica, usa "dev" por defecto
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+
+  # =========================
+  # BASE DE DATOS (Común)
+  # =========================
   datasource:
     url: ${DB_URL}
     username: ${DB_USERNAME:postgres}
@@ -9,16 +24,14 @@ spring:
     driver-class-name: org.postgresql.Driver
 
   jpa:
+    database: POSTGRESQL
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
     hibernate:
       ddl-auto: validate
-    database: POSTGRESQL
-    show-sql: false
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    properties:
-      hibernate:
-        format_sql: true
-        use_sql_comments: true
 
+  # =========================
+  # FLYWAY (Común)
+  # =========================
   flyway:
     enabled: true
     locations: classpath:db/migration
@@ -30,6 +43,9 @@ spring:
     sql-migration-separator: __
     sql-migration-suffix: .sql
 
+  # =========================
+  # EMAIL (Común)
+  # =========================
   mail:
     host: smtp.office365.com
     port: 587
@@ -45,35 +61,62 @@ spring:
           timeout: 5000
           writetimeout: 5000
 
+  # =========================
+  # MVC (Común)
+  # =========================
   mvc:
     problemdetails:
       enabled: true
 
-# Configuración de email para testing
+  # =========================
+  # REDIS (Común)
+  # =========================
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+# =========================
+# Email (testing / provider)
+# =========================
 email:
-  provider: azure # Opciones: javamail, azure
+  provider: ${EMAIL_PROVIDER:azure} # javamail | azure
   test:
     recipient: ${TEST_EMAIL:test@example.com}
 
+# =========================
+# Azure Communication Email
+# =========================
 azure:
   communication:
     connection-string: ${AZURE_COMMUNICATION_CONNECTION_STRING}
     sender-address: ${AZURE_SENDER_ADDRESS:DoNotReply@domain.com}
 
+# =========================
+# Server (Común)
+# =========================
 server:
-  port: 8080
-  error:
-    include-message: always
-    include-binding-errors: always
+  port: ${SERVER_PORT:8080}
   servlet:
     context-path: /api/v1
 
-
+# =========================
+# Security (Valores con variables de entorno)
+# =========================
+# Los tiempos por defecto se definen en los perfiles dev/prod
 security:
   jwt:
     secret-key: ${JWT_SECRET_KEY}
-    expiration: 86400000
+    access-token-expiration: ${JWT_ACCESS_EXPIRATION}
+    refresh-token-expiration: ${JWT_REFRESH_EXPIRATION}
+  token-cleanup:
+    enabled: ${TOKEN_CLEANUP_ENABLED:true}
+    cron: ${TOKEN_CLEANUP_CRON}
+    revoked-token-retention-days: ${REVOKED_TOKEN_RETENTION_DAYS}
 
+# =========================
+# Actuator / Management (Común)
+# =========================
 management:
   health:
     mail:
@@ -85,21 +128,21 @@ management:
     mappings:
       enabled: true
 
+# =========================
+# Storage (Común)
+# =========================
 storage:
   azure:
-    connection-string: ${AZURE_STORAGE_CONNECTION_STRING:DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://localhost:10000/devstoreaccount1;}
+    connection-string: ${AZURE_STORAGE_CONNECTION_STRING}
     container-name: ${STORAGE_CONTAINER_NAME:uploads}
   image:
-    max-file-size: ${STORAGE_MAX_FILE_SIZE:5242880} # Default 5MB
+    max-file-size: ${STORAGE_MAX_FILE_SIZE:5242880}       # 5MB
     max-files-count: ${STORAGE_MAX_FILES_COUNT:5}
-    max-total-size: ${STORAGE_MAX_TOTAL_SIZE:20971520} # Default 20MB
+    max-total-size: ${STORAGE_MAX_TOTAL_SIZE:20971520}   # 20MB
     allowed-content-types: ${STORAGE_ALLOWED_CONTENT_TYPES:image/jpeg,image/png,image/webp}
 
+# =========================
+# CORS (Común)
+# =========================
 cors:
-  allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000}
-
-spring:
-  data:
-    redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
+  allowed-origins: ${CORS_ALLOWED_ORIGINS}

@@ -3,6 +3,7 @@ package com.drtx.ecomerce.amazon.adapters.in.security;
 import com.drtx.ecomerce.amazon.adapters.in.security.dto.AuthRequest;
 import com.drtx.ecomerce.amazon.adapters.in.security.dto.AuthResponse;
 import com.drtx.ecomerce.amazon.adapters.in.security.dto.AuthTokens;
+import com.drtx.ecomerce.amazon.adapters.in.security.dto.RefreshTokenRequest;
 import com.drtx.ecomerce.amazon.adapters.in.security.dto.RegisterRequest;
 import com.drtx.ecomerce.amazon.adapters.in.security.dto.UserResponse;
 import com.drtx.ecomerce.amazon.adapters.in.security.mappers.UserSecurityMapper;
@@ -42,6 +43,12 @@ public class AuthController {
         String token = authHeader.replace("Bearer ", "");
         authService.logout(token);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthResponse> refreshToken(@RequestBody RefreshTokenRequest request) {
+        AuthResult result = authService.refreshToken(request.refreshToken());
+        return ResponseEntity.ok(toAuthResponse(result));
     }
 
     private AuthResponse toAuthResponse(AuthResult result) {

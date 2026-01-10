@@ -1,0 +1,55 @@
+# =====================================================
+# PERFIL DE PRODUCCIÓN
+# =====================================================
+# Solo contiene configuración específica de producción
+# Hereda toda la configuración común de application.yml
+# Activa con: SPRING_PROFILES_ACTIVE=prod
+# =====================================================
+
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  # En producción, deshabilitar show-sql
+  jpa:
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+        use_sql_comments: false
+
+# =========================
+# Server (Producción)
+# =========================
+server:
+  error:
+    include-message: never  # No exponer mensajes de error en prod
+    include-binding-errors: never
+    include-stacktrace: never
+
+# =========================
+# Security (Producción - tiempos cortos para mayor seguridad)
+# =========================
+security:
+  jwt:
+    # Tiempos más cortos para producción
+    access-token-expiration: ${JWT_ACCESS_EXPIRATION:900000}      # 15 minutos
+    refresh-token-expiration: ${JWT_REFRESH_EXPIRATION:604800000} # 7 días
+  token-cleanup:
+    cron: ${TOKEN_CLEANUP_CRON:0 0 */6 * * *}  # Cada 6 horas en producción
+    revoked-token-retention-days: ${REVOKED_TOKEN_RETENTION_DAYS:7}  # Menos días en prod
+
+# =========================
+# Logging (Producción - menos verboso)
+# =========================
+logging:
+  level:
+    root: WARN
+    com.drtx.ecomerce.amazon: ${APP_LOG_LEVEL:INFO}
+    com.drtx.ecomerce.amazon.application.usecases.auth: ${AUTH_LOG_LEVEL:INFO}
+    com.drtx.ecomerce.amazon.infrastructure.security: ${SECURITY_LOG_LEVEL:WARN}
+    org.springframework.security: WARN
+    org.hibernate: WARN
+
+

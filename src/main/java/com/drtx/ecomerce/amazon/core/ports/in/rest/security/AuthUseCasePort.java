@@ -10,4 +10,6 @@ public interface AuthUseCasePort {
     AuthResult login(LoginCommand command);
 
     void logout(String token);
+
+    AuthResult refreshToken(String refreshToken);
 }

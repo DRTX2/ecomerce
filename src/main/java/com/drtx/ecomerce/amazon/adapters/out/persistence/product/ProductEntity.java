@@ -39,4 +39,37 @@ public class ProductEntity {
 
     @OneToMany(mappedBy = "product")
     private List<ProductImageEntity> images;
+
+    // New Fields
+    @Column(nullable = false, unique = true)
+    private String sku;
+
+    @Column(nullable = false)
+    private Integer stockQuantity;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private com.drtx.ecomerce.amazon.core.model.product.ProductStatus status;
+
+    @Column(nullable = false, unique = true)
+    private String slug;
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private java.time.LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private java.time.LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = java.time.LocalDateTime.now();
+        if (this.status == null) {
+            this.status = com.drtx.ecomerce.amazon.core.model.product.ProductStatus.DRAFT;
+        }
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        this.updatedAt = java.time.LocalDateTime.now();
+    }
 }

@@ -18,7 +18,9 @@ public class CartTest {
     public void testCreateCartWithConstructor() {
         User user = new User(1L, "David", "david@email.com", "1234", "Ambato", "0987654321", UserRole.USER);
         Product p = new Product(1L, "Laptop", "Gaming laptop", new BigDecimal("1200"), null, null,
-                List.of("laptop.jpg"));
+                List.of("laptop.jpg"),
+                "SKU-CART", 100, com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE, "slug-cart", null,
+                null);
         Cart cart = new Cart(1L, user, null);
         CartItem item = new CartItem(1L, cart, p, 2);
         List<CartItem> items = List.of(item);

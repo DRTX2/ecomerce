@@ -23,8 +23,11 @@ public class JwtService implements TokenProvider {
     @Value("${security.jwt.secret-key}")
     private String secretKey;
 
-    @Value("${security.jwt.expiration}")
-    private long jwtExpirationInMs;
+    @Value("${security.jwt.access-token-expiration}")
+    private long accessTokenExpirationMs;
+
+    @Value("${security.jwt.refresh-token-expiration}")
+    private long refreshTokenExpirationMs;
 
     private SecretKey signingKey;
     private final TokenRevocationPort tokenRevocationPort;
@@ -35,33 +38,32 @@ public class JwtService implements TokenProvider {
     }
 
     @Override
-    public String generateToken(User user) {
-        return generateToken(new HashMap<>(), user);
+    public String generateAccessToken(User user) {
+        Map<String, Object> extraClaims = new HashMap<>();
+        String role = user.getRole() != null ? "ROLE_" + user.getRole().name() : "ROLE_USER";
+        extraClaims.put("Authorities", java.util.Collections.singletonList(Map.of("authority", role)));
+        extraClaims.put("type", "access");
+
+        return buildToken(extraClaims, user, accessTokenExpirationMs);
     }
 
-    public String generateToken(
+    @Override
+    public String generateRefreshToken(User user) {
+        Map<String, Object> extraClaims = new HashMap<>();
+        extraClaims.put("type", "refresh");
+
+        return buildToken(extraClaims, user, refreshTokenExpirationMs);
+    }
+
+    private String buildToken(
             Map<String, Object> extraClaims,
-            User user) {
-        // Assuming user.getRole() returns UserRole enum, we can map it to authorities
-        // string
-        String role = user.getRole() != null ? "ROLE_" + user.getRole().name() : "ROLE_USER";
-        // Or if you want a list of authorities like: [{authority=ROLE_SELLER}]
-        // But simpler is often better. Let's send the role as a claim or just handle it
-        // as we prefer.
-        // Spring Security expects "Authorities" claim to populate authorities if we use
-        // a specific filter.
-        // But usually we extract claims and build authorities manually in filter.
-        // Let's stick to putting authorities in the token if that's what was there.
-        // Previous implementations put `userDetails.getAuthorities()`.
-
-        // Let's emulate a list of simple authority objects
-        extraClaims.put("Authorities", java.util.Collections.singletonList(Map.of("authority", role)));
-
+            User user,
+            long expirationTime) {
         return Jwts.builder()
                 .claims(extraClaims)
-                .subject(user.getEmail()) // Assuming email is username
+                .subject(user.getEmail())
                 .issuedAt(new Date(System.currentTimeMillis()))
-                .expiration(new Date(System.currentTimeMillis() + jwtExpirationInMs))
+                .expiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(signingKey)
                 .compact();
     }
@@ -82,15 +84,16 @@ public class JwtService implements TokenProvider {
     @Override
     public boolean isTokenValid(String token, User user) {
         final String userEmail = extractUsername(token);
-        // Check blacklist first logic is commented out in original code or handled
-        // inside this method?
-        // Original code: if(tokenRevocationPort.isInvalidated(token))... wait, original
-        // code commented it out?
-        // No, original code: if(isTokenInvalidated(token)) return false; (commented
-        // out)
-        // But JwtAuthFilter checks it.
-        // I'll keep the logic simple: verify email + expiration.
         return userEmail.equals(user.getEmail()) && !isTokenExpired(token);
+    }
+
+    @Override
+    public boolean isRefreshTokenValid(String refreshToken) {
+        try {
+            return !isTokenExpired(refreshToken);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     public <T> T extractClaims(String token, Function<Claims, T> claimsResolver) {
@@ -104,6 +107,20 @@ public class JwtService implements TokenProvider {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
+    }
 
+    /**
+     * Obtiene el tiempo de expiración del access token en milisegundos.
+     */
+    public long getAccessTokenExpirationMs() {
+        return accessTokenExpirationMs;
+    }
+
+    /**
+     * Obtiene el tiempo de expiración del refresh token en milisegundos.
+     */
+    public long getRefreshTokenExpirationMs() {
+        return refreshTokenExpirationMs;
     }
 }
+

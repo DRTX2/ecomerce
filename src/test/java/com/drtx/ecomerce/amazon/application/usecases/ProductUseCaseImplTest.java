@@ -1,8 +1,10 @@
 package com.drtx.ecomerce.amazon.application.usecases;
+
 import com.drtx.ecomerce.amazon.application.usecases.product.ProductUseCaseImpl;
 
 import com.drtx.ecomerce.amazon.core.model.product.Category;
 import com.drtx.ecomerce.amazon.core.model.product.Product;
+import com.drtx.ecomerce.amazon.core.model.product.ProductStatus;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.ProductRepositoryPort;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -50,7 +53,13 @@ class ProductUseCaseImplTest {
                 new BigDecimal("999.99"),
                 testCategory,
                 new BigDecimal("4.5"),
-                List.of("image1.jpg", "image2.jpg"));
+                List.of("image1.jpg", "image2.jpg"),
+                "LAPTOP-001",
+                50,
+                ProductStatus.ACTIVE,
+                "laptop",
+                LocalDateTime.now(),
+                LocalDateTime.now());
     }
 
     @Test
@@ -64,7 +73,13 @@ class ProductUseCaseImplTest {
                 new BigDecimal("699.99"),
                 testCategory,
                 new BigDecimal("0.0"),
-                List.of("phone1.jpg"));
+                List.of("phone1.jpg"),
+                "PHONE-001",
+                100,
+                ProductStatus.DRAFT,
+                "smartphone",
+                null,
+                null);
 
         Product savedProduct = new Product(
                 2L,
@@ -73,7 +88,13 @@ class ProductUseCaseImplTest {
                 new BigDecimal("699.99"),
                 testCategory,
                 new BigDecimal("0.0"),
-                List.of("phone1.jpg"));
+                List.of("phone1.jpg"),
+                "PHONE-001",
+                100,
+                ProductStatus.DRAFT,
+                "smartphone",
+                LocalDateTime.now(),
+                LocalDateTime.now());
 
         when(productRepositoryPort.save(any(Product.class))).thenReturn(savedProduct);
 
@@ -133,7 +154,13 @@ class ProductUseCaseImplTest {
                 new BigDecimal("499.99"),
                 testCategory,
                 new BigDecimal("4.2"),
-                List.of("tablet1.jpg"));
+                List.of("tablet1.jpg"),
+                "TABLET-001",
+                30,
+                ProductStatus.ACTIVE,
+                "tablet",
+                LocalDateTime.now(),
+                LocalDateTime.now());
 
         Product product3 = new Product(
                 3L,
@@ -142,7 +169,13 @@ class ProductUseCaseImplTest {
                 new BigDecimal("149.99"),
                 testCategory,
                 new BigDecimal("4.7"),
-                List.of("headphones1.jpg"));
+                List.of("headphones1.jpg"),
+                "HEADPHONES-001",
+                200,
+                ProductStatus.ACTIVE,
+                "headphones",
+                LocalDateTime.now(),
+                LocalDateTime.now());
 
         List<Product> products = Arrays.asList(testProduct, product2, product3);
         when(productRepositoryPort.findAll()).thenReturn(products);
@@ -182,8 +215,15 @@ class ProductUseCaseImplTest {
                 new BigDecimal("1199.99"),
                 testCategory,
                 new BigDecimal("4.8"),
-                List.of("laptop_pro1.jpg", "laptop_pro2.jpg"));
+                List.of("laptop_pro1.jpg", "laptop_pro2.jpg"),
+                "LAPTOP-PRO-001",
+                20,
+                ProductStatus.ACTIVE,
+                "laptop-pro",
+                LocalDateTime.now(),
+                LocalDateTime.now());
 
+        when(productRepositoryPort.findById(productId)).thenReturn(Optional.of(testProduct));
         when(productRepositoryPort.updateById(eq(productId), any(Product.class)))
                 .thenReturn(updatedProduct);
 
@@ -200,31 +240,64 @@ class ProductUseCaseImplTest {
     }
 
     @Test
-    @DisplayName("Should delete product successfully")
+    @DisplayName("Should delete product successfully (Soft Delete)")
     void shouldDeleteProductSuccessfully() {
         // Given
         Long productId = 1L;
-        doNothing().when(productRepositoryPort).delete(productId);
+        when(productRepositoryPort.findById(productId)).thenReturn(Optional.of(testProduct));
+        when(productRepositoryPort.updateById(eq(productId), any(Product.class))).thenReturn(testProduct);
 
         // When
         productUseCase.deleteProduct(productId);
 
         // Then
-        verify(productRepositoryPort, times(1)).delete(productId);
+        verify(productRepositoryPort, times(1)).findById(productId);
+        verify(productRepositoryPort, times(1)).updateById(eq(productId),
+                argThat(p -> p.getStatus() == ProductStatus.ARCHIVED));
+        verify(productRepositoryPort, never()).delete(productId);
     }
 
     @Test
-    @DisplayName("Should handle delete for non-existent product")
+    @DisplayName("Should throw exception when deleting non-existent product")
     void shouldHandleDeleteForNonExistentProduct() {
         // Given
         Long productId = 999L;
-        doNothing().when(productRepositoryPort).delete(productId);
+        when(productRepositoryPort.findById(productId)).thenReturn(Optional.empty());
+
+        // When/Then
+        org.junit.jupiter.api.Assertions.assertThrows(RuntimeException.class, () -> {
+            productUseCase.deleteProduct(productId);
+        });
+
+        verify(productRepositoryPort, times(1)).findById(productId);
+        verify(productRepositoryPort, never()).delete(productId);
+        verify(productRepositoryPort, never()).updateById(any(), any());
+    }
+
+    @Test
+    @DisplayName("Should auto-generate slug when creating product with missing slug")
+    void shouldAutoGenerateSlugWhenMissingInCreate() {
+        // Given
+        Product productWithoutSlug = new Product(
+                null, "My Cool Product", "Desc", new BigDecimal("10.00"),
+                testCategory, BigDecimal.ZERO, List.of(), "SKU-AUTO", 10,
+                ProductStatus.DRAFT, null, null, null); // Slug is null
+
+        when(productRepositoryPort.save(any(Product.class))).thenAnswer(inv -> {
+            Product p = inv.getArgument(0);
+            // Simulate DB save returning ID
+            return new Product(100L, p.getName(), p.getDescription(), p.getPrice(),
+                    p.getCategory(), p.getAverageRating(), p.getImages(),
+                    p.getSku(), p.getStockQuantity(), p.getStatus(),
+                    p.getSlug(), LocalDateTime.now(), LocalDateTime.now());
+        });
 
         // When
-        productUseCase.deleteProduct(productId);
+        Product result = productUseCase.createProduct(productWithoutSlug);
 
         // Then
-        verify(productRepositoryPort, times(1)).delete(productId);
+        assertThat(result.getSlug()).isEqualTo("my-cool-product");
+        verify(productRepositoryPort).save(argThat(p -> p.getSlug().equals("my-cool-product")));
     }
 
     @Test
@@ -238,7 +311,13 @@ class ProductUseCaseImplTest {
                 new BigDecimal("199.99"),
                 testCategory,
                 new BigDecimal("0.0"),
-                List.of("newproduct.jpg"));
+                List.of("newproduct.jpg"),
+                "NEW-001",
+                10,
+                ProductStatus.DRAFT,
+                "new-product",
+                LocalDateTime.now(),
+                LocalDateTime.now());
 
         when(productRepositoryPort.save(any(Product.class))).thenReturn(noRatingProduct);
 

@@ -22,7 +22,13 @@ public class ProductTest {
                 new BigDecimal("19.99"),
                 cat,
                 new BigDecimal("4.5"),
-                List.of("img1.jpg", "img2.jpg"));
+                List.of("img1.jpg", "img2.jpg"),
+                "TEST-SKU",
+                100,
+                com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE,
+                "test-product",
+                java.time.LocalDateTime.now(),
+                java.time.LocalDateTime.now());
 
         assertEquals(1L, product.getId());
         assertEquals("Test Product", product.getName());

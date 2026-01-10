@@ -1,14 +1,37 @@
-HELP.md
-target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
+# =====================================================
+# GITIGNORE - Spring Boot Project
+# =====================================================
 
-.gradle/
-.gradle/**
-bin/
+# ============================
+# Variables de Entorno
+# ============================
+.env
+.env.local
+.env.*.local
 
-### STS ###
+# ============================
+# Gradle
+# ============================
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+# ============================
+# IDE - IntelliJ IDEA
+# ============================
+.idea/
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+# ============================
+# IDE - Eclipse
+# ============================
 .apt_generated
 .classpath
 .factorypath
@@ -16,29 +39,57 @@ bin/
 .settings
 .springBeans
 .sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
+# ============================
+# IDE - VS Code
+# ============================
+.vscode/
 
-### NetBeans ###
+# ============================
+# IDE - NetBeans
+# ============================
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
-build/
-!**/src/main/**/build/
-!**/src/test/**/build/
 
-### VS Code ###
-.vscode/
+# ============================
+# MacOS
+# ============================
+.DS_Store
 
-notes.md
+# ============================
+# Windows
+# ============================
+Thumbs.db
 
-### Environment Variables ###
-.env
-.env.local
-.env.*.local
+# ============================
+# Logs
+# ============================
+logs/
+*.log
+log/
+
+# ============================
+# Temporal Files
+# ============================
+*.tmp
+*.bak
+*.swp
+*~.nib
+
+# ============================
+# Spring Boot
+# ============================
+spring-boot-devtools.properties
+
+# ============================
+# Database
+# ============================
+*.db
+*.sqlite
+
