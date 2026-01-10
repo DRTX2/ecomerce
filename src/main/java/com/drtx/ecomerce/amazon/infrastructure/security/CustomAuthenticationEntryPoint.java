@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ProblemDetail;
@@ -14,11 +15,14 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 import java.net.URI;
 import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 
 @Component
+@RequiredArgsConstructor
 public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    // Inyectamos el ObjectMapper configurado por Spring (con soporte JSR310)
+    private final ObjectMapper objectMapper;
 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response,
@@ -30,10 +34,10 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
                 authException.getMessage());
         problemDetail.setTitle("Unauthorized");
         problemDetail.setType(URI.create("https://api.amazon.com/errors/unauthorized"));
-        problemDetail.setProperty("timestamp", Instant.now());
+        // Usamos String ISO-8601 en lugar de Instant para máxima compatibilidad
+        problemDetail.setProperty("timestamp", DateTimeFormatter.ISO_INSTANT.format(Instant.now()));
         problemDetail.setProperty("errorCode", "UNAUTHORIZED");
 
-        // Jackson supports serializing ProblemDetail in Spring Boot 3
         objectMapper.writeValue(response.getWriter(), problemDetail);
     }
 }

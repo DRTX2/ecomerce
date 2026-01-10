@@ -47,6 +47,9 @@ public class SecurityConfig {
                             "/auth/**",
                             "/auth/register",
                             "/auth/login").permitAll()
+                            // Endpoints públicos de solo lectura para el catálogo
+                            .requestMatchers(org.springframework.http.HttpMethod.GET, "/products/**").permitAll()
+                            .requestMatchers(org.springframework.http.HttpMethod.GET, "/categories/**").permitAll()
                             .anyRequest().authenticated();
                 })
                 .authenticationProvider(authenticationProvider())
