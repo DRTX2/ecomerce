@@ -9,11 +9,11 @@ spring:
     driver-class-name: org.postgresql.Driver
 
   jpa:
-    hibernate:
-      ddl-auto: validate
     database: POSTGRESQL
     show-sql: false
     database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: validate
     properties:
       hibernate:
         format_sql: true
@@ -49,31 +49,49 @@ spring:
     problemdetails:
       enabled: true
 
-# Configuración de email para testing
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+
+# =========================
+# Email (testing / provider)
+# =========================
 email:
-  provider: azure # Opciones: javamail, azure
+  provider: azure # javamail | azure
   test:
     recipient: ${TEST_EMAIL:test@example.com}
 
+# =========================
+# Azure Communication Email
+# =========================
 azure:
   communication:
     connection-string: ${AZURE_COMMUNICATION_CONNECTION_STRING}
     sender-address: ${AZURE_SENDER_ADDRESS:DoNotReply@domain.com}
 
+# =========================
+# Server
+# =========================
 server:
   port: 8080
+  servlet:
+    context-path: /api/v1
   error:
     include-message: always
     include-binding-errors: always
-  servlet:
-    context-path: /api/v1
 
-
+# =========================
+# Security
+# =========================
 security:
   jwt:
     secret-key: ${JWT_SECRET_KEY}
     expiration: 86400000
 
+# =========================
+# Actuator / Management
+# =========================
 management:
   health:
     mail:
@@ -85,21 +103,21 @@ management:
     mappings:
       enabled: true
 
+# =========================
+# Storage
+# =========================
 storage:
   azure:
-    connection-string: ${AZURE_STORAGE_CONNECTION_STRING:DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://localhost:10000/devstoreaccount1;}
+    connection-string: ${AZURE_STORAGE_CONNECTION_STRING}
     container-name: ${STORAGE_CONTAINER_NAME:uploads}
   image:
-    max-file-size: ${STORAGE_MAX_FILE_SIZE:5242880} # Default 5MB
+    max-file-size: ${STORAGE_MAX_FILE_SIZE:5242880}       # 5MB
     max-files-count: ${STORAGE_MAX_FILES_COUNT:5}
-    max-total-size: ${STORAGE_MAX_TOTAL_SIZE:20971520} # Default 20MB
+    max-total-size: ${STORAGE_MAX_TOTAL_SIZE:20971520}   # 20MB
     allowed-content-types: ${STORAGE_ALLOWED_CONTENT_TYPES:image/jpeg,image/png,image/webp}
 
+# =========================
+# CORS
+# =========================
 cors:
   allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000}
-
-spring:
-  data:
-    redis:
-      host: ${REDIS_HOST:localhost}
-      port: ${REDIS_PORT:6379}
