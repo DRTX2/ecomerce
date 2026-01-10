@@ -359,7 +359,7 @@ src/main/java/com/drtx/ecomerce/amazon/
 ### 11. 🔐 Módulo de Seguridad (Security)
 **Responsabilidad**: Autenticación, autorización, tokens
 
-Ver archivo: [SECURITY_MODULE_ARCHITECTURE.md](Docs/SECURITY_MODULE_ARCHITECTURE.md)
+Ver archivo: [SECURITY_MODULE_ARCHITECTURE.md](SECURITY_MODULE_ARCHITECTURE.md)
 
 **Core (Dominio)**:
 - `core/model/security/AuthResult.java`
