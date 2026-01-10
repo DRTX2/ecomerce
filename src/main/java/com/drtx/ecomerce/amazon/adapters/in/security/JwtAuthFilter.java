@@ -30,16 +30,26 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
-        System.out.println("JwtAuthFilter - Request URI: " + path);
+        String method = request.getMethod();
+        System.out.println("JwtAuthFilter - Request URI: " + path + " Method: " + method);
         // Remover el context-path si existe
         String contextPath = request.getContextPath();
         if (contextPath != null && !contextPath.isEmpty() && path.startsWith(contextPath)) {
             path = path.substring(contextPath.length());
         }
         System.out.println("JwtAuthFilter - Path without context: " + path);
-        boolean skip = path.equals("/auth/login") ||
+
+        // Rutas de autenticación siempre se saltan
+        boolean isAuthRoute = path.equals("/auth/login") ||
                 path.equals("/auth/register") ||
+                path.equals("/auth/refresh") ||
                 path.startsWith("/auth/");
+
+        // Rutas públicas de solo lectura (GET)
+        boolean isPublicReadRoute = "GET".equalsIgnoreCase(method) &&
+                (path.startsWith("/products") || path.startsWith("/categories"));
+
+        boolean skip = isAuthRoute || isPublicReadRoute;
         System.out.println("JwtAuthFilter - Should skip: " + skip);
         return skip;
     }

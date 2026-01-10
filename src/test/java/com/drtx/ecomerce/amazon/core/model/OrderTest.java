@@ -19,7 +19,9 @@ public class OrderTest {
     @Test
     public void testOrderCreation() {
         User user = new User(1L, "David", "email", "pass", "address", "123", UserRole.USER);
-        Product product = new Product(1L, "Phone", "Smartphone", new BigDecimal("500"), null, null, null);
+        Product product = new Product(1L, "Phone", "Smartphone", new BigDecimal("500"), null, null, null,
+                "SKU-ORD", 100, com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE, "slug-ord", null,
+                null);
         Order order = new Order(1L, user, null, new BigDecimal("500"), OrderState.PENDING, LocalDateTime.now(), null,
                 List.of());
         OrderItem item = new OrderItem(1L, order, product, 1, new BigDecimal("500"));

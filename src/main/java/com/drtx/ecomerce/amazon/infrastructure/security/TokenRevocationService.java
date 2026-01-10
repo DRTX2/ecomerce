@@ -3,9 +3,12 @@ package com.drtx.ecomerce.amazon.infrastructure.security;
 import com.drtx.ecomerce.amazon.core.ports.out.security.RevokedTokenPort;
 import com.drtx.ecomerce.amazon.core.ports.out.security.TokenRevocationPort;
 import lombok.RequiredArgsConstructor;
-import org.springframework.scheduling.annotation.Scheduled;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TokenRevocationService implements TokenRevocationPort {
@@ -14,7 +17,10 @@ public class TokenRevocationService implements TokenRevocationPort {
 
     @Override
     public void invalidate(String token) {
-        if(!revokedTokenPort.exists(token)) revokedTokenPort.save(token);
+        if (!revokedTokenPort.exists(token)) {
+            revokedTokenPort.save(token);
+            log.debug("Token invalidated successfully");
+        }
     }
 
     @Override
@@ -23,8 +29,9 @@ public class TokenRevocationService implements TokenRevocationPort {
     }
 
     @Override
-    @Scheduled(fixedRate = 3600000)
-    public void deleteExpiredTokens() {
-        revokedTokenPort.deleteExpiredTokens();
+    public int deleteTokensRevokedBefore(Instant before) {
+        int deleted = revokedTokenPort.deleteRevokedBefore(before);
+        log.info("Deleted {} revoked tokens older than {}", deleted, before);
+        return deleted;
     }
 }

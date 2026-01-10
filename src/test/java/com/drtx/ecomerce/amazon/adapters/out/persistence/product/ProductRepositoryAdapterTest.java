@@ -126,7 +126,8 @@ class ProductRepositoryAdapterTest {
         CategoryEntity cat2 = categoryRepository.save(new CategoryEntity(null, "Cat2", null, null));
 
         ProductEntity entity = new ProductEntity(null, "Old Name", "Desc", BigDecimal.ONE, cat1,
-                BigDecimal.valueOf(5), null);
+                BigDecimal.valueOf(5), null, "SKU-OLD", 10,
+                com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE, "old-slug", null, null);
         entity = productRepository.save(entity);
 
         Product updateData = new Product();
@@ -166,7 +167,9 @@ class ProductRepositoryAdapterTest {
         // Given
         CategoryEntity cat = categoryRepository.save(new CategoryEntity(null, "Cat", null, null));
         ProductEntity entity = productRepository
-                .save(new ProductEntity(null, "ToDel", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null));
+                .save(new ProductEntity(null, "ToDel", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null,
+                        "SKU-DEL", 0, com.drtx.ecomerce.amazon.core.model.product.ProductStatus.DRAFT, "del-slug", null,
+                        null));
 
         // When
         adapter.delete(entity.getId());

@@ -14,11 +14,20 @@ public class Product {
     private BigDecimal averageRating;
     private List<String> images;
 
+    // New fields
+    private String sku;
+    private Integer stockQuantity;
+    private ProductStatus status;
+    private String slug;
+    private java.time.LocalDateTime createdAt;
+    private java.time.LocalDateTime updatedAt;
+
     public Product() {
     }
 
     public Product(Long id, String name, String description, BigDecimal price, Category category,
-            BigDecimal averageRating, List<String> images) {
+            BigDecimal averageRating, List<String> images, String sku, Integer stockQuantity,
+            ProductStatus status, String slug, java.time.LocalDateTime createdAt, java.time.LocalDateTime updatedAt) {
         this.id = id;
         this.name = name;
         this.description = description;
@@ -26,6 +35,12 @@ public class Product {
         this.category = category;
         this.averageRating = averageRating;
         this.images = images;
+        this.sku = sku;
+        this.stockQuantity = stockQuantity;
+        this.status = status;
+        this.slug = slug;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
     public Long getId() {
@@ -84,12 +99,69 @@ public class Product {
         this.images = images;
     }
 
+    public String getSku() {
+        return sku;
+    }
+
+    public void setSku(String sku) {
+        this.sku = sku;
+    }
+
+    public Integer getStockQuantity() {
+        return stockQuantity;
+    }
+
+    public void setStockQuantity(Integer stockQuantity) {
+        this.stockQuantity = stockQuantity;
+    }
+
+    public ProductStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(ProductStatus status) {
+        this.status = status;
+    }
+
+    public String getSlug() {
+        return slug;
+    }
+
+    public void setSlug(String slug) {
+        this.slug = slug;
+    }
+
+    public java.time.LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(java.time.LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public java.time.LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(java.time.LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
     public void validate() {
         if (this.name == null || this.name.isBlank()) {
             throw new DomainException("Product name cannot be null or blank");
         }
-        if (price.compareTo(BigDecimal.ZERO) < 0) {
+        if (this.price == null || this.price.compareTo(BigDecimal.ZERO) < 0) {
             throw new DomainException("Product price cannot be negative");
+        }
+        if (this.sku == null || this.sku.isBlank()) {
+            throw new DomainException("Product SKU is required");
+        }
+        if (this.stockQuantity == null || this.stockQuantity < 0) {
+            throw new DomainException("Product stock cannot be negative");
+        }
+        if (this.status == null) {
+            this.status = ProductStatus.DRAFT; // Default to DRAFT if null
         }
     }
 }
