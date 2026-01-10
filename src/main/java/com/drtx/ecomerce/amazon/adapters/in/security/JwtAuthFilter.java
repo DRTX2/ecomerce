@@ -42,6 +42,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         // Rutas de autenticación siempre se saltan
         boolean isAuthRoute = path.equals("/auth/login") ||
                 path.equals("/auth/register") ||
+                path.equals("/auth/refresh") ||
                 path.startsWith("/auth/");
 
         // Rutas públicas de solo lectura (GET)
