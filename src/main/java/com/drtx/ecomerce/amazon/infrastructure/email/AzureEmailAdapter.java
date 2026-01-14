@@ -20,9 +20,7 @@ import java.util.Collections;
 import java.util.Map;
 
 /**
- * Adaptador para envío de correos electrónicos utilizando Microsoft Azure
- * Communication Services.
- * Se activa cuando la propiedad 'email.provider' es 'azure'.
+ * it's activated when the email provider is set to 'azure' in the application properties.
  */
 @Service
 @Slf4j
@@ -46,9 +44,9 @@ public class AzureEmailAdapter implements EmailPort {
             this.emailClient = new EmailClientBuilder()
                     .connectionString(connectionString)
                     .buildClient();
-            log.info("Azure EmailClient initialized successfully");
+            log.info("[OK] Azure EmailClient initialized successfully");
         } catch (Exception e) {
-            log.error("Failed to initialize Azure EmailClient", e);
+            log.error("[ERR] Failed to initialize Azure EmailClient", e);
             throw new RuntimeException("Failed to initialize Azure EmailClient", e);
         }
     }
@@ -64,9 +62,9 @@ public class AzureEmailAdapter implements EmailPort {
                     .setBodyPlainText(text);
 
             sendEmail(emailMessage, to);
-            log.info("Azure Simple Email sent to {}", to);
+            log.info("[OK] Azure Simple Email sent to {}", to);
         } catch (Exception e) {
-            log.error("Error sending Azure simple email to {}", to, e);
+            log.error("[ERR] Error sending Azure simple email to {}", to, e);
             throw new NotificationException("Error sending Azure simple email to " + to, e);
         }
     }
@@ -82,9 +80,9 @@ public class AzureEmailAdapter implements EmailPort {
                     .setBodyHtml(htmlContent);
 
             sendEmail(emailMessage, to);
-            log.info("Azure HTML Email sent to {}", to);
+            log.info("[OK] Azure HTML Email sent to {}", to);
         } catch (Exception e) {
-            log.error("Error sending Azure HTML email to {}", to, e);
+            log.error("[ERR] Error sending Azure HTML email to {}", to, e);
             throw new NotificationException("Error sending Azure HTML email to " + to, e);
         }
     }
@@ -94,7 +92,7 @@ public class AzureEmailAdapter implements EmailPort {
         PollResponse<EmailSendResult> response = poller.waitForCompletion();
 
         if (response.getValue().getStatus().toString().equals("Succeeded")) {
-            log.debug("Email send operation status: {}", response.getStatus());
+            log.debug("[OK] Email send operation status: {}", response.getStatus());
         }
     }
 

@@ -2,8 +2,10 @@ package com.drtx.ecomerce.amazon.infrastructure.security;
 
 import com.drtx.ecomerce.amazon.adapters.in.security.JwtAuthFilter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.ProviderManager;
@@ -32,7 +34,7 @@ public class SecurityConfig {
     private final UserDetailsService userDetailsService;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
-    @org.springframework.beans.factory.annotation.Value("${cors.allowed-origins}")
+    @Value("${cors.allowed-origins}")
     private String allowedOrigins;
 
     @Bean
@@ -49,8 +51,8 @@ public class SecurityConfig {
                             "/auth/login",
                             "/auth/refresh").permitAll()
                             // Endpoints públicos de solo lectura para el catálogo
-                            .requestMatchers(org.springframework.http.HttpMethod.GET, "/products/**").permitAll()
-                            .requestMatchers(org.springframework.http.HttpMethod.GET, "/categories/**").permitAll()
+                            .requestMatchers(HttpMethod.GET, "/products/**").permitAll()
+                            .requestMatchers(HttpMethod.GET, "/categories/**").permitAll()
                             .anyRequest().authenticated();
                 })
                 .authenticationProvider(authenticationProvider())

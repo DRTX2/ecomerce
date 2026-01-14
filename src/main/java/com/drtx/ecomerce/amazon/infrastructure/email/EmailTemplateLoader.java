@@ -43,9 +43,7 @@ public class EmailTemplateLoader {
         String path = TEMPLATE_PATH + templateName + ".html";
         ClassPathResource resource = new ClassPathResource(path);
 
-        if (!resource.exists()) {
-            throw new IOException("Plantilla no encontrada: " + path);
-        }
+        if (!resource.exists()) throw new IOException("Plantilla no encontrada: " + path);
 
         return Files.readString(
                 resource.getFile().toPath(),

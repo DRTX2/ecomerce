@@ -6,6 +6,7 @@ import com.drtx.ecomerce.amazon.adapters.in.rest.cart.mappers.CartRestMapper;
 
 import com.drtx.ecomerce.amazon.core.model.order.Cart;
 import com.drtx.ecomerce.amazon.core.ports.in.rest.CartUseCasePort;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +28,7 @@ public class CartController {
     }
 
     @PostMapping
-    public ResponseEntity<CartResponse> createCart(@RequestBody @jakarta.validation.Valid CartRequest cart) {
+    public ResponseEntity<CartResponse> createCart(@RequestBody @Valid CartRequest cart) {
         Cart newCart = mapper.toDomain(cart);
         return ResponseEntity.ok(mapper.toResponse(
                 cartService.createCart(newCart)));
@@ -40,8 +41,7 @@ public class CartController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<CartResponse> updateCart(@PathVariable Long id,
-            @RequestBody @jakarta.validation.Valid CartRequest cartRequest) {
+    public ResponseEntity<CartResponse> updateCart(@PathVariable Long id, @RequestBody @Valid CartRequest cartRequest) {
         Cart cart = mapper.toDomain(cartRequest);
         return ResponseEntity.ok(mapper.toResponse(
                 cartService.updateCart(id, cart)));

@@ -2,6 +2,7 @@ package com.drtx.ecomerce.amazon.application.usecases.cart;
 
 import com.drtx.ecomerce.amazon.core.model.exceptions.DomainExceptionFactory;
 import com.drtx.ecomerce.amazon.core.model.order.Cart;
+import com.drtx.ecomerce.amazon.core.ports.in.rest.CartUseCasePort;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.CartRepositoryPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,7 +12,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class CartUseCaseImpl implements com.drtx.ecomerce.amazon.core.ports.in.rest.CartUseCasePort {
+public class CartUseCaseImpl implements CartUseCasePort {
     private final CartRepositoryPort repositort;
 
     @Override
@@ -41,8 +42,7 @@ public class CartUseCaseImpl implements com.drtx.ecomerce.amazon.core.ports.in.r
     @Override
     public void deleteCart(Long id) {
         // Verify cart exists before deleting
-        repositort.findById(id)
-                .orElseThrow(() -> DomainExceptionFactory.cartNotFound(id));
+        repositort.findById(id).orElseThrow(() -> DomainExceptionFactory.cartNotFound(id));
 
         repositort.delete(id);
     }

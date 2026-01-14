@@ -28,6 +28,7 @@ public class AppealUseCaseImpl implements AppealUseCasePort {
     @Override
     @Transactional
     public Appeal createAppeal(Long incidenceId, String reason, String sellerEmail) {
+        // to create an appeal, the incidence needs to exist and must be in DECIDED or CLOSED status
         Incidence incidence = incidenceRepository.findById(incidenceId)
                 .orElseThrow(() -> new RuntimeException("Incidence not found with id " + incidenceId));
 
@@ -35,7 +36,6 @@ public class AppealUseCaseImpl implements AppealUseCasePort {
             throw new RuntimeException("Incidence must be decided to be appealed");
         }
 
-        // Verify existing appeal
         if (appealRepository.findByIncidenceId(incidenceId).isPresent()) {
             throw new RuntimeException("Appeal already exists for this incidence");
         }

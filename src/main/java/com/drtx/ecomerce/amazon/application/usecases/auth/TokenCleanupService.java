@@ -13,15 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
-/**
- * Servicio programado para limpiar tokens expirados y revocados.
- * Se ejecuta automáticamente según el cron configurado.
- *
- * Configuración en application.yml:
- * - security.token-cleanup.enabled: habilita/deshabilita el job
- * - security.token-cleanup.cron: expresión cron para programar
- * - security.token-cleanup.revoked-token-retention-days: días para mantener tokens revocados
- */
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -35,8 +26,7 @@ public class TokenCleanupService {
     private int revokedTokenRetentionDays;
 
     /**
-     * Ejecuta la limpieza de tokens según el cron configurado.
-     * Por defecto: 2 AM diario en desarrollo, cada 6 horas en producción.
+     * clean tokens, by default at 2AM(development), each 6 hours in production.
      */
     @Scheduled(cron = "${security.token-cleanup.cron:0 0 2 * * *}")
     @Transactional
@@ -46,8 +36,8 @@ public class TokenCleanupService {
     }
 
     /**
-     * Ejecuta la limpieza manualmente.
-     * Útil para testing o ejecución desde un endpoint admin.
+     * manually executes the cleanup.
+     * Useful for testing or execution from an admin endpoint.
      */
     @Transactional
     public CleanupResult cleanup() {
@@ -56,13 +46,13 @@ public class TokenCleanupService {
 
         log.info("Token cleanup started at {}", now);
 
-        // 1. Eliminar refresh tokens expirados
+        // 1. delete expired refresh tokens
         int expiredRefreshTokensDeleted = cleanupExpiredRefreshTokens(now);
 
-        // 2. Eliminar refresh tokens revocados
+        // 2. delete revoked refresh tokens
         int revokedRefreshTokensDeleted = cleanupRevokedRefreshTokens();
 
-        // 3. Eliminar tokens de acceso revocados (más antiguos que retention period)
+        // 3. Delete old revoked access tokens beyond retention period
         Instant retentionCutoff = now.minus(revokedTokenRetentionDays, ChronoUnit.DAYS);
         int oldRevokedTokensDeleted = cleanupOldRevokedTokens(retentionCutoff);
 
@@ -120,9 +110,6 @@ public class TokenCleanupService {
         }
     }
 
-    /**
-     * Resultado de la operación de limpieza.
-     */
     public record CleanupResult(
         int expiredRefreshTokensDeleted,
         int revokedRefreshTokensDeleted,
@@ -146,4 +133,3 @@ public class TokenCleanupService {
         }
     }
 }
-

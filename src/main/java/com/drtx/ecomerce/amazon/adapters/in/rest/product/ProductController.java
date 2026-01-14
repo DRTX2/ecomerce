@@ -13,6 +13,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -32,12 +33,14 @@ public class ProductController {
         @PreAuthorize("hasRole('SELLER')")
         public ResponseEntity<ImageUploadResponse> uploadImages(
                         @RequestParam("files") List<MultipartFile> files,
-                        org.springframework.security.core.Authentication authentication) {
+                        Authentication authentication) {
 
-                String role = authentication.getAuthorities().stream()
+                String role = authentication.getAuthorities()
+                                .stream()
                                 .findFirst()
-                                .map(auth -> auth.getAuthority().replace("ROLE_", ""))
-                                .orElse("USER");
+                                .map(auth -> auth.getAuthority()
+                                        .replace("ROLE_", ""))
+                                        .orElse("USER");
 
                 Long userId = 1L; // Placeholder as in original
 

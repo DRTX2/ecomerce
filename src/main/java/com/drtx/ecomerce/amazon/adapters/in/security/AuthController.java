@@ -52,50 +52,6 @@ public class AuthController {
     }
 
     private AuthResponse toAuthResponse(AuthResult result) {
-        // Need to convert Domain User to UserResponse DTO
-        // Ideally UserSecurityMapper should do this.
-        // Assuming UserSecurityMapper has toUserResponse(User).
-        // If not, I'll need to add it or do it manually here.
-        // Let's check imports to see if UserSecurityMapper handles this.
-        // The original code passed UserResponse directly from AuthService which used
-        // SecurityUserMapper.
-        // Now AuthService returns AuthResult (domain + token).
-        // I need to use userSecurityMapper here, BUT imports of AuthService showed
-        // SecurityUserMapper,
-        // and imports of AuthController shows UserSecurityMapper.
-        // These might be different mappers or same one renamed or imported differently.
-        // Original AuthController line 19: private final UserSecurityMapper
-        // userSecurityMapper;
-        // Function registerRequestToDomain uses it.
-        // Let's assume it has methods we need or I can add a helper here.
-
-        // Wait, I can't see UserSecurityMapper content.
-        // But I can define the DTOs here to be safe or rely on what I saw in
-        // AuthService removed imports.
-        // AuthService imported:
-        // com.drtx.ecomerce.amazon.adapters.in.security.mappers.SecurityUserMapper
-        // AuthController imports:
-        // com.drtx.ecomerce.amazon.adapters.in.security.mappers.UserSecurityMapper
-        // They sound different!
-
-        // But let's assume I can construct AuthResponse manually if needed.
-        // AuthResponse(UserResponse user, AuthTokens tokens)
-
-        // Wait, UserSecurityMapper is injected.
-        // Let's assume it has a method toUserResponse(User). I'll use it.
-        // If it fails, I'll fix it.
-
-        // But wait, the mapper in AuthService was
-        // `com.drtx.ecomerce...SecurityUserMapper`.
-        // The one in AuthController is `com.drtx.ecomerce...UserSecurityMapper`.
-        // I should probably check `adapters/in/security` to see the mappers.
-
-        // For now I will assume `userSecurityMapper` in AuthController is the one to
-        // use.
-        // If compilation fails, I'll fix.
-
-        // Wait, I need UserResponse and AuthTokens constructions
-
         UserResponse userResponse = new UserResponse(
                 result.user().getId(),
                 result.user().getName(),

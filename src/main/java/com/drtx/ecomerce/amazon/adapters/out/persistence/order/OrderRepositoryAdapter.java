@@ -34,6 +34,13 @@ public class OrderRepositoryAdapter implements OrderRepositoryPort {
     }
 
     @Override
+    public List<Order> findByUserId(Long userId) {
+        return repository.findByUserId(userId).stream()
+                .map(orderMapper::toDomain)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public Order updateById(Order order) {
         final OrderEntity orderToUpdate = repository.findById(order.getId()).orElseThrow(
                 () -> new EntityNotFoundException("Order not found with id: " + order.getId()));

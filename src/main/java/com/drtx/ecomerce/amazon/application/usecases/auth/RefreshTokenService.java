@@ -45,6 +45,7 @@ public class RefreshTokenService {
     }
 
     public RefreshToken verifyAndGetRefreshToken(String token) {
+        // this verify if the token exists and is valid (not expired or revoked)
         RefreshToken refreshToken = refreshTokenRepository.findByToken(token)
                 .orElseThrow(() -> {
                     log.warn("Refresh token not found: {}...", token.substring(0, Math.min(20, token.length())));

@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,7 +42,7 @@ public class JwtService implements TokenProvider {
     public String generateAccessToken(User user) {
         Map<String, Object> extraClaims = new HashMap<>();
         String role = user.getRole() != null ? "ROLE_" + user.getRole().name() : "ROLE_USER";
-        extraClaims.put("Authorities", java.util.Collections.singletonList(Map.of("authority", role)));
+        extraClaims.put("Authorities", Collections.singletonList(Map.of("authority", role)));
         extraClaims.put("type", "access");
 
         return buildToken(extraClaims, user, accessTokenExpirationMs);

@@ -46,6 +46,29 @@ public final class DomainExceptionFactory {
         return new EntityNotFoundException("Incidence", incidenceId);
     }
 
+    public static EntityNotFoundException userNotFound(String email) {
+        return new EntityNotFoundException(
+                String.format("User with email '%s' not found", email));
+    }
+
+    // ========== Authorization Exceptions ==========
+
+    public static DomainException unauthorized(String message) {
+        return new DomainException("Unauthorized: " + message);
+    }
+
+    // ========== State Machine Exceptions ==========
+
+    public static DomainException invalidStateTransition(String fromState, String toState, String validTransitions) {
+        return new DomainException(
+                String.format("Invalid state transition from %s to %s. Valid transitions: %s",
+                        fromState, toState, validTransitions));
+    }
+
+    public static DomainException invalidOperation(String message) {
+        return new DomainException("Invalid operation: " + message);
+    }
+
     // ========== Business Rule Violations ==========
 
     public static DomainException invalidPassword(String reason) {

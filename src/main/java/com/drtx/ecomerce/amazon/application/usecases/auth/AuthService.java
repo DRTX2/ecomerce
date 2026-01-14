@@ -29,21 +29,25 @@ public class AuthService implements AuthUseCasePort {
     @Override
     public AuthResult register(User user) {
         log.info("Registering new user: {}", user.getEmail());
-
+        // username don't allow to be part of the password
         if (user.getPassword().toLowerCase().contains(user.getEmail().toLowerCase())) {
             log.warn("Registration failed - password contains email: {}", user.getEmail());
             throw new DomainException("Password cannot contain the email address.");
         }
+        // encode password and save user
         String encodedPassword = passwordService.encode(user.getPassword());
         user.setPassword(encodedPassword);
         User savedUser = repository.save(user);
-
+        // generate tokens
         String accessToken = tokenProvider.generateAccessToken(savedUser);
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(savedUser);
 
         log.info("User registered successfully: {}", savedUser.getEmail());
-        return new AuthResult(savedUser, accessToken, refreshToken.getToken(),
-            tokenProvider.getAccessTokenExpirationMs());
+        return new AuthResult(
+                savedUser,
+                accessToken,
+                refreshToken.getToken(),
+                tokenProvider.getAccessTokenExpirationMs());
     }
 
     @Override
@@ -51,13 +55,13 @@ public class AuthService implements AuthUseCasePort {
         log.info("Login attempt for user: {}", command.email());
 
         authenticationFacade.authenticate(command.email(), command.password());
-
+        // If authentication is successful, retrieve user details
         var user = repository.findByEmail(command.email())
                 .orElseThrow(() -> {
                     log.error("User not found after successful authentication: {}", command.email());
                     return new RuntimeException("User not found with email: " + command.email());
                 });
-
+        // send tokens
         String accessToken = tokenProvider.generateAccessToken(user);
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
 
@@ -71,10 +75,10 @@ public class AuthService implements AuthUseCasePort {
         String userEmail = tokenProvider.extractUsername(token);
         log.info("Logout request for user: {}", userEmail);
 
-        // Invalidar el access token
+        // invalidate access token
         tokenRevocationPort.invalidate(token);
 
-        // Revocar refresh token del usuario
+        // Revoke user refresh token
         refreshTokenService.revokeRefreshToken(userEmail);
 
         log.info("Logout successful for user: {}", userEmail);

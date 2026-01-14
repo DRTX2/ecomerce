@@ -24,10 +24,10 @@ public class FavoriteUseCaseImpl implements FavoriteUseCasePort {
     @Override
     @Transactional
     public Favorite addFavorite(Long productId, String userEmail) {
+        // verify user exists, if favorite already exists, and product exists, otherwise is saved.
         User user = userRepository.findByEmail(userEmail)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Check if already exists
         if (favoriteRepository.findByUserIdAndProductId(user.getId(), productId).isPresent()) {
             throw new RuntimeException("Favorite already exists");
         }

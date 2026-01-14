@@ -4,6 +4,7 @@ import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
+import com.drtx.ecomerce.amazon.core.model.exceptions.StorageException;
 import com.drtx.ecomerce.amazon.core.ports.out.ImageStoragePort;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -38,8 +39,7 @@ public class AzureBlobStorageAdapter implements ImageStoragePort {
             // We could set http headers/content type if needed
             return blobClient.getBlobUrl();
         } catch (Exception e) {
-            throw new com.drtx.ecomerce.amazon.core.model.exceptions.StorageException(
-                    "Failed to upload image to Azure Storage", e);
+            throw new StorageException("Failed to upload image to Azure Storage", e);
         }
     }
 }

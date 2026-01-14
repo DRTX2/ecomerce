@@ -2,6 +2,8 @@ package com.drtx.ecomerce.amazon.application.usecases.product;
 
 import com.drtx.ecomerce.amazon.core.model.exceptions.DomainExceptionFactory;
 import com.drtx.ecomerce.amazon.core.model.product.Product;
+import com.drtx.ecomerce.amazon.core.model.product.ProductStatus;
+import com.drtx.ecomerce.amazon.core.ports.in.rest.ProductUseCasePort;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.ProductRepositoryPort;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -11,7 +13,7 @@ import java.util.Optional;
 
 @Service
 @AllArgsConstructor
-public class ProductUseCaseImpl implements com.drtx.ecomerce.amazon.core.ports.in.rest.ProductUseCasePort {
+public class ProductUseCaseImpl implements ProductUseCasePort {
     private final ProductRepositoryPort repository;
 
     @Override
@@ -28,7 +30,7 @@ public class ProductUseCaseImpl implements com.drtx.ecomerce.amazon.core.ports.i
 
         // Default status
         if (product.getStatus() == null) {
-            product.setStatus(com.drtx.ecomerce.amazon.core.model.product.ProductStatus.DRAFT);
+            product.setStatus(ProductStatus.DRAFT);
         }
 
         return repository.save(product);
@@ -70,10 +72,11 @@ public class ProductUseCaseImpl implements com.drtx.ecomerce.amazon.core.ports.i
                 .orElseThrow(() -> DomainExceptionFactory.productNotFound(id));
 
         // Soft delete: Change status to ARCHIVED
-        product.setStatus(com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ARCHIVED);
+        product.setStatus(ProductStatus.ARCHIVED);
         repository.updateById(id, product);
     }
 
+    // Utility method to generate slug from name
     private String generateSlug(String name) {
         if (name == null)
             return null;

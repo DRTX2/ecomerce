@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component;
 public class AuthenticationFacadeAdapter implements AuthenticationFacade {
     private final AuthenticationManager authenticationManager;
 
-
     @Override
     public void authenticate(String email, String password) {
         var authToken=new UsernamePasswordAuthenticationToken(email,password);
