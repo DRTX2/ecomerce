@@ -4,6 +4,10 @@ import com.drtx.ecomerce.amazon.core.model.user.User;
 
 import java.time.LocalDateTime;
 
+/**
+ * Modelo de dominio para reportes.
+ * Simplificado: usa constructor vacío + setters en lugar de builder.
+ */
 public class Report {
     private Long id;
     private User reporter;
@@ -22,10 +26,6 @@ public class Report {
         this.comment = comment;
         this.createdAt = createdAt;
         this.source = source;
-    }
-
-    public static ReportBuilder builder() {
-        return new ReportBuilder();
     }
 
     public Long getId() {
@@ -82,52 +82,6 @@ public class Report {
         }
         if (this.source == null) {
             this.source = ReportSource.USER;
-        }
-    }
-
-    public static class ReportBuilder {
-        private Long id;
-        private User reporter;
-        private String reason;
-        private String comment;
-        private LocalDateTime createdAt;
-        private ReportSource source;
-
-        ReportBuilder() {
-        }
-
-        public ReportBuilder id(Long id) {
-            this.id = id;
-            return this;
-        }
-
-        public ReportBuilder reporter(User reporter) {
-            this.reporter = reporter;
-            return this;
-        }
-
-        public ReportBuilder reason(String reason) {
-            this.reason = reason;
-            return this;
-        }
-
-        public ReportBuilder comment(String comment) {
-            this.comment = comment;
-            return this;
-        }
-
-        public ReportBuilder createdAt(LocalDateTime createdAt) {
-            this.createdAt = createdAt;
-            return this;
-        }
-
-        public ReportBuilder source(ReportSource source) {
-            this.source = source;
-            return this;
-        }
-
-        public Report build() {
-            return new Report(id, reporter, reason, comment, createdAt, source);
         }
     }
 }

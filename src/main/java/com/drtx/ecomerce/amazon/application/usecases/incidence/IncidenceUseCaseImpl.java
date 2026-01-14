@@ -1,5 +1,6 @@
 package com.drtx.ecomerce.amazon.application.usecases.incidence;
 
+import com.drtx.ecomerce.amazon.core.model.exceptions.DomainExceptionFactory;
 import com.drtx.ecomerce.amazon.core.model.issues.Incidence;
 import com.drtx.ecomerce.amazon.core.model.issues.IncidenceDecision;
 import com.drtx.ecomerce.amazon.core.model.issues.IncidenceStatus;
@@ -28,7 +29,7 @@ public class IncidenceUseCaseImpl implements IncidenceUseCasePort {
     @Transactional
     public Incidence createIncidence(Long productId, Report report, String reporterEmail) {
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found with id " + productId));
+                .orElseThrow(() -> DomainExceptionFactory.productNotFound(productId));
 
         if (reporterEmail != null) {
             userRepository.findByEmail(reporterEmail).ifPresent(report::setReporter);
@@ -63,24 +64,29 @@ public class IncidenceUseCaseImpl implements IncidenceUseCasePort {
 
     @Override
     @Transactional
-    public Incidence resolveIncidence(Long id, IncidenceDecision decision, String moderatorComment, String moderatorEmail) {
+    public Incidence resolveIncidence(Long id, IncidenceDecision decision, String moderatorComment,
+            String moderatorEmail) {
         Incidence incidence = incidenceRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Incidence not found with id " + id));
+                .orElseThrow(() -> DomainExceptionFactory.incidenceNotFound(id));
 
         if (moderatorEmail != null) {
             userRepository.findByEmail(moderatorEmail).ifPresent(incidence::setModerator);
         }
-        
+
         incidence.setDecision(decision);
         incidence.setModeratorComment(moderatorComment);
         incidence.setStatus(IncidenceStatus.DECIDED);
-        
+
         return incidenceRepository.save(incidence);
     }
 
     @Override
     @Transactional
     public Incidence updateIncidence(Long id, Incidence incidence) {
+        // Verificar existencia antes de actualizar
+        if (incidenceRepository.findById(id).isEmpty()) {
+            throw DomainExceptionFactory.incidenceNotFound(id);
+        }
         return incidenceRepository.updateById(id, incidence);
     }
 }

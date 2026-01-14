@@ -25,13 +25,11 @@ public class RefreshTokenMapper {
             return null;
         }
 
-        return RefreshToken.builder()
-                .id(entity.getId())
-                .token(entity.getToken())
-                .userEmail(entity.getUserEmail())
-                .expiryDate(entity.getExpiryDate())
-                .revoked(entity.isRevoked())
-                .build();
+        return new RefreshToken(
+                entity.getId(),
+                entity.getToken(),
+                entity.getUserEmail(),
+                entity.getExpiryDate(),
+                entity.isRevoked());
     }
 }
-

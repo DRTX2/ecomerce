@@ -3,7 +3,11 @@ package com.drtx.ecomerce.amazon.core.model.issues;
 import com.drtx.ecomerce.amazon.core.model.user.User;
 
 import java.time.LocalDateTime;
-// refactorizar
+
+/**
+ * Modelo de dominio para apelaciones.
+ * Simplificado: usa constructor vacío + setters en lugar de builder.
+ */
 public class Appeal {
     private Long id;
     private Incidence incidence;
@@ -29,10 +33,6 @@ public class Appeal {
         this.newModerator = newModerator;
         this.finalDecision = finalDecision;
         this.finalDecisionAt = finalDecisionAt;
-    }
-
-    public static AppealBuilder builder() {
-        return new AppealBuilder();
     }
 
     public Long getId() {
@@ -116,71 +116,6 @@ public class Appeal {
         }
         if (this.finalDecision == null) {
             this.finalDecision = AppealDecision.PENDING;
-        }
-    }
-
-    public static class AppealBuilder {
-        private Long id;
-        private Incidence incidence;
-        private User seller;
-        private String reason;
-        private LocalDateTime createdAt;
-        private AppealStatus status;
-        private User newModerator;
-        private AppealDecision finalDecision;
-        private LocalDateTime finalDecisionAt;
-
-        AppealBuilder() {
-        }
-
-        public AppealBuilder id(Long id) {
-            this.id = id;
-            return this;
-        }
-
-        public AppealBuilder incidence(Incidence incidence) {
-            this.incidence = incidence;
-            return this;
-        }
-
-        public AppealBuilder seller(User seller) {
-            this.seller = seller;
-            return this;
-        }
-
-        public AppealBuilder reason(String reason) {
-            this.reason = reason;
-            return this;
-        }
-
-        public AppealBuilder createdAt(LocalDateTime createdAt) {
-            this.createdAt = createdAt;
-            return this;
-        }
-
-        public AppealBuilder status(AppealStatus status) {
-            this.status = status;
-            return this;
-        }
-
-        public AppealBuilder newModerator(User newModerator) {
-            this.newModerator = newModerator;
-            return this;
-        }
-
-        public AppealBuilder finalDecision(AppealDecision finalDecision) {
-            this.finalDecision = finalDecision;
-            return this;
-        }
-
-        public AppealBuilder finalDecisionAt(LocalDateTime finalDecisionAt) {
-            this.finalDecisionAt = finalDecisionAt;
-            return this;
-        }
-
-        public Appeal build() {
-            return new Appeal(id, incidence, seller, reason, createdAt, status, newModerator, finalDecision,
-                    finalDecisionAt);
         }
     }
 }

@@ -1,5 +1,6 @@
 package com.drtx.ecomerce.amazon.application.usecases.favorite;
 
+import com.drtx.ecomerce.amazon.core.model.exceptions.DomainExceptionFactory;
 import com.drtx.ecomerce.amazon.core.model.user.Favorite;
 import com.drtx.ecomerce.amazon.core.model.product.Product;
 import com.drtx.ecomerce.amazon.core.model.user.User;
@@ -24,21 +25,19 @@ public class FavoriteUseCaseImpl implements FavoriteUseCasePort {
     @Override
     @Transactional
     public Favorite addFavorite(Long productId, String userEmail) {
-        // verify user exists, if favorite already exists, and product exists, otherwise is saved.
         User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> DomainExceptionFactory.userNotFound(userEmail));
 
         if (favoriteRepository.findByUserIdAndProductId(user.getId(), productId).isPresent()) {
-            throw new RuntimeException("Favorite already exists");
+            throw DomainExceptionFactory.invalidOperation("Favorite already exists for this product");
         }
 
         Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+                .orElseThrow(() -> DomainExceptionFactory.productNotFound(productId));
 
-        Favorite favorite = Favorite.builder()
-                .user(user)
-                .product(product)
-                .build();
+        Favorite favorite = new Favorite();
+        favorite.setUser(user);
+        favorite.setProduct(product);
         favorite.initializeDefaults();
 
         return favoriteRepository.save(favorite);
@@ -47,16 +46,16 @@ public class FavoriteUseCaseImpl implements FavoriteUseCasePort {
     @Override
     @Transactional
     public void removeFavorite(Long productId, String userEmail) {
-         User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-         
-         favoriteRepository.deleteByUserIdAndProductId(user.getId(), productId);
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> DomainExceptionFactory.userNotFound(userEmail));
+
+        favoriteRepository.deleteByUserIdAndProductId(user.getId(), productId);
     }
 
     @Override
     public List<Product> getUserFavorites(String userEmail) {
         User user = userRepository.findByEmail(userEmail)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> DomainExceptionFactory.userNotFound(userEmail));
         return favoriteRepository.findFavoritesByUserId(user.getId());
     }
 }

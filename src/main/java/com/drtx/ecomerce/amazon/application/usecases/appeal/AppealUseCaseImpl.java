@@ -1,5 +1,6 @@
 package com.drtx.ecomerce.amazon.application.usecases.appeal;
 
+import com.drtx.ecomerce.amazon.core.model.exceptions.DomainExceptionFactory;
 import com.drtx.ecomerce.amazon.core.model.issues.Incidence;
 import com.drtx.ecomerce.amazon.core.model.issues.IncidenceStatus;
 import com.drtx.ecomerce.amazon.core.model.issues.Appeal;
@@ -28,27 +29,29 @@ public class AppealUseCaseImpl implements AppealUseCasePort {
     @Override
     @Transactional
     public Appeal createAppeal(Long incidenceId, String reason, String sellerEmail) {
-        // to create an appeal, the incidence needs to exist and must be in DECIDED or CLOSED status
         Incidence incidence = incidenceRepository.findById(incidenceId)
-                .orElseThrow(() -> new RuntimeException("Incidence not found with id " + incidenceId));
+                .orElseThrow(() -> DomainExceptionFactory.incidenceNotFound(incidenceId));
 
+        // Validate incidence status
         if (incidence.getStatus() != IncidenceStatus.DECIDED && incidence.getStatus() != IncidenceStatus.CLOSED) {
-            throw new RuntimeException("Incidence must be decided to be appealed");
+            throw DomainExceptionFactory.invalidOperation(
+                    "Incidence must be in DECIDED or CLOSED status to be appealed. Current status: "
+                            + incidence.getStatus());
         }
 
+        // Check if appeal already exists
         if (appealRepository.findByIncidenceId(incidenceId).isPresent()) {
-            throw new RuntimeException("Appeal already exists for this incidence");
+            throw DomainExceptionFactory.invalidOperation("Appeal already exists for this incidence");
         }
 
         User seller = userRepository.findByEmail(sellerEmail)
-                .orElseThrow(() -> new RuntimeException("Seller user not found"));
+                .orElseThrow(() -> DomainExceptionFactory.userNotFound(sellerEmail));
 
-        Appeal appeal = Appeal.builder()
-                .incidence(incidence)
-                .seller(seller)
-                .reason(reason)
-                .build();
-
+        // Create appeal using setters
+        Appeal appeal = new Appeal();
+        appeal.setIncidence(incidence);
+        appeal.setSeller(seller);
+        appeal.setReason(reason);
         appeal.initializeDefaults();
 
         // Update Incidence status
@@ -67,10 +70,10 @@ public class AppealUseCaseImpl implements AppealUseCasePort {
     @Transactional
     public Appeal resolveAppeal(Long id, AppealDecision decision, String moderatorEmail) {
         Appeal appeal = appealRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Appeal not found with id " + id));
+                .orElseThrow(() -> DomainExceptionFactory.appealNotFound(id));
 
         User moderator = userRepository.findByEmail(moderatorEmail)
-                .orElseThrow(() -> new RuntimeException("Moderator not found"));
+                .orElseThrow(() -> DomainExceptionFactory.userNotFound(moderatorEmail));
 
         appeal.setNewModerator(moderator);
         appeal.setFinalDecision(decision);

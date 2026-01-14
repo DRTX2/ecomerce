@@ -37,10 +37,9 @@ public class IncidenceGraphQLController {
     @MutationMapping
     public Incidence createIncidence(@Argument Long productId, @Argument ReportInput input) {
         String userEmail = getAuthenticatedUserEmail();
-        Report report = Report.builder()
-                .reason(input.reason())
-                .comment(input.comment())
-                .build();
+        Report report = new Report();
+        report.setReason(input.reason());
+        report.setComment(input.comment());
         return incidenceUseCase.createIncidence(productId, report, userEmail);
     }
 

@@ -7,7 +7,11 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-// refactorizar posteriormente
+
+/**
+ * Modelo de dominio para incidencias.
+ * Simplificado: usa constructor vacío + setters en lugar de builder.
+ */
 public class Incidence {
     private Long id;
     private UUID publicUi;
@@ -36,10 +40,6 @@ public class Incidence {
         this.moderatorComment = moderatorComment;
         this.decision = decision;
         this.reports = reports;
-    }
-
-    public static IncidenceBuilder builder() {
-        return new IncidenceBuilder();
     }
 
     public Long getId() {
@@ -123,82 +123,17 @@ public class Incidence {
     }
 
     public void initializeDefaults() {
-        if (this.publicUi == null) this.publicUi = UUID.randomUUID();
-        if (this.createdAt == null) this.createdAt = LocalDateTime.now();
-        if (this.status == null) this.status = IncidenceStatus.OPEN;
-        if (this.decision == null) this.decision = IncidenceDecision.PENDING;
-        if (this.autoclosed == null) this.autoclosed = false;
-        if (this.reports == null) this.reports = new ArrayList<>();
-    }
-
-    public static class IncidenceBuilder {
-        private Long id;
-        private UUID publicUi;
-        private Product product;
-        private IncidenceStatus status;
-        private LocalDateTime createdAt;
-        private Boolean autoclosed;
-        private User moderator;
-        private String moderatorComment;
-        private IncidenceDecision decision;
-        private List<Report> reports;
-
-        IncidenceBuilder() {
-        }
-
-        public IncidenceBuilder id(Long id) {
-            this.id = id;
-            return this;
-        }
-
-        public IncidenceBuilder publicUi(UUID publicUi) {
-            this.publicUi = publicUi;
-            return this;
-        }
-
-        public IncidenceBuilder product(Product product) {
-            this.product = product;
-            return this;
-        }
-
-        public IncidenceBuilder status(IncidenceStatus status) {
-            this.status = status;
-            return this;
-        }
-
-        public IncidenceBuilder createdAt(LocalDateTime createdAt) {
-            this.createdAt = createdAt;
-            return this;
-        }
-
-        public IncidenceBuilder autoclosed(Boolean autoclosed) {
-            this.autoclosed = autoclosed;
-            return this;
-        }
-
-        public IncidenceBuilder moderator(User moderator) {
-            this.moderator = moderator;
-            return this;
-        }
-
-        public IncidenceBuilder moderatorComment(String moderatorComment) {
-            this.moderatorComment = moderatorComment;
-            return this;
-        }
-
-        public IncidenceBuilder decision(IncidenceDecision decision) {
-            this.decision = decision;
-            return this;
-        }
-
-        public IncidenceBuilder reports(List<Report> reports) {
-            this.reports = reports;
-            return this;
-        }
-
-        public Incidence build() {
-            return new Incidence(id, publicUi, product, status, createdAt, autoclosed, moderator, moderatorComment,
-                    decision, reports);
-        }
+        if (this.publicUi == null)
+            this.publicUi = UUID.randomUUID();
+        if (this.createdAt == null)
+            this.createdAt = LocalDateTime.now();
+        if (this.status == null)
+            this.status = IncidenceStatus.OPEN;
+        if (this.decision == null)
+            this.decision = IncidenceDecision.PENDING;
+        if (this.autoclosed == null)
+            this.autoclosed = false;
+        if (this.reports == null)
+            this.reports = new ArrayList<>();
     }
 }

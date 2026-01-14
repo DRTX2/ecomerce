@@ -31,12 +31,11 @@ public class RefreshTokenService {
 
         String tokenString = tokenProvider.generateRefreshToken(user);
 
-        RefreshToken refreshToken = RefreshToken.builder()
-                .token(tokenString)
-                .userEmail(user.getEmail())
-                .expiryDate(Instant.now().plusMillis(tokenProvider.getRefreshTokenExpirationMs()))
-                .revoked(false)
-                .build();
+        RefreshToken refreshToken = new RefreshToken();
+        refreshToken.setToken(tokenString);
+        refreshToken.setUserEmail(user.getEmail());
+        refreshToken.setExpiryDate(Instant.now().plusMillis(tokenProvider.getRefreshTokenExpirationMs()));
+        refreshToken.setRevoked(false);
 
         RefreshToken saved = refreshTokenRepository.save(refreshToken);
         log.info("Refresh token created for user: {}", user.getEmail());
@@ -72,4 +71,3 @@ public class RefreshTokenService {
         refreshTokenRepository.deleteByToken(token);
     }
 }
-
