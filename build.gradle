@@ -2,6 +2,8 @@ plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.4.4'
 	id 'io.spring.dependency-management' version '1.1.7'
+	id 'jacoco'  // Code coverage
+	id 'org.owasp.dependencycheck' version '9.0.9'  // Security vulnerability check
 }
 
 group = 'com.drtx.ecomerce'
@@ -128,3 +130,71 @@ tasks.named('bootRun') {
         }
     }
 }
+
+// ==================== JACOCO COVERAGE ====================
+jacoco {
+    toolVersion = '0.8.11'
+}
+
+tasks.named('test') {
+    finalizedBy jacocoTestReport // report is always generated after tests run
+}
+
+tasks.named('jacocoTestReport') {
+    dependsOn test // tests are required to run before generating the report
+
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
+}
+
+tasks.named('jacocoTestCoverageVerification') {
+    dependsOn test
+
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.60  // 60% coverage minimum
+            }
+        }
+
+        rule {
+            element = 'CLASS'
+            excludes = [
+                '**.config.**',
+                '**.dto.**',
+                '**.mapper.**',
+                '**.entity.**',
+                '*.*Application',
+                '**.exception.**'
+            ]
+
+            limit {
+                counter = 'LINE'
+                value = 'COVEREDRATIO'
+                minimum = 0.50
+            }
+        }
+    }
+}
+
+// ==================== OWASP DEPENDENCY CHECK ====================
+dependencyCheck {
+    format = 'HTML'
+    failBuildOnCVSS = 7  // Fail build if CVSS score >= 7 (High severity)
+    suppressionFile = file("${project.rootDir}/owasp-suppressions.xml").exists()
+        ? "${project.rootDir}/owasp-suppressions.xml"
+        : null
+
+    analyzers {
+        assemblyEnabled = false
+        nugetconfEnabled = false
+        nuspecEnabled = false
+    }
+
+    skipConfigurations = ['compileOnly', 'testCompileOnly', 'developmentOnly']
+}
+
+

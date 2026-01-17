@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
+    <!--
+        OWASP Dependency-Check Suppressions
+
+        This file is used to suppress false positives or known issues that are not applicable
+        to this project. Each suppression should include:
+        - Clear reason why it's suppressed
+        - CVE ID or vulnerability details
+        - Affected package
+
+        Review suppressions periodically and remove when issues are fixed.
+    -->
+
+    <!-- Example suppression (remove if not needed):
+    <suppress>
+        <notes><![CDATA[
+            False positive - this vulnerability only affects Windows environments
+        ]]></notes>
+        <cve>CVE-XXXX-XXXXX</cve>
+    </suppress>
+    -->
+
+    <!-- Add your suppressions here -->
+
+</suppressions>
+
