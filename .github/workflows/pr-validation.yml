@@ -1,0 +1,103 @@
+name: PR Validation
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches: [ "main", "develop" ]
+
+jobs:
+  # ==================== PR CHECKS ====================
+  pr-validation:
+    name: PR Validation
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.draft == false
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: PR Title Check
+        uses: amannn/action-semantic-pull-request@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          types: |
+            feat
+            fix
+            docs
+            style
+            refactor
+            perf
+            test
+            build
+            ci
+            chore
+            revert
+          requireScope: false
+          subjectPattern: ^[A-Z].+$
+          subjectPatternError: |
+            The subject "{subject}" found in the pull request title "{title}"
+            didn't match the configured pattern. Please ensure that the subject
+            starts with an uppercase character.
+
+      - name: Check PR size
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const additions = pr.additions;
+            const deletions = pr.deletions;
+            const totalChanges = additions + deletions;
+            
+            console.log(`📊 PR Stats:`);
+            console.log(`   Additions: ${additions}`);
+            console.log(`   Deletions: ${deletions}`);
+            console.log(`   Total: ${totalChanges}`);
+            
+            if (totalChanges > 1000) {
+              core.warning(`⚠️ This PR is quite large (${totalChanges} lines). Consider breaking it down into smaller PRs for easier review.`);
+            }
+
+      - name: Check for conflicts
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            
+            if (pr.mergeable === false) {
+              core.setFailed('❌ This PR has merge conflicts. Please resolve them.');
+            } else if (pr.mergeable === null) {
+              core.warning('⚠️ Mergeable status is unknown. GitHub is still computing it.');
+            } else {
+              console.log('✅ No merge conflicts detected');
+            }
+
+  # ==================== REQUIRE CI PASS ====================
+  require-ci:
+    name: Require CI Success
+    runs-on: ubuntu-latest
+    needs: pr-validation
+    if: github.event.pull_request.draft == false
+
+    steps:
+      - name: Wait for CI
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: checkRuns } = await github.rest.checks.listForRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: context.payload.pull_request.head.sha,
+            });
+            
+            console.log('📋 CI Status:');
+            checkRuns.check_runs.forEach(run => {
+              console.log(`   ${run.name}: ${run.status} - ${run.conclusion}`);
+            });
+            
+            const ciRun = checkRuns.check_runs.find(run => run.name === 'Build & Compile');
+            
+            if (ciRun && ciRun.conclusion !== 'success') {
+              core.setFailed('❌ CI build must pass before merging');
+            }
+

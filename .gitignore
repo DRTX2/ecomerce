@@ -93,3 +93,23 @@ spring-boot-devtools.properties
 *.db
 *.sqlite
 
+# ============================
+# Test Reports & Coverage
+# ============================
+build/reports/
+build/test-results/
+build/jacoco/
+*.exec
+.jacoco/
+
+# ============================
+# OWASP Dependency Check
+# ============================
+dependency-check-report.html
+build/reports/dependency-check-report.html
+odc-reports/
+
+# ============================
+# CI/CD
+# ============================
+.github/workflows/*.log

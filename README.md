@@ -1,5 +1,10 @@
 # E-commerce Backend API
 
+![CI/CD Pipeline](https://github.com/YOUR_USERNAME/YOUR_REPO/actions/workflows/ci.yml/badge.svg)
+![Java](https://img.shields.io/badge/Java-21-orange?logo=openjdk)
+![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.4-brightgreen?logo=spring)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+
 Robust and scalable backend for a modern e-commerce platform. Built with **Java 21** and **Spring Boot 3**, this project implements a pure **Hexagonal Architecture** to ensure separation of concerns, maintainability, and framework independence.
 
 ## 📝 Description
@@ -70,6 +75,7 @@ graph TD
 ### Prerequisites
 - Docker and Docker Compose
 - Java 21 (optional if using Docker)
+- Make (optional, for convenience commands)
 
 ### Quick Start (Recommended)
 
@@ -84,9 +90,95 @@ graph TD
 
 3. **Run with Docker Compose**:
    ```bash
+   # Using make (recommended)
+   make docker-up
+   
+   # Or using docker-compose directly
    docker-compose up --build
    ```
    The API will be available at `http://localhost:8080/api/v1`.
+
+### Alternative: Local Development
+
+1. **Build the project**:
+   ```bash
+   make build
+   # Or: ./gradlew clean build
+   ```
+
+2. **Run tests**:
+   ```bash
+   make test
+   # Or: ./gradlew test
+   ```
+
+3. **Start application**:
+   ```bash
+   make run-dev
+   # Or: ./gradlew bootRun
+   ```
+
+### 🛠️ Development Commands
+
+We provide a `Makefile` with convenient shortcuts:
+
+```bash
+make help              # Show all available commands
+make build             # Build without tests
+make test              # Run all tests
+make coverage          # Generate coverage report
+make security          # Run security scan
+make docker-up         # Start Docker services
+make docker-down       # Stop Docker services
+make ci-local          # Run full CI pipeline locally
+```
+
+## 🧪 Testing & Quality
+
+### Running Tests
+
+```bash
+# All tests
+make test
+
+# Unit tests only
+make test-unit
+
+# Integration tests only
+make test-integration
+
+# With coverage
+make coverage
+```
+
+### Code Coverage
+
+- **Minimum overall coverage**: 60%
+- **Per-class minimum**: 50%
+- View reports: `build/reports/jacoco/test/html/index.html`
+
+### Security Scanning
+
+```bash
+# Run OWASP dependency check
+make security
+
+# View report
+open build/reports/dependency-check-report.html
+```
+
+## 🔄 CI/CD Pipeline
+
+This project uses **GitHub Actions** for continuous integration and deployment:
+
+- ✅ **Build & Compile**: Validates code compilation
+- ✅ **Automated Tests**: Runs unit and integration tests with PostgreSQL & Redis
+- ✅ **Code Coverage**: JaCoCo reports with 60% minimum threshold
+- ✅ **Security Scanning**: OWASP dependency check + CodeQL analysis
+- ✅ **Docker Validation**: Ensures Docker images build successfully
+- ✅ **PR Validation**: Enforces conventional commits and quality standards
+
+**Quick Reference**: [CI/CD Guide](.github/CI_QUICK_REFERENCE.md) | [Detailed Documentation](.github/CI_CD_GUIDE.md)
 
 ## 📚 Documentation
 
@@ -97,7 +189,7 @@ For full project documentation (detailed guides, architecture decisions, and API
 | ➡️ **[Explore Technical Documentation](./Docs/README.md)** |
 
 <!-- esto se agrego -->
-## � Roadmap & Future Improvements
+## 🗺️ Roadmap & Future Improvements
 
 This project is in continuous evolution. Here is the strategic plan for upcoming versions:
 
@@ -109,8 +201,12 @@ This project is in continuous evolution. Here is the strategic plan for upcoming
   - [ ] Payment Gateway Integration (Stripe/PayPal).
   - [ ] AI-powered product recommendations.
 - **DevOps**:
-  - [ ] CI/CD Pipeline with GitHub Actions.
+  - [x] ✅ CI/CD Pipeline with GitHub Actions (Implemented!)
+  - [x] ✅ Automated testing with coverage reports
+  - [x] ✅ Security scanning (OWASP + CodeQL)
   - [ ] Kubernetes (K8s) manifests for scalable deployment.
+  - [ ] Monitoring & Observability (Prometheus + Grafana)
+  - [ ] Automated deployment to cloud (AWS/Azure/GCP)
 
 ## �👤 Author
 
