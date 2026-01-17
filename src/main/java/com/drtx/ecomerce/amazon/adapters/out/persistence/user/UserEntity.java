@@ -18,11 +18,22 @@ public class UserEntity {
     private Long id;
 
     private String name;
+
     @Column(unique = true)
     private String email;
+
     private String password;
+
     private String address;
+
     private String phone;
+
     @Enumerated(EnumType.STRING)
     private UserRole role;
+
+    @Column(nullable = false)
+    private boolean enabled;
+
+    @Column(nullable = false)
+    private boolean locked;
 }

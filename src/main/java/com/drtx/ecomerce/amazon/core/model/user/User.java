@@ -8,12 +8,13 @@ public class User {
     private String address;
     private String phone;
     private UserRole role;
-    // private String orderList;
+    private boolean enabled;
+    private boolean locked;
 
     public User() {
     }
 
-    public User(Long id, String name, String email, String password, String address, String phone, UserRole role) {
+    public User(Long id, String name, String email, String password, String address, String phone, UserRole role, boolean enabled, boolean locked) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -21,6 +22,8 @@ public class User {
         this.address = address;
         this.phone = phone;
         this.role = role;
+        this.enabled = enabled;
+        this.locked = locked;
     }
 
     public Long getId() {
@@ -77,5 +80,21 @@ public class User {
 
     public void setRole(UserRole role) {
         this.role = role;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean locked) {
+        this.locked = locked;
     }
 }
