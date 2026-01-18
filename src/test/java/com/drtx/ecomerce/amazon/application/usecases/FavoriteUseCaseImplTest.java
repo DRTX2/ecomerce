@@ -45,7 +45,7 @@ class FavoriteUseCaseImplTest {
 
         when(userRepository.findByEmail(userEmail)).thenReturn(Optional.of(user));
         when(favoriteRepository.findByUserIdAndProductId(user.getId(), productId)).thenReturn(Optional.empty());
-        when(productRepository.findById(productId)).thenReturn(Optional.of(product));
+        when(productRepository.findByUuid(productId)).thenReturn(Optional.of(product));
         when(favoriteRepository.save(any(Favorite.class))).thenAnswer(i -> i.getArgument(0));
 
         // Act

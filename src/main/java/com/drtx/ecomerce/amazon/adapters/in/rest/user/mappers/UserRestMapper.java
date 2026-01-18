@@ -10,6 +10,5 @@ import org.mapstruct.Mapping;
 public interface UserRestMapper {
     User toDomain(UserRequest request);
 
-    @Mapping(target = "id", source = "id")// refers to properties
     UserResponse toResponse(User user);
 }

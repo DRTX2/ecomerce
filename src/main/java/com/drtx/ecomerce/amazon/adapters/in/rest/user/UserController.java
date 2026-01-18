@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -28,23 +29,23 @@ public class UserController {
         return ResponseEntity.ok( listUserResponse);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> findById(@PathVariable Long id){
-        return userUseCasePort.getUserById(id)
+    @GetMapping("/{uuid}")
+    public ResponseEntity<UserResponse> findByUuid(@PathVariable UUID uuid){
+        return userUseCasePort.getUserByUuid(uuid)
                 .map(userMapper::toResponse)
                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @RequestBody UserRequest request){
-        User user =userMapper.toDomain(request);
-        return ResponseEntity.ok(userMapper.toResponse(userUseCasePort.updateUser(id,user)));
+    @PutMapping("/{uuid}")
+    public ResponseEntity<UserResponse> updateUser(@PathVariable UUID uuid, @RequestBody UserRequest request){
+        User user = userMapper.toDomain(request);
+        return ResponseEntity.ok(userMapper.toResponse(userUseCasePort.updateUserByUuid(uuid, user)));
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id){
-        userUseCasePort.deleteUser(id);
+    @DeleteMapping("/{uuid}")
+    public ResponseEntity<Void> deleteUser(@PathVariable UUID uuid){
+        userUseCasePort.deleteUserByUuid(uuid);
         return ResponseEntity.noContent().build();
     }
 }

@@ -10,6 +10,7 @@ import com.drtx.ecomerce.amazon.core.ports.in.rest.UserUseCasePort;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -18,8 +19,8 @@ public class UserUseCaseImpl implements UserUseCasePort {
     private final PasswordService passwordService;
 
     @Override
-    public Optional<User> getUserById(Long id) {
-        return repository.findById(id);
+    public Optional<User> getUserByUuid(UUID uuid) {
+        return repository.findByUuid(uuid);
     }
 
     @Override
@@ -28,20 +29,20 @@ public class UserUseCaseImpl implements UserUseCasePort {
     }
 
     @Override
-    public User updateUser(Long id, User user) {
+    public User updateUserByUuid(UUID uuid, User user) {
         // Verify user exists
-        repository.findById(id)
-                .orElseThrow(() -> DomainExceptionFactory.userNotFound(id));
+        repository.findByUuid(uuid)
+                .orElseThrow(() -> DomainExceptionFactory.userNotFound(uuid));
 
-        return repository.updateById(id, user);
+        return repository.updateByUuid(uuid, user);
     }
 
     @Override
-    public void deleteUser(Long id) {
+    public void deleteUserByUuid(UUID uuid) {
         // Verify user exists before deleting
-        repository.findById(id)
-                .orElseThrow(() -> DomainExceptionFactory.userNotFound(id));
+        repository.findByUuid(uuid)
+                .orElseThrow(() -> DomainExceptionFactory.userNotFound(uuid));
 
-        repository.delete(id);
+        repository.deleteByUuid(uuid);
     }
 }

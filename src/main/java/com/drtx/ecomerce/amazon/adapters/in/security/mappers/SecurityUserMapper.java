@@ -13,7 +13,7 @@ public class SecurityUserMapper {
 
     public UserResponse toUserResponse(User user) {
         return new UserResponse(
-                user.getId(),
+                user.getUuid(),
                 user.getName(),
                 user.getEmail(),
                 user.getRole()

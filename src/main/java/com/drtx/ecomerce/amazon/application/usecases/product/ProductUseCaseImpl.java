@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -37,8 +38,8 @@ public class ProductUseCaseImpl implements ProductUseCasePort {
     }
 
     @Override
-    public Optional<Product> getProductById(Long id) {
-        return repository.findById(id);
+    public Optional<Product> getProductByUuid(UUID id) {
+        return repository.findByUuid(id);
     }
 
     @Override
@@ -47,10 +48,10 @@ public class ProductUseCaseImpl implements ProductUseCasePort {
     }
 
     @Override
-    public Product updateProduct(Long id, Product product) {
+    public Product updateProduct(UUID uuid, Product product) {
         // Verify product exists
-        Product existingProduct = repository.findById(id)
-                .orElseThrow(() -> DomainExceptionFactory.productNotFound(id));
+        Product existingProduct = repository.findByUuid(uuid)
+                .orElseThrow(() -> DomainExceptionFactory.productNotFound(uuid));
 
         // Business validation
         if (product.getPrice() != null && product.getPrice().doubleValue() <= 0) {
@@ -62,18 +63,18 @@ public class ProductUseCaseImpl implements ProductUseCasePort {
             product.setSlug(generateSlug(product.getName()));
         }
 
-        return repository.updateById(id, product);
+        return repository.updateByUuid(uuid, product);
     }
 
     @Override
-    public void deleteProduct(Long id) {
+    public void deleteProductByUuid(UUID uuid) {
         // Verify product exists before deleting
-        Product product = repository.findById(id)
-                .orElseThrow(() -> DomainExceptionFactory.productNotFound(id));
+        Product product = repository.findByUuid(uuid)
+                .orElseThrow(() -> DomainExceptionFactory.productNotFound(uuid));
 
         // Soft delete: Change status to ARCHIVED
         product.setStatus(ProductStatus.ARCHIVED);
-        repository.updateById(id, product);
+        repository.updateByUuid(uuid, product);
     }
 
     // Utility method to generate slug from name

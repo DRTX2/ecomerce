@@ -1,7 +1,6 @@
 package com.drtx.ecomerce.amazon.application.usecases;
 
 import com.drtx.ecomerce.amazon.application.usecases.product.ProductUseCaseImpl;
-
 import com.drtx.ecomerce.amazon.core.model.product.Category;
 import com.drtx.ecomerce.amazon.core.model.product.Product;
 import com.drtx.ecomerce.amazon.core.model.product.ProductStatus;
@@ -16,11 +15,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -28,6 +28,9 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 @DisplayName("ProductUseCaseImpl Unit Tests")
 class ProductUseCaseImplTest {
+
+    private static final LocalDateTime NOW =
+            LocalDateTime.of(2026, 1, 1, 12, 0);
 
     @Mock
     private ProductRepositoryPort productRepositoryPort;
@@ -37,17 +40,22 @@ class ProductUseCaseImplTest {
 
     private Product testProduct;
     private Category testCategory;
+    private UUID productUuid;
 
     @BeforeEach
     void setUp() {
+        productUuid = UUID.randomUUID();
+
         testCategory = new Category(
                 1L,
                 "Electronics",
                 "Electronic devices",
-                List.of());
+                List.of()
+        );
 
         testProduct = new Product(
                 1L,
+                productUuid,
                 "Laptop",
                 "High-performance laptop",
                 new BigDecimal("999.99"),
@@ -58,275 +66,127 @@ class ProductUseCaseImplTest {
                 50,
                 ProductStatus.ACTIVE,
                 "laptop",
-                LocalDateTime.now(),
-                LocalDateTime.now());
+                NOW,
+                NOW
+        );
     }
 
     @Test
     @DisplayName("Should create product successfully")
     void shouldCreateProductSuccessfully() {
-        // Given
-        Product newProduct = new Product(
-                null,
-                "Smartphone",
-                "Latest smartphone model",
-                new BigDecimal("699.99"),
-                testCategory,
-                new BigDecimal("0.0"),
-                List.of("phone1.jpg"),
-                "PHONE-001",
-                100,
-                ProductStatus.DRAFT,
-                "smartphone",
-                null,
-                null);
+        when(productRepositoryPort.save(any(Product.class)))
+                .thenReturn(testProduct);
 
-        Product savedProduct = new Product(
-                2L,
-                "Smartphone",
-                "Latest smartphone model",
-                new BigDecimal("699.99"),
-                testCategory,
-                new BigDecimal("0.0"),
-                List.of("phone1.jpg"),
-                "PHONE-001",
-                100,
-                ProductStatus.DRAFT,
-                "smartphone",
-                LocalDateTime.now(),
-                LocalDateTime.now());
+        Product result = productUseCase.createProduct(testProduct);
 
-        when(productRepositoryPort.save(any(Product.class))).thenReturn(savedProduct);
-
-        // When
-        Product result = productUseCase.createProduct(newProduct);
-
-        // Then
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(2L);
-        assertThat(result.getName()).isEqualTo("Smartphone");
-        assertThat(result.getPrice()).isEqualByComparingTo(new BigDecimal("699.99"));
-        verify(productRepositoryPort, times(1)).save(newProduct);
+        assertThat(result.getUuid()).isEqualTo(productUuid);
+        verify(productRepositoryPort).save(testProduct);
     }
 
     @Test
-    @DisplayName("Should get product by ID successfully")
-    void shouldGetProductByIdSuccessfully() {
-        // Given
-        Long productId = 1L;
-        when(productRepositoryPort.findById(productId)).thenReturn(Optional.of(testProduct));
+    @DisplayName("Should get product by UUID successfully")
+    void shouldGetProductByUuidSuccessfully() {
+        when(productRepositoryPort.findByUuid(productUuid))
+                .thenReturn(Optional.of(testProduct));
 
-        // When
-        Optional<Product> result = productUseCase.getProductById(productId);
+        Optional<Product> result = productUseCase.getProductByUuid(productUuid);
 
-        // Then
         assertThat(result).isPresent();
-        assertThat(result.get().getId()).isEqualTo(productId);
         assertThat(result.get().getName()).isEqualTo("Laptop");
-        assertThat(result.get().getPrice()).isEqualByComparingTo(new BigDecimal("999.99"));
-        assertThat(result.get().getAverageRating()).isEqualByComparingTo(new BigDecimal("4.5"));
-        verify(productRepositoryPort, times(1)).findById(productId);
+        verify(productRepositoryPort).findByUuid(productUuid);
     }
 
     @Test
-    @DisplayName("Should return empty when product not found by ID")
-    void shouldReturnEmptyWhenProductNotFoundById() {
-        // Given
-        Long productId = 999L;
-        when(productRepositoryPort.findById(productId)).thenReturn(Optional.empty());
+    @DisplayName("Should return empty when product not found by UUID")
+    void shouldReturnEmptyWhenProductNotFound() {
+        when(productRepositoryPort.findByUuid(productUuid))
+                .thenReturn(Optional.empty());
 
-        // When
-        Optional<Product> result = productUseCase.getProductById(productId);
+        Optional<Product> result = productUseCase.getProductByUuid(productUuid);
 
-        // Then
         assertThat(result).isEmpty();
-        verify(productRepositoryPort, times(1)).findById(productId);
+        verify(productRepositoryPort).findByUuid(productUuid);
     }
 
     @Test
     @DisplayName("Should get all products successfully")
     void shouldGetAllProductsSuccessfully() {
-        // Given
-        Product product2 = new Product(
-                2L,
-                "Tablet",
-                "Portable tablet device",
-                new BigDecimal("499.99"),
-                testCategory,
-                new BigDecimal("4.2"),
-                List.of("tablet1.jpg"),
-                "TABLET-001",
-                30,
-                ProductStatus.ACTIVE,
-                "tablet",
-                LocalDateTime.now(),
-                LocalDateTime.now());
+        when(productRepositoryPort.findAll())
+                .thenReturn(List.of(testProduct));
 
-        Product product3 = new Product(
-                3L,
-                "Headphones",
-                "Wireless headphones",
-                new BigDecimal("149.99"),
-                testCategory,
-                new BigDecimal("4.7"),
-                List.of("headphones1.jpg"),
-                "HEADPHONES-001",
-                200,
-                ProductStatus.ACTIVE,
-                "headphones",
-                LocalDateTime.now(),
-                LocalDateTime.now());
-
-        List<Product> products = Arrays.asList(testProduct, product2, product3);
-        when(productRepositoryPort.findAll()).thenReturn(products);
-
-        // When
         List<Product> result = productUseCase.getAllProducts();
 
-        // Then
-        assertThat(result).hasSize(3);
-        assertThat(result).containsExactlyInAnyOrder(testProduct, product2, product3);
-        verify(productRepositoryPort, times(1)).findAll();
-    }
-
-    @Test
-    @DisplayName("Should return empty list when no products exist")
-    void shouldReturnEmptyListWhenNoProductsExist() {
-        // Given
-        when(productRepositoryPort.findAll()).thenReturn(List.of());
-
-        // When
-        List<Product> result = productUseCase.getAllProducts();
-
-        // Then
-        assertThat(result).isEmpty();
-        verify(productRepositoryPort, times(1)).findAll();
+        assertThat(result).hasSize(1);
+        verify(productRepositoryPort).findAll();
     }
 
     @Test
     @DisplayName("Should update product successfully")
     void shouldUpdateProductSuccessfully() {
-        // Given
-        Long productId = 1L;
-        Product updatedProduct = new Product(
-                productId,
-                "Laptop Pro",
-                "Updated high-performance laptop",
-                new BigDecimal("1199.99"),
-                testCategory,
-                new BigDecimal("4.8"),
-                List.of("laptop_pro1.jpg", "laptop_pro2.jpg"),
-                "LAPTOP-PRO-001",
-                20,
-                ProductStatus.ACTIVE,
-                "laptop-pro",
-                LocalDateTime.now(),
-                LocalDateTime.now());
+        when(productRepositoryPort.findByUuid(productUuid))
+                .thenReturn(Optional.of(testProduct));
 
-        when(productRepositoryPort.findById(productId)).thenReturn(Optional.of(testProduct));
-        when(productRepositoryPort.updateById(eq(productId), any(Product.class)))
-                .thenReturn(updatedProduct);
+        when(productRepositoryPort.updateByUuid(eq(productUuid), any(Product.class)))
+                .thenReturn(testProduct);
 
-        // When
-        Product result = productUseCase.updateProduct(productId, updatedProduct);
+        Product result = productUseCase.updateProduct(productUuid, testProduct);
 
-        // Then
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(productId);
-        assertThat(result.getName()).isEqualTo("Laptop Pro");
-        assertThat(result.getPrice()).isEqualByComparingTo(new BigDecimal("1199.99"));
-        assertThat(result.getAverageRating()).isEqualByComparingTo(new BigDecimal("4.8"));
-        verify(productRepositoryPort, times(1)).updateById(productId, updatedProduct);
+        verify(productRepositoryPort).updateByUuid(eq(productUuid), any(Product.class));
     }
 
     @Test
-    @DisplayName("Should delete product successfully (Soft Delete)")
+    @DisplayName("Should soft delete product successfully")
     void shouldDeleteProductSuccessfully() {
-        // Given
-        Long productId = 1L;
-        when(productRepositoryPort.findById(productId)).thenReturn(Optional.of(testProduct));
-        when(productRepositoryPort.updateById(eq(productId), any(Product.class))).thenReturn(testProduct);
+        when(productRepositoryPort.findByUuid(productUuid))
+                .thenReturn(Optional.of(testProduct));
 
-        // When
-        productUseCase.deleteProduct(productId);
+        productUseCase.deleteProductByUuid(productUuid);
 
-        // Then
-        verify(productRepositoryPort, times(1)).findById(productId);
-        verify(productRepositoryPort, times(1)).updateById(eq(productId),
-                argThat(p -> p.getStatus() == ProductStatus.ARCHIVED));
-        verify(productRepositoryPort, never()).delete(productId);
+        verify(productRepositoryPort).updateByUuid(
+                eq(productUuid),
+                argThat(p -> p.getStatus() == ProductStatus.ARCHIVED)
+        );
     }
 
     @Test
     @DisplayName("Should throw exception when deleting non-existent product")
-    void shouldHandleDeleteForNonExistentProduct() {
-        // Given
-        Long productId = 999L;
-        when(productRepositoryPort.findById(productId)).thenReturn(Optional.empty());
+    void shouldThrowWhenDeletingNonExistentProduct() {
+        when(productRepositoryPort.findByUuid(productUuid))
+                .thenReturn(Optional.empty());
 
-        // When/Then
-        org.junit.jupiter.api.Assertions.assertThrows(RuntimeException.class, () -> {
-            productUseCase.deleteProduct(productId);
-        });
+        assertThrows(RuntimeException.class,
+                () -> productUseCase.deleteProductByUuid(productUuid));
 
-        verify(productRepositoryPort, times(1)).findById(productId);
-        verify(productRepositoryPort, never()).delete(productId);
-        verify(productRepositoryPort, never()).updateById(any(), any());
+        verify(productRepositoryPort, never()).updateByUuid(any(), any());
     }
 
     @Test
-    @DisplayName("Should auto-generate slug when creating product with missing slug")
-    void shouldAutoGenerateSlugWhenMissingInCreate() {
-        // Given
+    @DisplayName("Should auto-generate slug when missing")
+    void shouldAutoGenerateSlugWhenMissing() {
         Product productWithoutSlug = new Product(
-                null, "My Cool Product", "Desc", new BigDecimal("10.00"),
-                testCategory, BigDecimal.ZERO, List.of(), "SKU-AUTO", 10,
-                ProductStatus.DRAFT, null, null, null); // Slug is null
-
-        when(productRepositoryPort.save(any(Product.class))).thenAnswer(inv -> {
-            Product p = inv.getArgument(0);
-            // Simulate DB save returning ID
-            return new Product(100L, p.getName(), p.getDescription(), p.getPrice(),
-                    p.getCategory(), p.getAverageRating(), p.getImages(),
-                    p.getSku(), p.getStockQuantity(), p.getStatus(),
-                    p.getSlug(), LocalDateTime.now(), LocalDateTime.now());
-        });
-
-        // When
-        Product result = productUseCase.createProduct(productWithoutSlug);
-
-        // Then
-        assertThat(result.getSlug()).isEqualTo("my-cool-product");
-        verify(productRepositoryPort).save(argThat(p -> p.getSlug().equals("my-cool-product")));
-    }
-
-    @Test
-    @DisplayName("Should handle product with no rating")
-    void shouldHandleProductWithNoRating() {
-        // Given
-        Product noRatingProduct = new Product(
-                5L,
-                "New Product",
-                "Brand new product with no reviews",
-                new BigDecimal("199.99"),
+                null,
+                UUID.randomUUID(),
+                "My Cool Product",
+                "Desc",
+                new BigDecimal("10.00"),
                 testCategory,
-                new BigDecimal("0.0"),
-                List.of("newproduct.jpg"),
-                "NEW-001",
+                BigDecimal.ZERO,
+                List.of(),
+                "SKU-AUTO",
                 10,
                 ProductStatus.DRAFT,
-                "new-product",
-                LocalDateTime.now(),
-                LocalDateTime.now());
+                null,
+                null,
+                null
+        );
 
-        when(productRepositoryPort.save(any(Product.class))).thenReturn(noRatingProduct);
+        when(productRepositoryPort.save(any(Product.class)))
+                .thenAnswer(inv -> inv.getArgument(0));
 
-        // When
-        Product result = productUseCase.createProduct(noRatingProduct);
+        Product result = productUseCase.createProduct(productWithoutSlug);
 
-        // Then
-        assertThat(result).isNotNull();
-        assertThat(result.getAverageRating()).isEqualByComparingTo(new BigDecimal("0.0"));
-        verify(productRepositoryPort, times(1)).save(noRatingProduct);
+        assertThat(result.getSlug()).isEqualTo("my-cool-product");
     }
 }

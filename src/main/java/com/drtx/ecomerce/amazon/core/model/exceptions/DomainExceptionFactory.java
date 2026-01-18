@@ -1,10 +1,7 @@
 package com.drtx.ecomerce.amazon.core.model.exceptions;
 
-/**
- * Factory para crear excepciones de dominio con mensajes estandarizados.
- * Nivel Senior: Centraliza la creación de excepciones siguiendo el patrón
- * Factory.
- */
+import java.util.UUID;
+
 public final class DomainExceptionFactory {
 
     private DomainExceptionFactory() {
@@ -13,11 +10,11 @@ public final class DomainExceptionFactory {
 
     // ========== Entity Not Found ==========
 
-    public static EntityNotFoundException productNotFound(Long productId) {
-        return new EntityNotFoundException("Product", productId);
+    public static EntityNotFoundException productNotFound(UUID productUuuid) {
+        return new EntityNotFoundException("Product", productUuuid);
     }
 
-    public static EntityNotFoundException userNotFound(Long userId) {
+    public static EntityNotFoundException userNotFound(UUID userId) {
         return new EntityNotFoundException("User", userId);
     }
 

@@ -53,7 +53,7 @@ class IncidenceUseCaseImplTest {
     void createIncidence_ShouldCreateNew_WhenNoneExists() {
         // Arrange
         Long productId = 1L;
-        when(productRepository.findById(productId)).thenReturn(Optional.of(sampleProduct));
+        when(productRepository.findByUuid(productId)).thenReturn(Optional.of(sampleProduct));
         when(incidenceRepository.findByProductIdAndStatusOpen(productId)).thenReturn(Optional.empty());
         when(incidenceRepository.save(any(Incidence.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -78,7 +78,7 @@ class IncidenceUseCaseImplTest {
         existingIncidence.setStatus(IncidenceStatus.OPEN);
         existingIncidence.setReports(new ArrayList<>());
         
-        when(productRepository.findById(productId)).thenReturn(Optional.of(sampleProduct));
+        when(productRepository.findByUuid(productId)).thenReturn(Optional.of(sampleProduct));
         when(incidenceRepository.findByProductIdAndStatusOpen(productId)).thenReturn(Optional.of(existingIncidence));
         when(incidenceRepository.save(any(Incidence.class))).thenAnswer(invocation -> invocation.getArgument(0));
 

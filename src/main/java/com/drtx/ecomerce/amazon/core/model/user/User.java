@@ -1,7 +1,10 @@
 package com.drtx.ecomerce.amazon.core.model.user;
 
+import java.util.UUID;
+
 public class User {
     private Long id;
+    private UUID uuid;
     private String name;
     private String email;
     private String password;
@@ -14,8 +17,9 @@ public class User {
     public User() {
     }
 
-    public User(Long id, String name, String email, String password, String address, String phone, UserRole role, boolean enabled, boolean locked) {
+    public User(Long id, UUID uuid,String name, String email, String password, String address, String phone, UserRole role, boolean enabled, boolean locked) {
         this.id = id;
+        this.uuid = uuid;
         this.name = name;
         this.email = email;
         this.password = password;
@@ -96,5 +100,13 @@ public class User {
 
     public void setLocked(boolean locked) {
         this.locked = locked;
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 }

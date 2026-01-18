@@ -4,9 +4,11 @@ import com.drtx.ecomerce.amazon.core.model.exceptions.DomainException;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.UUID;
 
 public class Product {
     private Long id;
+    private UUID uuid;
     private String name;
     private String description;
     private BigDecimal price;
@@ -25,10 +27,11 @@ public class Product {
     public Product() {
     }
 
-    public Product(Long id, String name, String description, BigDecimal price, Category category,
+    public Product(Long id, UUID uuid, String name, String description, BigDecimal price, Category category,
             BigDecimal averageRating, List<String> images, String sku, Integer stockQuantity,
             ProductStatus status, String slug, java.time.LocalDateTime createdAt, java.time.LocalDateTime updatedAt) {
         this.id = id;
+        this.uuid=uuid;
         this.name = name;
         this.description = description;
         this.price = price;
@@ -49,6 +52,14 @@ public class Product {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public String getName() {

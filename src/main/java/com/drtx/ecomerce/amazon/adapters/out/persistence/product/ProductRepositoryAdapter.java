@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -26,8 +27,8 @@ public class ProductRepositoryAdapter implements ProductRepositoryPort {
     }
 
     @Override
-    public Optional<Product> findById(Long id) {
-        return productPersistenceRepository.findById(id).map(mapper::toDomain);
+    public Optional<Product> findByUuid(UUID uuid) {
+        return productPersistenceRepository.findByUuid(uuid).map(mapper::toDomain);
     }
 
     @Override
@@ -36,9 +37,9 @@ public class ProductRepositoryAdapter implements ProductRepositoryPort {
     }
 
     @Override
-    public Product updateById(Long id, Product product) {
-        ProductEntity productToUpdate = productPersistenceRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Product: " + id));
+    public Product updateByUuid(UUID uuid, Product product) {
+        ProductEntity productToUpdate = productPersistenceRepository.findByUuid(uuid)
+                .orElseThrow(() -> new EntityNotFoundException("Product: " + uuid));
 
         productToUpdate.setName(product.getName());
         productToUpdate.setDescription(product.getDescription());
@@ -56,7 +57,7 @@ public class ProductRepositoryAdapter implements ProductRepositoryPort {
     }
 
     @Override
-    public void delete(Long id) {
-        productPersistenceRepository.deleteById(id);
+    public void deleteByUuid(UUID uuid) {
+        productPersistenceRepository.deleteByUuid(uuid);
     }
 }

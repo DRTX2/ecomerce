@@ -91,7 +91,7 @@ class ProductRepositoryAdapterTest {
 
     @Test
     @DisplayName("Should find product by ID")
-    void testFindById() {
+    void testFindByUuid() {
         // Given
         CategoryEntity categoryEntity = new CategoryEntity();
         categoryEntity.setName("Books");
@@ -111,7 +111,7 @@ class ProductRepositoryAdapterTest {
         when(mapper.toDomain(any(ProductEntity.class))).thenReturn(domainProduct);
 
         // When
-        Optional<Product> found = adapter.findById(entity.getId());
+        Optional<Product> found = adapter.findByUuid(entity.getId());
 
         // Then
         assertThat(found).isPresent();

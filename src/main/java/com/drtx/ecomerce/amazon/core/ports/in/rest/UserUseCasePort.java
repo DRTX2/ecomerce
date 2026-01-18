@@ -4,10 +4,11 @@ import com.drtx.ecomerce.amazon.core.model.user.User;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface UserUseCasePort {
-    Optional<User> getUserById(Long id);
+    Optional<User> getUserByUuid(UUID uuid);
     List<User> getAllUsers();
-    User updateUser(Long id, User user);
-    void deleteUser(Long id);
+    User updateUserByUuid(UUID uuid, User user);
+    void deleteUserByUuid(UUID uuid);
 }

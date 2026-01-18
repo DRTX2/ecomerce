@@ -53,7 +53,7 @@ public class AuthController {
 
     private AuthResponse toAuthResponse(AuthResult result) {
         UserResponse userResponse = new UserResponse(
-                result.user().getId(),
+                result.user().getUuid(),
                 result.user().getName(),
                 result.user().getEmail(),
                 result.user().getRole());

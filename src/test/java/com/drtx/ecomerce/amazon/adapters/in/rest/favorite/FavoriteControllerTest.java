@@ -29,6 +29,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.eq;
@@ -94,7 +95,7 @@ class FavoriteControllerTest {
         testFavorite.setUser(testUser);
         testFavorite.setProduct(testProduct);
 
-        UserResponse userResponse = new UserResponse(1L, "Test User", "user@example.com", "USER", "Address", "Phone");
+        UserResponse userResponse = new UserResponse(UUID.randomUUID(), "Test User", "user@example.com", "USER", "Address", "Phone");
 
         // Constructor ProductResponse: Long id, String name, String description,
         // BigDecimal price, Integer stock, Category category, Double rating, List image

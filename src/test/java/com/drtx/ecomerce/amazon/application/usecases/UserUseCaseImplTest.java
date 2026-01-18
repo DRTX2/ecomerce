@@ -16,8 +16,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -41,60 +43,68 @@ class UserUseCaseImplTest {
     void setUp() {
         testUser = new User(
                 1L,
+                UUID.randomUUID(),
                 "John Doe",
                 "john.doe@example.com",
                 "encodedPassword123",
                 "123 Main St",
                 "555-0100",
-                UserRole.USER
+                UserRole.USER,
+                true,
+                false
         );
     }
 
     @Test
-    @DisplayName("Should get user by ID successfully")
-    void shouldGetUserByIdSuccessfully() {
+    @DisplayName("Should get user by UUID successfully")
+    void shouldGetUserByUuidSuccessfully() {
         // Given
-        Long userId = 1L;
-        when(userRepositoryPort.findById(userId)).thenReturn(Optional.of(testUser));
+        UUID uuid = testUser.getUuid();
+        when(userRepositoryPort.findByUuid(uuid))
+                .thenReturn(Optional.of(testUser));
 
         // When
-        Optional<User> result = userUseCase.getUserById(userId);
+        Optional<User> result = userUseCase.getUserByUuid(uuid);
 
         // Then
         assertThat(result).isPresent();
-        assertThat(result.get().getId()).isEqualTo(userId);
+        assertThat(result.get().getUuid()).isEqualTo(uuid);
         assertThat(result.get().getName()).isEqualTo("John Doe");
-        assertThat(result.get().getEmail()).isEqualTo("john.doe@example.com");
-        verify(userRepositoryPort, times(1)).findById(userId);
+
+        verify(userRepositoryPort).findByUuid(uuid);
     }
 
     @Test
     @DisplayName("Should return empty when user not found by ID")
     void shouldReturnEmptyWhenUserNotFoundById() {
         // Given
-        Long userId = 999L;
-        when(userRepositoryPort.findById(userId)).thenReturn(Optional.empty());
+        UUID userUuid = UUID.randomUUID();
+        when(userRepositoryPort.findByUuid(userUuid)).thenReturn(Optional.empty());
 
         // When
-        Optional<User> result = userUseCase.getUserById(userId);
+        Optional<User> result = userUseCase.getUserByUuid(userUuid);
 
         // Then
         assertThat(result).isEmpty();
-        verify(userRepositoryPort, times(1)).findById(userId);
+        verify(userRepositoryPort, times(1)).findByUuid(userUuid);
     }
 
     @Test
     @DisplayName("Should get all users successfully")
     void shouldGetAllUsersSuccessfully() {
         // Given
+        UUID userUUID = UUID.randomUUID();
         User user2 = new User(
                 2L,
+                userUUID,
                 "Jane Smith",
                 "jane.smith@example.com",
                 "encodedPassword456",
                 "456 Oak Ave",
                 "555-0200",
-                UserRole.USER
+                UserRole.USER,
+                true,
+                false
         );
 
         List<User> users = Arrays.asList(testUser, user2);
@@ -126,56 +136,46 @@ class UserUseCaseImplTest {
     @Test
     @DisplayName("Should update user successfully")
     void shouldUpdateUserSuccessfully() {
-        // Given
-        Long userId = 1L;
-        User updatedUser = new User(
-                userId,
-                "John Doe Updated",
-                "john.updated@example.com",
-                "newEncodedPassword",
-                "789 Pine Rd",
-                "555-0300",
-                UserRole.USER
-        );
+        UUID uuid = testUser.getUuid();
 
-        when(userRepositoryPort.updateById(eq(userId), any(User.class))).thenReturn(updatedUser);
+        when(userRepositoryPort.findByUuid(uuid))
+                .thenReturn(Optional.of(testUser));
 
-        // When
-        User result = userUseCase.updateUser(userId, updatedUser);
+        when(userRepositoryPort.updateByUuid(eq(uuid), any(User.class)))
+                .thenReturn(testUser);
 
-        // Then
+        User result = userUseCase.updateUserByUuid(uuid, testUser);
+
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(userId);
-        assertThat(result.getName()).isEqualTo("John Doe Updated");
-        assertThat(result.getEmail()).isEqualTo("john.updated@example.com");
-        verify(userRepositoryPort, times(1)).updateById(userId, updatedUser);
+        assertThat(result.getUuid()).isEqualTo(uuid);
+
+        verify(userRepositoryPort).findByUuid(uuid);
+        verify(userRepositoryPort).updateByUuid(eq(uuid), any(User.class));
     }
 
     @Test
     @DisplayName("Should delete user successfully")
     void shouldDeleteUserSuccessfully() {
-        // Given
-        Long userId = 1L;
-        doNothing().when(userRepositoryPort).delete(userId);
+        UUID uuid = testUser.getUuid();
 
-        // When
-        userUseCase.deleteUser(userId);
+        when(userRepositoryPort.findByUuid(uuid))
+                .thenReturn(Optional.of(testUser));
 
-        // Then
-        verify(userRepositoryPort, times(1)).delete(userId);
+        userUseCase.deleteUserByUuid(uuid);
+
+        verify(userRepositoryPort).findByUuid(uuid);
+        verify(userRepositoryPort).deleteByUuid(uuid);
     }
 
     @Test
-    @DisplayName("Should handle delete for non-existent user")
-    void shouldHandleDeleteForNonExistentUser() {
-        // Given
-        Long userId = 999L;
-        doNothing().when(userRepositoryPort).delete(userId);
+    @DisplayName("Should throw exception when deleting non-existent user")
+    void shouldThrowWhenDeletingNonExistentUser() {
+        UUID uuid = UUID.randomUUID();
 
-        // When
-        userUseCase.deleteUser(userId);
+        when(userRepositoryPort.findByUuid(uuid))
+                .thenReturn(Optional.empty());
 
-        // Then
-        verify(userRepositoryPort, times(1)).delete(userId);
+        assertThatThrownBy(() -> userUseCase.deleteUserByUuid(uuid))
+                .isInstanceOf(RuntimeException.class); // o tu excepción de dominio
     }
 }

@@ -20,6 +20,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -45,6 +46,8 @@ class UserControllerTest {
         private UserRequest testUserRequest;
         private UserResponse testUserResponse;
 
+        private UUID userUuid;
+
         @BeforeEach
         void setUp() {
                 UserController controller = new UserController(userUseCasePort, userRestMapper);
@@ -52,7 +55,10 @@ class UserControllerTest {
                 objectMapper = new ObjectMapper();
 
                 testUser = new User();
+
                 testUser.setId(1L);
+                userUuid = UUID.fromString("3fa85f64-5717-4562-b3fc-2c963f66afa6");
+                testUser.setUuid(userUuid);
                 testUser.setName("John Doe");
                 testUser.setEmail("john@example.com");
                 testUser.setRole(UserRole.USER);
@@ -68,7 +74,7 @@ class UserControllerTest {
                                 "password123");
 
                 testUserResponse = new UserResponse(
-                                1L,
+                                userUuid,
                                 "John Doe",
                                 "john@example.com",
                                 "USER",
@@ -97,47 +103,48 @@ class UserControllerTest {
         }
 
         @Test
-        @DisplayName("GET /users/{id} - Should return user when found")
-        void testGetUserById_Found() throws Exception {
+        @DisplayName("GET /users/{uuid} - Should return user when found")
+        void testGetUserByUuid_Found() throws Exception {
                 // Given
-                when(userUseCasePort.getUserById(1L)).thenReturn(Optional.of(testUser));
+                when(userUseCasePort.getUserByUuid(userUuid)).thenReturn(Optional.of(testUser));
                 when(userRestMapper.toResponse(testUser)).thenReturn(testUserResponse);
 
                 // When & Then
-                mockMvc.perform(get("/users/{id}", 1L)
+                mockMvc.perform(get("/users/{uuid}", userUuid.toString())
                                 .contentType(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isOk())
                                 .andExpect(jsonPath("$.name", is("John Doe")))
                                 .andExpect(jsonPath("$.email", is("john@example.com")));
 
-                verify(userUseCasePort, times(1)).getUserById(1L);
+                verify(userUseCasePort, times(1)).getUserByUuid(userUuid);
                 verify(userRestMapper, times(1)).toResponse(testUser);
         }
 
         @Test
-        @DisplayName("GET /users/{id} - Should return 404 when user not found")
-        void testGetUserById_NotFound() throws Exception {
+        @DisplayName("GET /users/{uuid} - Should return 404 when user not found")
+        void testGetUserByUuid_NotFound() throws Exception {
                 // Given
-                when(userUseCasePort.getUserById(999L)).thenReturn(Optional.empty());
+                UUID notFoundUuid = UUID.randomUUID();
+                when(userUseCasePort.getUserByUuid(notFoundUuid)).thenReturn(Optional.empty());
 
                 // When & Then
-                mockMvc.perform(get("/users/{id}", 999L)
+                mockMvc.perform(get("/users/{uuid}", notFoundUuid.toString())
                                 .contentType(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isNotFound());
 
-                verify(userUseCasePort, times(1)).getUserById(999L);
+                verify(userUseCasePort, times(1)).getUserByUuid(notFoundUuid);
         }
 
         @Test
-        @DisplayName("PUT /users/{id} - Should update user")
+        @DisplayName("PUT /users/{uuid} - Should update user")
         void testUpdateUser() throws Exception {
                 // Given
                 when(userRestMapper.toDomain(any(UserRequest.class))).thenReturn(testUser);
-                when(userUseCasePort.updateUser(eq(1L), any(User.class))).thenReturn(testUser);
+                when(userUseCasePort.updateUserByUuid(eq(userUuid), any(User.class))).thenReturn(testUser);
                 when(userRestMapper.toResponse(testUser)).thenReturn(testUserResponse);
 
                 // When & Then
-                mockMvc.perform(put("/users/{id}", 1L)
+                mockMvc.perform(put("/users/{uuid}", userUuid.toString())
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(testUserRequest)))
                                 .andExpect(status().isOk())
@@ -145,21 +152,21 @@ class UserControllerTest {
                                 .andExpect(jsonPath("$.email", is("john@example.com")));
 
                 verify(userRestMapper, times(1)).toDomain(any(UserRequest.class));
-                verify(userUseCasePort, times(1)).updateUser(eq(1L), any(User.class));
+                verify(userUseCasePort, times(1)).updateUserByUuid(eq(userUuid), any(User.class));
                 verify(userRestMapper, times(1)).toResponse(testUser);
         }
 
         @Test
-        @DisplayName("DELETE /users/{id} - Should delete user")
+        @DisplayName("DELETE /users/{uuid} - Should delete user")
         void testDeleteUser() throws Exception {
                 // Given
-                doNothing().when(userUseCasePort).deleteUser(1L);
+                doNothing().when(userUseCasePort).deleteUserByUuid(userUuid);
 
                 // When & Then
-                mockMvc.perform(delete("/users/{id}", 1L)
+                mockMvc.perform(delete("/users/{uuid}", userUuid.toString())
                                 .contentType(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isNoContent());
 
-                verify(userUseCasePort, times(1)).deleteUser(1L);
+                verify(userUseCasePort, times(1)).deleteUserByUuid(userUuid);
         }
 }

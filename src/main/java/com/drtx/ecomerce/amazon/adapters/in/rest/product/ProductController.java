@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -85,27 +86,27 @@ public class ProductController {
                                 this.service.createProduct(newProduct)));
         }
 
-        @GetMapping("/{id}")
-        public ResponseEntity<ProductResponse> findProductById(@PathVariable Long id) {
-                return service.getProductById(id)
+        @GetMapping("/{uuid}")
+        public ResponseEntity<ProductResponse> findProductById(@PathVariable UUID uuid) {
+                return service.getProductByUuid(uuid)
                                 .map(mapper::toResponse)
                                 .map(ResponseEntity::ok)
                                 .orElseThrow(() -> new EntityNotFoundException(
-                                                "Product not found with id: " + id));
+                                                "Product not found with id: " + uuid));
         }
 
-        @PutMapping("/{id}")
+        @PutMapping("/{uuid}")
         @PreAuthorize("hasRole('SELLER')")
-        public ResponseEntity<ProductResponse> updateProduct(@PathVariable Long id, @RequestBody ProductRequest req) {
+        public ResponseEntity<ProductResponse> updateProduct(@PathVariable UUID uuid, @RequestBody ProductRequest req) {
                 Product product = mapper.toDomain(req);
                 return ResponseEntity.ok(mapper.toResponse(
-                                service.updateProduct(id, product)));
+                                service.updateProduct(uuid, product)));
         }
 
-        @DeleteMapping("/{id}")
+        @DeleteMapping("/{uuid}")
         @PreAuthorize("hasRole('SELLER')")
-        public ResponseEntity<Void> deleteProduct(@PathVariable Long id) {
-                service.deleteProduct(id);
+        public ResponseEntity<Void> deleteProduct(@PathVariable UUID uuid) {
+                service.deleteProductByUuid(uuid);
                 return ResponseEntity.noContent().build();
         }
 }

@@ -3,9 +3,10 @@ package com.drtx.ecomerce.amazon.adapters.in.rest.user.dto;
 import jakarta.annotation.Nullable;
 
 import java.util.Date;
+import java.util.UUID;
 
 public record UserResponse (
-        Long id,
+        UUID uuid,
         String name,
         String email,
         String role,

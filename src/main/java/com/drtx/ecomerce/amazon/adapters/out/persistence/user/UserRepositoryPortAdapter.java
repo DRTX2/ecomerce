@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
@@ -43,31 +44,38 @@ public class UserRepositoryPortAdapter implements UserRepositoryPort {
                 .collect(Collectors.toList());
     }
 
+
+    @Override
+    public Optional<User> findByEmail(String email){
+        return repository.findByEmail(email)
+                .map(mapper::toDomain);
+    }
+
+    @Override
+    public Optional<User> findByUuid(UUID uuid){
+        return repository.findByUuid(uuid)
+                .map(mapper::toDomain);
+    }
+
     @Override
     @Transactional
-    public User updateById(Long id, User user) {
-        UserEntity existingUser=repository.findById(id)
-                .orElseThrow(()->new EntityNotFoundException("User: "+id));
+    public User updateByUuid(UUID uuid, User user) {
+        UserEntity existingUser = repository.findByUuid(uuid)
+                .orElseThrow(() -> new EntityNotFoundException("User with UUID: " + uuid));
 
         existingUser.setName(user.getName());
         existingUser.setEmail(user.getEmail());
         existingUser.setAddress(user.getAddress());
         existingUser.setRole(user.getRole());
         existingUser.setPhone(user.getPhone());
-        UserEntity updatedUser= repository.save(existingUser);
+        UserEntity updatedUser = repository.save(existingUser);
         return mapper.toDomain(updatedUser);
     }
 
     @Override
-    public void delete(Long id) {
-        if(!repository.existsById(id))
-            throw  new EntityNotFoundException("User: "+id);
-        repository.deleteById(id);
-    }
-
-    @Override
-    public Optional<User> findByEmail(String email){
-        return repository.findByEmail(email)
-                .map(mapper::toDomain);
+    public void deleteByUuid(UUID uuid) {
+        UserEntity user = repository.findByUuid(uuid)
+                .orElseThrow(() -> new EntityNotFoundException("User with UUID: " + uuid));
+        repository.deleteById(user.getId());
     }
 }

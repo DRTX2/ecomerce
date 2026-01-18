@@ -32,7 +32,7 @@ public class FavoriteUseCaseImpl implements FavoriteUseCasePort {
             throw DomainExceptionFactory.invalidOperation("Favorite already exists for this product");
         }
 
-        Product product = productRepository.findById(productId)
+        Product product = productRepository.findByUuid(productId)
                 .orElseThrow(() -> DomainExceptionFactory.productNotFound(productId));
 
         Favorite favorite = new Favorite();

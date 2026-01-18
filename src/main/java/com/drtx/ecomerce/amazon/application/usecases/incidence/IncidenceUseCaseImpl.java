@@ -28,7 +28,7 @@ public class IncidenceUseCaseImpl implements IncidenceUseCasePort {
     @Override
     @Transactional
     public Incidence createIncidence(Long productId, Report report, String reporterEmail) {
-        Product product = productRepository.findById(productId)
+        Product product = productRepository.findByUuid(productId)
                 .orElseThrow(() -> DomainExceptionFactory.productNotFound(productId));
 
         if (reporterEmail != null) {
