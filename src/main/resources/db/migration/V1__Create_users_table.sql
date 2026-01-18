@@ -25,7 +25,10 @@ CREATE TABLE IF NOT EXISTS users (
     
     -- Role del usuario (ENUM como VARCHAR por compatibilidad con Hibernate)
     role VARCHAR(50) NOT NULL DEFAULT 'USER' CHECK (role IN ('USER', 'ADMIN', 'MODERATOR', 'SELLER')),
-    
+
+    enabled BOOLEAN NOT NULL DEFAULT true,
+    locked BOOLEAN NOT NULL DEFAULT false,
+
     -- Auditoría
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -50,3 +53,5 @@ COMMENT ON COLUMN users.phone IS 'Número de teléfono de contacto';
 COMMENT ON COLUMN users.role IS 'Rol asignado (USER, ADMIN, MODERATOR, SELLER)';
 COMMENT ON COLUMN users.created_at IS 'Timestamp de creación del registro';
 COMMENT ON COLUMN users.updated_at IS 'Timestamp de última actualización';
+COMMENT ON COLUMN users.enabled IS 'Indica si el usuario está habilitado';
+COMMENT ON COLUMN users.locked IS 'Indica si el usuario está bloqueado';
