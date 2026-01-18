@@ -3,9 +3,11 @@ package com.drtx.ecomerce.amazon.core.model.order;
 import com.drtx.ecomerce.amazon.core.model.user.User;
 
 import java.util.List;
+import java.util.UUID;
 
 public class Cart {
     private Long id;
+    private UUID uuid;
     private User user;
     private List<CartItem> items;
 
@@ -17,8 +19,9 @@ public class Cart {
         this.items = items;
     }
 
-    public Cart(Long id, User user, List<CartItem> items) {
+    public Cart(Long id, UUID uuid, User user, List<CartItem> items) {
         this.id = id;
+        this.uuid = uuid;
         this.user = user;
         this.items = items;
     }
@@ -29,6 +32,14 @@ public class Cart {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public User getUser() {

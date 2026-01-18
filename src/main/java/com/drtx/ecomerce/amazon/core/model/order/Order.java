@@ -6,9 +6,11 @@ import com.drtx.ecomerce.amazon.core.model.discount.Discount;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 public class Order {
     private Long id;
+    private UUID uuid;
     private User user;
     private List<OrderItem> items;
     private BigDecimal total;
@@ -17,9 +19,10 @@ public class Order {
     private LocalDateTime deliveredAt;
     private List<Discount> appliedDiscounts;
 
-    public Order(Long id, User user, List<OrderItem> items, BigDecimal total, OrderState orderState,
+    public Order(Long id, UUID uuid, User user, List<OrderItem> items, BigDecimal total, OrderState orderState,
             LocalDateTime createdAt, LocalDateTime deliveredAt, List<Discount> appliedDiscounts) {
         this.id = id;
+        this.uuid = uuid;
         this.user = user;
         this.items = items;
         this.total = total;
@@ -35,6 +38,14 @@ public class Order {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public User getUser() {

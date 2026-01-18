@@ -8,7 +8,10 @@ import java.util.UUID;
 
 public interface ProductRepositoryPort {
     Product save(Product product);
+
+    Optional<Product> findById(Long id);  // Legacy support
     Optional<Product> findByUuid(UUID uuid);
+
     List<Product> findAll();
     Product updateByUuid(UUID uuid, Product productToUPdate);
     void deleteByUuid(UUID uuid);

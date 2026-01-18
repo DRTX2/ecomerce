@@ -3,6 +3,7 @@ package com.drtx.ecomerce.amazon.core.model.issues;
 import com.drtx.ecomerce.amazon.core.model.user.User;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * Modelo de dominio para apelaciones.
@@ -10,6 +11,7 @@ import java.time.LocalDateTime;
  */
 public class Appeal {
     private Long id;
+    private UUID uuid;
     private Incidence incidence;
     private User seller;
     private String reason;
@@ -22,9 +24,10 @@ public class Appeal {
     public Appeal() {
     }
 
-    public Appeal(Long id, Incidence incidence, User seller, String reason, LocalDateTime createdAt,
+    public Appeal(Long id, UUID uuid, Incidence incidence, User seller, String reason, LocalDateTime createdAt,
             AppealStatus status, User newModerator, AppealDecision finalDecision, LocalDateTime finalDecisionAt) {
         this.id = id;
+        this.uuid = uuid;
         this.incidence = incidence;
         this.seller = seller;
         this.reason = reason;
@@ -41,6 +44,14 @@ public class Appeal {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public Incidence getIncidence() {

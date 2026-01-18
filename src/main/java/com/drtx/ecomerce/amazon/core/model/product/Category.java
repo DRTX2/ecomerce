@@ -1,9 +1,11 @@
 package com.drtx.ecomerce.amazon.core.model.product;
 
 import java.util.List;
+import java.util.UUID;
 
 public class Category {
     private Long id;
+    private UUID uuid;
     private String name;
     private String description;
     private List<Product> products;
@@ -11,8 +13,9 @@ public class Category {
     public Category() {
     }
 
-    public Category(Long id, String name, String description, List<Product> products) {
+    public Category(Long id, UUID uuid, String name, String description, List<Product> products) {
         this.id = id;
+        this.uuid = uuid;
         this.name = name;
         this.description = description;
         this.products = products;
@@ -24,6 +27,14 @@ public class Category {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public UUID getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public String getName() {

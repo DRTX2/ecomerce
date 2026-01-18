@@ -10,8 +10,12 @@ public final class DomainExceptionFactory {
 
     // ========== Entity Not Found ==========
 
-    public static EntityNotFoundException productNotFound(UUID productUuuid) {
-        return new EntityNotFoundException("Product", productUuuid);
+    public static EntityNotFoundException productNotFound(UUID productUuid) {
+        return new EntityNotFoundException("Product", productUuid);
+    }
+
+    public static EntityNotFoundException productNotFound(Long productId) {
+        return new EntityNotFoundException("Product", productId);
     }
 
     public static EntityNotFoundException userNotFound(UUID userId) {
@@ -27,20 +31,40 @@ public final class DomainExceptionFactory {
         return new EntityNotFoundException("Order", orderId);
     }
 
+    public static EntityNotFoundException orderNotFound(UUID orderUuid) {
+        return new EntityNotFoundException("Order", orderUuid);
+    }
+
     public static EntityNotFoundException categoryNotFound(Long categoryId) {
         return new EntityNotFoundException("Category", categoryId);
+    }
+
+    public static EntityNotFoundException categoryNotFound(UUID categoryUuid) {
+        return new EntityNotFoundException("Category", categoryUuid);
     }
 
     public static EntityNotFoundException cartNotFound(Long cartId) {
         return new EntityNotFoundException("Cart", cartId);
     }
 
+    public static EntityNotFoundException cartNotFound(UUID cartUuid) {
+        return new EntityNotFoundException("Cart", cartUuid);
+    }
+
     public static EntityNotFoundException appealNotFound(Long appealId) {
         return new EntityNotFoundException("Appeal", appealId);
     }
 
+    public static EntityNotFoundException appealNotFound(UUID appealUuid) {
+        return new EntityNotFoundException("Appeal", appealUuid);
+    }
+
     public static EntityNotFoundException incidenceNotFound(Long incidenceId) {
         return new EntityNotFoundException("Incidence", incidenceId);
+    }
+
+    public static EntityNotFoundException incidenceNotFound(UUID incidenceUuid) {
+        return new EntityNotFoundException("Incidence", incidenceUuid);
     }
 
     public static EntityNotFoundException userNotFound(String email) {
