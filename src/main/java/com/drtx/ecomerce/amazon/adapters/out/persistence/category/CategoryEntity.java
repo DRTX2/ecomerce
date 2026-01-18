@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "categories")
@@ -19,8 +20,19 @@ public class CategoryEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(unique = true, nullable = false, updatable = false)
+    private UUID uuid;
+
     private String name;
     private String description;
     @OneToMany(mappedBy = "category")
     private List<ProductEntity> products;
+
+    @PrePersist
+    protected void onCreate() {
+        if (this.uuid == null) {
+            this.uuid = UUID.randomUUID();
+        }
+    }
 }

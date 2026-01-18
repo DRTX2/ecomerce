@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
@@ -54,5 +55,27 @@ public class CategoryRepositoryAdapter implements CategoryRepositoryPort {
     @Override
     public void delete(Long id) {
         repository.deleteById(id);
+    }
+
+    @Override
+    public Optional<Category> findByUuid(UUID uuid) {
+        return repository.findByUuid(uuid).map(mapper::toDomain);
+    }
+
+    @Override
+    @Transactional
+    public Category updateByUuid(UUID uuid, Category category) {
+        CategoryEntity entityToUpdate = repository.findByUuid(uuid)
+                .orElseThrow(() -> new EntityNotFoundException("Category with uuid: " + uuid));
+        entityToUpdate.setName(category.getName());
+        entityToUpdate.setDescription(category.getDescription());
+        return mapper.toDomain(repository.save(entityToUpdate));
+    }
+
+    @Override
+    public void deleteByUuid(UUID uuid) {
+        CategoryEntity entity = repository.findByUuid(uuid)
+                .orElseThrow(() -> new EntityNotFoundException("Category with uuid: " + uuid));
+        repository.delete(entity);
     }
 }

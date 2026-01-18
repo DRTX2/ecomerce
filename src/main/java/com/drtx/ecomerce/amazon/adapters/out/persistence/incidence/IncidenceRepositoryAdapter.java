@@ -1,5 +1,6 @@
 package com.drtx.ecomerce.amazon.adapters.out.persistence.incidence;
 
+import com.drtx.ecomerce.amazon.core.model.exceptions.EntityNotFoundException;
 import com.drtx.ecomerce.amazon.core.model.issues.Incidence;
 import com.drtx.ecomerce.amazon.core.model.issues.IncidenceStatus;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.IncidenceRepositoryPort;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -29,6 +31,11 @@ public class IncidenceRepositoryAdapter implements IncidenceRepositoryPort {
     @Override
     public Optional<Incidence> findById(Long id) {
         return repository.findById(id).map(mapper::toDomain);
+    }
+
+    @Override
+    public Optional<Incidence> findByUuid(UUID uuid) {
+        return repository.findByPublicUi(uuid).map(mapper::toDomain);
     }
 
     @Override
@@ -56,7 +63,29 @@ public class IncidenceRepositoryAdapter implements IncidenceRepositoryPort {
     }
 
     @Override
+    public Incidence updateByUuid(UUID uuid, Incidence incidence) {
+        IncidenceEntity existing = repository.findByPublicUi(uuid)
+                .orElseThrow(() -> new EntityNotFoundException("Incidence not found with uuid: " + uuid));
+
+        IncidenceEntity entity = mapper.toEntity(incidence);
+        entity.setId(existing.getId());
+        entity.setPublicUi(existing.getPublicUi());
+
+        if (entity.getReports() != null) {
+            entity.getReports().forEach(report -> report.setIncidence(entity));
+        }
+        return mapper.toDomain(repository.save(entity));
+    }
+
+    @Override
     public void delete(Long id) {
         repository.deleteById(id);
+    }
+
+    @Override
+    public void deleteByUuid(UUID uuid) {
+        IncidenceEntity entity = repository.findByPublicUi(uuid)
+                .orElseThrow(() -> new EntityNotFoundException("Incidence not found with uuid: " + uuid));
+        repository.delete(entity);
     }
 }

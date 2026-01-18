@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
@@ -70,5 +71,41 @@ public class OrderRepositoryAdapter implements OrderRepositoryPort {
             throw new EntityNotFoundException("Order not found with id: " + id);
         }
         repository.deleteById(id);
+    }
+
+    @Override
+    public Optional<Order> findByUuid(UUID uuid) {
+        return repository.findByUuid(uuid).map(orderMapper::toDomain);
+    }
+
+    @Override
+    public Order updateByUuid(UUID uuid, Order order) {
+        final OrderEntity orderToUpdate = repository.findByUuid(uuid).orElseThrow(
+                () -> new EntityNotFoundException("Order not found with uuid: " + uuid));
+
+        // Update the entity with domain values
+        orderToUpdate.setOrderState(order.getOrderState());
+        orderToUpdate.setDeliveredAt(order.getDeliveredAt());
+        orderToUpdate.setTotal(order.getTotal());
+
+        // Update items if provided
+        if (order.getItems() != null) {
+            List<OrderItemEntity> itemEntities = order.getItems().stream()
+                    .map(orderMapper::toEntity)
+                    .peek(item -> item.setOrder(orderToUpdate))
+                    .collect(Collectors.toList());
+            orderToUpdate.getItems().clear();
+            orderToUpdate.getItems().addAll(itemEntities);
+        }
+
+        OrderEntity saved = repository.save(orderToUpdate);
+        return orderMapper.toDomain(saved);
+    }
+
+    @Override
+    public void deleteByUuid(UUID uuid) {
+        OrderEntity order = repository.findByUuid(uuid)
+                .orElseThrow(() -> new EntityNotFoundException("Order not found with uuid: " + uuid));
+        repository.delete(order);
     }
 }

@@ -27,6 +27,11 @@ public class ProductRepositoryAdapter implements ProductRepositoryPort {
     }
 
     @Override
+    public Optional<Product> findById(Long id) {
+        return productPersistenceRepository.findById(id).map(mapper::toDomain);
+    }
+
+    @Override
     public Optional<Product> findByUuid(UUID uuid) {
         return productPersistenceRepository.findByUuid(uuid).map(mapper::toDomain);
     }

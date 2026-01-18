@@ -8,6 +8,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(name = "appeals")
@@ -21,6 +22,9 @@ public class AppealEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @Column(unique = true, nullable = false, updatable = false)
+    private UUID uuid;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "incidence_id", nullable = false)
@@ -52,6 +56,9 @@ public class AppealEntity {
 
     @PrePersist
     protected void prePersist() {
+        if (this.uuid == null) {
+            this.uuid = UUID.randomUUID();
+        }
         this.createdAt = LocalDateTime.now();
         if (status == null) status = AppealStatus.PENDING;
         if (finalDecision == null) finalDecision = AppealDecision.PENDING;

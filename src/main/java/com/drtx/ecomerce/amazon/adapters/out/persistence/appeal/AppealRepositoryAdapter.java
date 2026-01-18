@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -22,6 +23,11 @@ public class AppealRepositoryAdapter implements AppealRepositoryPort {
     @Override
     public Optional<Appeal> findById(Long id) {
         return repository.findById(id).map(mapper::toDomain);
+    }
+
+    @Override
+    public Optional<Appeal> findByUuid(UUID uuid) {
+        return repository.findByUuid(uuid).map(mapper::toDomain);
     }
 
     @Override
