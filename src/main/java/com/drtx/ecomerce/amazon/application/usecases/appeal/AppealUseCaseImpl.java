@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -67,6 +68,11 @@ public class AppealUseCaseImpl implements AppealUseCasePort {
     }
 
     @Override
+    public Optional<Appeal> getAppealByUuid(UUID uuid) {
+        return appealRepository.findByUuid(uuid);
+    }
+
+    @Override
     @Transactional
     public Appeal resolveAppeal(Long id, AppealDecision decision, String moderatorEmail) {
         Appeal appeal = appealRepository.findById(id)
@@ -79,6 +85,27 @@ public class AppealUseCaseImpl implements AppealUseCasePort {
         appeal.setFinalDecision(decision);
         appeal.setFinalDecisionAt(LocalDateTime.now());
         appeal.setStatus(AppealStatus.RESOLVED);
+
+        return appealRepository.save(appeal);
+    }
+
+    @Override
+    @Transactional
+    public Appeal resolveAppealByUuid(UUID uuid, AppealDecision decision, String moderatorEmail) {
+        Appeal appeal = appealRepository.findByUuid(uuid)
+                .orElseThrow(() -> DomainExceptionFactory.appealNotFound(uuid));
+
+        User moderator = userRepository.findByEmail(moderatorEmail)
+                .orElseThrow(() -> DomainExceptionFactory.userNotFound(moderatorEmail));
+
+        appeal.setNewModerator(moderator);
+        appeal.setFinalDecision(decision);
+        appeal.setFinalDecisionAt(LocalDateTime.now());
+        appeal.setStatus(AppealStatus.RESOLVED);
+
+        Incidence incidence = appeal.getIncidence();
+        incidence.setStatus(decision == AppealDecision.GRANTED ? IncidenceStatus.DECIDED : IncidenceStatus.CLOSED);
+        incidenceRepository.save(incidence);
 
         return appealRepository.save(appeal);
     }

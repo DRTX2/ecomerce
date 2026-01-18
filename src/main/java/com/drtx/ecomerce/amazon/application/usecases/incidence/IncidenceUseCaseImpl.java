@@ -6,6 +6,7 @@ import com.drtx.ecomerce.amazon.core.model.issues.IncidenceDecision;
 import com.drtx.ecomerce.amazon.core.model.issues.IncidenceStatus;
 import com.drtx.ecomerce.amazon.core.model.issues.Report;
 import com.drtx.ecomerce.amazon.core.model.product.Product;
+import com.drtx.ecomerce.amazon.core.model.user.User;
 import com.drtx.ecomerce.amazon.core.ports.in.rest.IncidenceUseCasePort;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.IncidenceRepositoryPort;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.ProductRepositoryPort;
@@ -14,8 +15,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +31,7 @@ public class IncidenceUseCaseImpl implements IncidenceUseCasePort {
     @Override
     @Transactional
     public Incidence createIncidence(Long productId, Report report, String reporterEmail) {
-        Product product = productRepository.findByUuid(productId)
+        Product product = productRepository.findById(productId)
                 .orElseThrow(() -> DomainExceptionFactory.productNotFound(productId));
 
         if (reporterEmail != null) {
@@ -58,6 +61,11 @@ public class IncidenceUseCaseImpl implements IncidenceUseCasePort {
     }
 
     @Override
+    public Optional<Incidence> getIncidenceByUuid(UUID uuid) {
+        return incidenceRepository.findByUuid(uuid);
+    }
+
+    @Override
     public List<Incidence> getAllIncidences() {
         return incidenceRepository.findAll();
     }
@@ -82,11 +90,38 @@ public class IncidenceUseCaseImpl implements IncidenceUseCasePort {
 
     @Override
     @Transactional
+    public Incidence resolveIncidenceByUuid(UUID uuid, IncidenceDecision decision, String moderatorComment, String moderatorEmail) {
+        Incidence incidence = incidenceRepository.findByUuid(uuid)
+                .orElseThrow(() -> DomainExceptionFactory.incidenceNotFound(uuid));
+
+        User moderator = userRepository.findByEmail(moderatorEmail)
+                .orElseThrow(() -> DomainExceptionFactory.userNotFound(moderatorEmail));
+
+        incidence.setModerator(moderator);
+        incidence.setModeratorComment(moderatorComment);
+        incidence.setDecision(decision);
+        incidence.setStatus(IncidenceStatus.DECIDED);
+
+        return incidenceRepository.save(incidence);
+    }
+
+    @Override
+    @Transactional
     public Incidence updateIncidence(Long id, Incidence incidence) {
         // Verificar existencia antes de actualizar
         if (incidenceRepository.findById(id).isEmpty()) {
             throw DomainExceptionFactory.incidenceNotFound(id);
         }
         return incidenceRepository.updateById(id, incidence);
+    }
+
+    @Override
+    @Transactional
+    public Incidence updateIncidenceByUuid(UUID uuid, Incidence incidence) {
+        // Verify incidence exists
+        incidenceRepository.findByUuid(uuid)
+                .orElseThrow(() -> DomainExceptionFactory.incidenceNotFound(uuid));
+
+        return incidenceRepository.updateByUuid(uuid, incidence);
     }
 }

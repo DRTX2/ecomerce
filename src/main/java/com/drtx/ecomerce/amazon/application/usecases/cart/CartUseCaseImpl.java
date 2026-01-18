@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -26,6 +27,11 @@ public class CartUseCaseImpl implements CartUseCasePort {
     }
 
     @Override
+    public Optional<Cart> getCartByUuid(UUID uuid) {
+        return repositort.findByUuid(uuid);
+    }
+
+    @Override
     public List<Cart> getAllCarts(Long userId) {
         return repositort.findAll(userId);
     }
@@ -40,10 +46,28 @@ public class CartUseCaseImpl implements CartUseCasePort {
     }
 
     @Override
+    public Cart updateCartByUuid(UUID uuid, Cart cart) {
+        // Verify cart exists
+        repositort.findByUuid(uuid)
+                .orElseThrow(() -> DomainExceptionFactory.cartNotFound(uuid));
+
+        return repositort.updateByUuid(uuid, cart);
+    }
+
+    @Override
     public void deleteCart(Long id) {
         // Verify cart exists before deleting
         repositort.findById(id).orElseThrow(() -> DomainExceptionFactory.cartNotFound(id));
 
         repositort.delete(id);
+    }
+
+    @Override
+    public void deleteCartByUuid(UUID uuid) {
+        // Verify cart exists before deleting
+        repositort.findByUuid(uuid)
+                .orElseThrow(() -> DomainExceptionFactory.cartNotFound(uuid));
+
+        repositort.deleteByUuid(uuid);
     }
 }

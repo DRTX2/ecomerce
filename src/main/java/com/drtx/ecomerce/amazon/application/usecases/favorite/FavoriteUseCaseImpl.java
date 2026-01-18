@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -32,8 +33,29 @@ public class FavoriteUseCaseImpl implements FavoriteUseCasePort {
             throw DomainExceptionFactory.invalidOperation("Favorite already exists for this product");
         }
 
-        Product product = productRepository.findByUuid(productId)
+        Product product = productRepository.findById(productId)
                 .orElseThrow(() -> DomainExceptionFactory.productNotFound(productId));
+
+        Favorite favorite = new Favorite();
+        favorite.setUser(user);
+        favorite.setProduct(product);
+        favorite.initializeDefaults();
+
+        return favoriteRepository.save(favorite);
+    }
+
+    @Override
+    @Transactional
+    public Favorite addFavoriteByProductUuid(UUID productUuid, String userEmail) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> DomainExceptionFactory.userNotFound(userEmail));
+
+        Product product = productRepository.findByUuid(productUuid)
+                .orElseThrow(() -> DomainExceptionFactory.productNotFound(productUuid));
+
+        if (favoriteRepository.findByUserIdAndProductId(user.getId(), product.getId()).isPresent()) {
+            throw DomainExceptionFactory.invalidOperation("Favorite already exists for this product");
+        }
 
         Favorite favorite = new Favorite();
         favorite.setUser(user);
@@ -50,6 +72,18 @@ public class FavoriteUseCaseImpl implements FavoriteUseCasePort {
                 .orElseThrow(() -> DomainExceptionFactory.userNotFound(userEmail));
 
         favoriteRepository.deleteByUserIdAndProductId(user.getId(), productId);
+    }
+
+    @Override
+    @Transactional
+    public void removeFavoriteByProductUuid(UUID productUuid, String userEmail) {
+        User user = userRepository.findByEmail(userEmail)
+                .orElseThrow(() -> DomainExceptionFactory.userNotFound(userEmail));
+
+        Product product = productRepository.findByUuid(productUuid)
+                .orElseThrow(() -> DomainExceptionFactory.productNotFound(productUuid));
+
+        favoriteRepository.deleteByUserIdAndProductId(user.getId(), product.getId());
     }
 
     @Override

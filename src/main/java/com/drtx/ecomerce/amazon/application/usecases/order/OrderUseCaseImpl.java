@@ -84,6 +84,7 @@ public class OrderUseCaseImpl implements OrderUseCasePort {
         // Create the order
         Order order = new Order(
                 null,
+                null, // uuid will be auto-generated
                 user,
                 orderItems,
                 total,
@@ -165,6 +166,64 @@ public class OrderUseCaseImpl implements OrderUseCasePort {
         }
 
         orderRepository.delete(id);
+    }
+
+    // UUID-based methods
+    @Override
+    public Optional<Order> getOrderByUuid(UUID uuid) {
+        return orderRepository.findByUuid(uuid);
+    }
+
+    @Override
+    @Transactional
+    public Order updateOrderByUuid(UUID uuid, Order order) {
+        // Verify order exists
+        orderRepository.findByUuid(uuid)
+                .orElseThrow(() -> DomainExceptionFactory.orderNotFound(uuid));
+
+        return orderRepository.updateByUuid(uuid, order);
+    }
+
+    @Override
+    @Transactional
+    public Order updateOrderStateByUuid(UUID uuid, OrderState newState) {
+        Order order = orderRepository.findByUuid(uuid)
+                .orElseThrow(() -> DomainExceptionFactory.orderNotFound(uuid));
+
+        OrderState currentState = order.getOrderState();
+
+        // Validate state transition
+        if (!isValidTransition(currentState, newState)) {
+            throw DomainExceptionFactory.invalidStateTransition(
+                    currentState.name(),
+                    newState.name(),
+                    VALID_TRANSITIONS.get(currentState).toString());
+        }
+
+        order.setOrderState(newState);
+
+        // Set delivered timestamp if transitioning to DELIVERED
+        if (newState == OrderState.DELIVERED) {
+            order.setDeliveredAt(LocalDateTime.now());
+        }
+
+        return orderRepository.updateByUuid(uuid, order);
+    }
+
+    @Override
+    @Transactional
+    public void deleteOrderByUuid(UUID uuid) {
+        Order order = orderRepository.findByUuid(uuid)
+                .orElseThrow(() -> DomainExceptionFactory.orderNotFound(uuid));
+
+        // Only allow deletion of PENDING or CANCELED orders
+        if (order.getOrderState() != OrderState.PENDING && order.getOrderState() != OrderState.CANCELED) {
+            throw DomainExceptionFactory.invalidOperation(
+                    "Cannot delete order in state: " + order.getOrderState().name() +
+                            ". Only PENDING or CANCELED orders can be deleted.");
+        }
+
+        orderRepository.deleteByUuid(uuid);
     }
 
     private boolean isValidTransition(OrderState from, OrderState to) {

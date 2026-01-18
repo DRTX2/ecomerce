@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @AllArgsConstructor
@@ -25,6 +26,11 @@ public class CategoryUseCaseImpl implements CategoryUseCasePort {
     }
 
     @Override
+    public Optional<Category> getCategoryByUuid(UUID uuid) {
+        return repository.findByUuid(uuid);
+    }
+
+    @Override
     public List<Category> getAllCategories() {
         return repository.findAll();
     }
@@ -35,7 +41,17 @@ public class CategoryUseCaseImpl implements CategoryUseCasePort {
     }
 
     @Override
+    public Category updateCategoryByUuid(UUID uuid, Category category) {
+        return repository.updateByUuid(uuid, category);
+    }
+
+    @Override
     public void deleteCategory(Long id) {
         repository.delete(id);
+    }
+
+    @Override
+    public void deleteCategoryByUuid(UUID uuid) {
+        repository.deleteByUuid(uuid);
     }
 }
