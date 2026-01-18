@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * REST Controller para gestión de órdenes.
@@ -76,9 +77,68 @@ public class OrderController {
     }
 
     /**
-     * Obtiene una orden por ID
+     * Obtiene una orden por UUID
      */
-    @GetMapping("/{id}")
+    @GetMapping("/{uuid}")
+    public ResponseEntity<OrderResponse> findOrderByUuid(@PathVariable UUID uuid) {
+        return orderUseCasePort.getOrderByUuid(uuid)
+                .map(mapper::toResponse)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    /**
+     * Actualiza una orden completa por UUID (solo ADMIN)
+     */
+    @PutMapping("/{uuid}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<OrderResponse> updateOrderByUuid(@PathVariable UUID uuid,
+            @RequestBody @Valid OrderRequest orderRequest) {
+        Order orderToUpdate = mapper.toDomain(orderRequest);
+        Order updatedOrder = orderUseCasePort.updateOrderByUuid(uuid, orderToUpdate);
+        return ResponseEntity.ok(mapper.toResponse(updatedOrder));
+    }
+
+    /**
+     * Actualiza el estado de una orden por UUID (ADMIN o SELLER)
+     * Útil para marcar órdenes como enviadas, entregadas, etc.
+     */
+    @PatchMapping("/{uuid}/state")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
+    public ResponseEntity<OrderResponse> updateOrderStateByUuid(
+            @PathVariable UUID uuid,
+            @RequestBody @Valid UpdateOrderStateRequest request) {
+        Order updatedOrder = orderUseCasePort.updateOrderStateByUuid(uuid, request.newState());
+        return ResponseEntity.ok(mapper.toResponse(updatedOrder));
+    }
+
+    /**
+     * Cancela una orden por UUID (usuario puede cancelar sus propias órdenes PENDING)
+     */
+    @PostMapping("/{uuid}/cancel")
+    public ResponseEntity<OrderResponse> cancelOrderByUuid(@PathVariable UUID uuid) {
+        Order updatedOrder = orderUseCasePort.updateOrderStateByUuid(uuid,
+                com.drtx.ecomerce.amazon.core.model.order.OrderState.CANCELED);
+        return ResponseEntity.ok(mapper.toResponse(updatedOrder));
+    }
+
+    /**
+     * Elimina una orden por UUID (solo ADMIN)
+     */
+    @DeleteMapping("/{uuid}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteOrderByUuid(@PathVariable UUID uuid) {
+        orderUseCasePort.deleteOrderByUuid(uuid);
+        return ResponseEntity.noContent().build();
+    }
+
+    // Legacy endpoints using Long ID (deprecated, maintain for backward compatibility)
+
+    /**
+     * @deprecated Use {@link #findOrderByUuid(UUID)} instead
+     */
+    @Deprecated
+    @GetMapping("/by-id/{id}")
     public ResponseEntity<OrderResponse> findOrderById(@PathVariable Long id) {
         return orderUseCasePort.getOrderById(id)
                 .map(mapper::toResponse)
@@ -87,9 +147,10 @@ public class OrderController {
     }
 
     /**
-     * Actualiza una orden completa (solo ADMIN)
+     * @deprecated Use {@link #updateOrderByUuid(UUID, OrderRequest)} instead
      */
-    @PutMapping("/{id}")
+    @Deprecated
+    @PutMapping("/by-id/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<OrderResponse> updateOrder(@PathVariable Long id,
             @RequestBody @Valid OrderRequest orderRequest) {
@@ -100,10 +161,10 @@ public class OrderController {
     }
 
     /**
-     * Actualiza el estado de una orden (ADMIN o SELLER)
-     * Útil para marcar órdenes como enviadas, entregadas, etc.
+     * @deprecated Use {@link #updateOrderStateByUuid(UUID, UpdateOrderStateRequest)} instead
      */
-    @PatchMapping("/{id}/state")
+    @Deprecated
+    @PatchMapping("/by-id/{id}/state")
     @PreAuthorize("hasAnyRole('ADMIN', 'SELLER')")
     public ResponseEntity<OrderResponse> updateOrderState(
             @PathVariable Long id,
@@ -113,9 +174,10 @@ public class OrderController {
     }
 
     /**
-     * Cancela una orden (usuario puede cancelar sus propias órdenes PENDING)
+     * @deprecated Use {@link #cancelOrderByUuid(UUID)} instead
      */
-    @PostMapping("/{id}/cancel")
+    @Deprecated
+    @PostMapping("/by-id/{id}/cancel")
     public ResponseEntity<OrderResponse> cancelOrder(@PathVariable Long id) {
         Order updatedOrder = orderUseCasePort.updateOrderState(id,
                 com.drtx.ecomerce.amazon.core.model.order.OrderState.CANCELED);
@@ -123,9 +185,10 @@ public class OrderController {
     }
 
     /**
-     * Elimina una orden (solo ADMIN)
+     * @deprecated Use {@link #deleteOrderByUuid(UUID)} instead
      */
-    @DeleteMapping("/{id}")
+    @Deprecated
+    @DeleteMapping("/by-id/{id}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> deleteOrderById(@PathVariable Long id) {
         orderUseCasePort.deleteOrder(id);

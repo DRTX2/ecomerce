@@ -6,9 +6,10 @@ import com.drtx.ecomerce.amazon.core.model.issues.AppealDecision;
 import com.drtx.ecomerce.amazon.core.model.issues.AppealStatus;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 public record AppealResponse(
-        Long id,
+        UUID uuid,
         IncidenceResponse incidence,
         UserResponse seller,
         String reason,

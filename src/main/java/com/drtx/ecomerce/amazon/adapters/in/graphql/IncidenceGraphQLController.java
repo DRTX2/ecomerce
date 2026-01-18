@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Controller
 @RequiredArgsConstructor
@@ -30,8 +31,8 @@ public class IncidenceGraphQLController {
 
     @QueryMapping
     @PreAuthorize("hasRole('MODERATOR')")
-    public Optional<Incidence> getIncidenceById(@Argument Long id) {
-        return incidenceUseCase.getIncidenceById(id);
+    public Optional<Incidence> getIncidenceByUuid(@Argument UUID uuid) {
+        return incidenceUseCase.getIncidenceByUuid(uuid);
     }
 
     @MutationMapping
@@ -45,9 +46,9 @@ public class IncidenceGraphQLController {
 
     @MutationMapping
     @PreAuthorize("hasRole('MODERATOR')")
-    public Incidence resolveIncidence(@Argument Long id, @Argument ResolveIncidenceInput input) {
+    public Incidence resolveIncidenceByUuid(@Argument UUID uuid, @Argument ResolveIncidenceInput input) {
         String moderatorEmail = getAuthenticatedUserEmail();
-        return incidenceUseCase.resolveIncidence(id, input.decision(), input.moderatorComment(), moderatorEmail);
+        return incidenceUseCase.resolveIncidenceByUuid(uuid, input.decision(), input.moderatorComment(), moderatorEmail);
     }
 
     private String getAuthenticatedUserEmail() {

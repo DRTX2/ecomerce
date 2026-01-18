@@ -19,6 +19,7 @@ public interface IncidenceRestMapper {
     @Mapping(target = "source", ignore = true)
     Report toDomain(ReportRequest request);
 
+    @Mapping(target = "uuid", source = "publicUi")
     IncidenceResponse toResponse(Incidence incidence);
 
     ReportResponse toResponse(Report report);

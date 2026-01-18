@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -45,7 +46,42 @@ public class IncidenceController {
         );
     }
 
-    @GetMapping("/{id}")
+    /**
+     * Get incidence by UUID (main endpoint)
+     */
+    @GetMapping("/{uuid}")
+    public ResponseEntity<IncidenceResponse> getIncidenceByUuid(@PathVariable UUID uuid) {
+        return incidenceUseCase.getIncidenceByUuid(uuid)
+                .map(mapper::toResponse)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    /**
+     * Resolve incidence by UUID (main endpoint - MODERATOR only)
+     */
+    @PutMapping("/{uuid}/resolve")
+    public ResponseEntity<IncidenceResponse> resolveIncidenceByUuid(
+            @PathVariable UUID uuid,
+            @Valid @RequestBody ResolveIncidenceRequest request
+    ) {
+        String moderatorEmail = getAuthenticatedUserEmail();
+        Incidence incidence = incidenceUseCase.resolveIncidenceByUuid(
+                uuid,
+                request.decision(),
+                request.moderatorComment(),
+                moderatorEmail
+        );
+        return ResponseEntity.ok(mapper.toResponse(incidence));
+    }
+
+    // Legacy endpoints using Long ID (deprecated)
+
+    /**
+     * @deprecated Use {@link #getIncidenceByUuid(UUID)} instead
+     */
+    @Deprecated
+    @GetMapping("/by-id/{id}")
     public ResponseEntity<IncidenceResponse> getIncidence(@PathVariable Long id) {
         return incidenceUseCase.getIncidenceById(id)
                 .map(mapper::toResponse)
@@ -53,7 +89,11 @@ public class IncidenceController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/{id}/resolve")
+    /**
+     * @deprecated Use {@link #resolveIncidenceByUuid(UUID, ResolveIncidenceRequest)} instead
+     */
+    @Deprecated
+    @PutMapping("/by-id/{id}/resolve")
     public ResponseEntity<IncidenceResponse> resolveIncidence(
             @PathVariable Long id,
             @Valid @RequestBody ResolveIncidenceRequest request

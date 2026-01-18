@@ -14,6 +14,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/appeals")
 @RequiredArgsConstructor
@@ -29,7 +31,37 @@ public class AppealController {
         return ResponseEntity.ok(mapper.toResponse(appeal));
     }
 
-    @GetMapping("/{id}")
+    /**
+     * Get appeal by UUID (main endpoint)
+     */
+    @GetMapping("/{uuid}")
+    public ResponseEntity<AppealResponse> getAppealByUuid(@PathVariable UUID uuid) {
+        return appealUseCase.getAppealByUuid(uuid)
+                .map(mapper::toResponse)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    /**
+     * Resolve appeal by UUID (main endpoint - MODERATOR only)
+     */
+    @PutMapping("/{uuid}/resolve")
+    @PreAuthorize("hasRole('MODERATOR')")
+    public ResponseEntity<AppealResponse> resolveAppealByUuid(
+            @PathVariable UUID uuid,
+            @Valid @RequestBody ResolveAppealRequest request) {
+        String moderatorEmail = getAuthenticatedUserEmail();
+        Appeal appeal = appealUseCase.resolveAppealByUuid(uuid, request.decision(), moderatorEmail);
+        return ResponseEntity.ok(mapper.toResponse(appeal));
+    }
+
+    // Legacy endpoints using Long ID (deprecated)
+
+    /**
+     * @deprecated Use {@link #getAppealByUuid(UUID)} instead
+     */
+    @Deprecated
+    @GetMapping("/by-id/{id}")
     public ResponseEntity<AppealResponse> getAppeal(@PathVariable Long id) {
         return appealUseCase.getAppealById(id)
                 .map(mapper::toResponse)
@@ -37,7 +69,11 @@ public class AppealController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/{id}/resolve")
+    /**
+     * @deprecated Use {@link #resolveAppealByUuid(UUID, ResolveAppealRequest)} instead
+     */
+    @Deprecated
+    @PutMapping("/by-id/{id}/resolve")
     @PreAuthorize("hasRole('MODERATOR')")
     public ResponseEntity<AppealResponse> resolveAppeal(
             @PathVariable Long id,

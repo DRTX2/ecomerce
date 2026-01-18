@@ -13,6 +13,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -24,17 +25,17 @@ public class FavoriteController {
     private final FavoriteRestMapper favoriteMapper;
     private final ProductRestMapper productMapper;
 
-    @PostMapping("/product/{productId}")
-    public ResponseEntity<FavoriteResponse> addFavorite(@PathVariable Long productId) {
+    @PostMapping("/product/{productUuid}")
+    public ResponseEntity<FavoriteResponse> addFavorite(@PathVariable UUID productUuid) {
         String userEmail = getAuthenticatedUserEmail();
-        Favorite favorite = favoriteUseCase.addFavorite(productId, userEmail);
+        Favorite favorite = favoriteUseCase.addFavoriteByProductUuid(productUuid, userEmail);
         return ResponseEntity.ok(favoriteMapper.toResponse(favorite));
     }
 
-    @DeleteMapping("/product/{productId}")
-    public ResponseEntity<Void> removeFavorite(@PathVariable Long productId) {
+    @DeleteMapping("/product/{productUuid}")
+    public ResponseEntity<Void> removeFavorite(@PathVariable UUID productUuid) {
         String userEmail = getAuthenticatedUserEmail();
-        favoriteUseCase.removeFavorite(productId, userEmail);
+        favoriteUseCase.removeFavoriteByProductUuid(productUuid, userEmail);
         return ResponseEntity.noContent().build();
     }
 

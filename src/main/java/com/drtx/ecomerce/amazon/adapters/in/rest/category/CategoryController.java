@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/categories")
@@ -33,13 +34,56 @@ public class CategoryController {
                 categoryUseCasePort.createCategory(newCategory)));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable Long id) {
-        return categoryUseCasePort.getCategoryById(id).map(categoryMapper::toResponse).map(ResponseEntity::ok)
+    /**
+     * Get category by UUID (main endpoint)
+     */
+    @GetMapping("/{uuid}")
+    public ResponseEntity<CategoryResponse> getCategoryByUuid(@PathVariable UUID uuid) {
+        return categoryUseCasePort.getCategoryByUuid(uuid)
+                .map(categoryMapper::toResponse)
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @PutMapping("/{id}")
+    /**
+     * Update category by UUID (main endpoint)
+     */
+    @PutMapping("/{uuid}")
+    public ResponseEntity<CategoryResponse> updateCategoryByUuid(@PathVariable UUID uuid,
+            @RequestBody @jakarta.validation.Valid CategoryRequest categoryRequest) {
+        Category category = categoryMapper.toDomain(categoryRequest);
+        return ResponseEntity.ok(categoryMapper.toResponse(
+                categoryUseCasePort.updateCategoryByUuid(uuid, category)));
+    }
+
+    /**
+     * Delete category by UUID (main endpoint)
+     */
+    @DeleteMapping("/{uuid}")
+    public ResponseEntity<Void> deleteCategoryByUuid(@PathVariable UUID uuid) {
+        categoryUseCasePort.deleteCategoryByUuid(uuid);
+        return ResponseEntity.noContent().build();
+    }
+
+    // Legacy endpoints using Long ID (deprecated)
+
+    /**
+     * @deprecated Use {@link #getCategoryByUuid(UUID)} instead
+     */
+    @Deprecated
+    @GetMapping("/by-id/{id}")
+    public ResponseEntity<CategoryResponse> getCategoryById(@PathVariable Long id) {
+        return categoryUseCasePort.getCategoryById(id)
+                .map(categoryMapper::toResponse)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    /**
+     * @deprecated Use {@link #updateCategoryByUuid(UUID, CategoryRequest)} instead
+     */
+    @Deprecated
+    @PutMapping("/by-id/{id}")
     public ResponseEntity<CategoryResponse> updateCategory(@PathVariable Long id,
             @RequestBody @jakarta.validation.Valid CategoryRequest categoryRequest) {
         Category category = categoryMapper.toDomain(categoryRequest);
@@ -47,7 +91,11 @@ public class CategoryController {
                 categoryUseCasePort.updateCategory(id, category)));
     }
 
-    @DeleteMapping("/{id}")
+    /**
+     * @deprecated Use {@link #deleteCategoryByUuid(UUID)} instead
+     */
+    @Deprecated
+    @DeleteMapping("/by-id/{id}")
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {
         categoryUseCasePort.deleteCategory(id);
         return ResponseEntity.noContent().build();

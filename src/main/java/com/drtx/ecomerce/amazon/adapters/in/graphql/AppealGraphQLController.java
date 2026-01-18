@@ -11,6 +11,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 
+import java.util.UUID;
+
 @Controller
 @RequiredArgsConstructor
 public class AppealGraphQLController {
@@ -25,9 +27,9 @@ public class AppealGraphQLController {
 
     @MutationMapping
     @PreAuthorize("hasRole('MODERATOR')")
-    public Appeal resolveAppeal(@Argument Long id, @Argument AppealDecision decision) {
+    public Appeal resolveAppealByUuid(@Argument UUID uuid, @Argument AppealDecision decision) {
         String moderatorEmail = getAuthenticatedUserEmail();
-        return appealUseCase.resolveAppeal(id, decision, moderatorEmail);
+        return appealUseCase.resolveAppealByUuid(uuid, decision, moderatorEmail);
     }
 
     private String getAuthenticatedUserEmail() {

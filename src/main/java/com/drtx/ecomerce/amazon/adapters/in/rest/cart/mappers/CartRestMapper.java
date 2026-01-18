@@ -12,9 +12,11 @@ import com.drtx.ecomerce.amazon.core.model.order.CartItem;
 @Mapper(componentModel = "spring")
 public interface CartRestMapper {
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "uuid", ignore = true)
     @Mapping(target = "user", ignore = true)
     Cart toDomain(CartRequest request);
 
+    @Mapping(target = "uuid", source = "uuid")
     CartResponse toResponse(Cart domain);
 
     @Mapping(target = "id", ignore = true)

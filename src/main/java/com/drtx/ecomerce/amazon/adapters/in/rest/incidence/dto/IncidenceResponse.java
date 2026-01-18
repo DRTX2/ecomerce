@@ -10,8 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 public record IncidenceResponse(
-    Long id,
-    UUID publicUi,
+    UUID uuid,  // Renamed from publicUi for consistency
     ProductResponse product,
     IncidenceStatus status,
     LocalDateTime createdAt,
