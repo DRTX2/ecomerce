@@ -4,9 +4,11 @@ import com.drtx.ecomerce.amazon.adapters.in.rest.product.dto.ProductRequest;
 import com.drtx.ecomerce.amazon.adapters.in.rest.product.dto.ProductResponse;
 import com.drtx.ecomerce.amazon.adapters.in.rest.product.mappers.ProductRestMapper;
 import com.drtx.ecomerce.amazon.application.usecases.product.UploadProductImageUseCase;
+import com.drtx.ecomerce.amazon.core.model.pagination.PageResponse;
 import com.drtx.ecomerce.amazon.core.model.product.Category;
 import com.drtx.ecomerce.amazon.core.model.product.Product;
 import com.drtx.ecomerce.amazon.core.model.product.ProductStatus;
+import com.drtx.ecomerce.amazon.core.model.product.ProductSearchCriteria;
 import com.drtx.ecomerce.amazon.core.ports.in.rest.ProductUseCasePort;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -101,7 +103,7 @@ class ProductControllerTest {
                 "laptop-high-performance");
 
         testProductResponse = new ProductResponse(
-                1L,
+                productUuid,
                 "Laptop",
                 "High-performance laptop",
                 999.99,
@@ -117,23 +119,62 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("GET /products - Should return all products")
-    void testGetAllProducts() throws Exception {
+    @DisplayName("GET /products/search - Should return paged products")
+    void testSearchProducts() throws Exception {
         // Given
-        List<Product> products = Arrays.asList(testProduct);
-        when(productUseCasePort.getAllProducts()).thenReturn(products);
+        List<Product> products = List.of(testProduct);
+        PageResponse<Product> pageResponse = PageResponse.of(products, 0, 20, 1L);
+
+        when(productMapper.toCriteria(any())).thenReturn(mock(ProductSearchCriteria.class));
+        when(productUseCasePort.searchProducts(any(ProductSearchCriteria.class))).thenReturn(pageResponse);
         when(productMapper.toResponse(any(Product.class))).thenReturn(testProductResponse);
 
         // When & Then
-        mockMvc.perform(get(BASE_URL)
+        mockMvc.perform(get(BASE_URL + "/search")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].uuid", is(productUuid.toString())))
-                .andExpect(jsonPath("$[0].name", is("Laptop")))
-                .andExpect(jsonPath("$[0].price", is(999.99)));
+                .andExpect(jsonPath("$.content", hasSize(1)))
+                .andExpect(jsonPath("$.content[0].uuid", is(productUuid.toString())))
+                .andExpect(jsonPath("$.content[0].name", is("Laptop")))
+                .andExpect(jsonPath("$.totalElements", is(1)));
 
-        verify(productUseCasePort, times(1)).getAllProducts();
+        verify(productUseCasePort, times(1)).searchProducts(any(ProductSearchCriteria.class));
+    }
+
+    @Test
+    @DisplayName("GET /products/popular - Should return popular products")
+    void testGetPopularProducts() throws Exception {
+        // Given
+        when(productUseCasePort.getPopularProducts(anyInt())).thenReturn(List.of(testProduct));
+        when(productMapper.toResponse(any(Product.class))).thenReturn(testProductResponse);
+
+        // When & Then
+        mockMvc.perform(get(BASE_URL + "/popular")
+                        .param("limit", "12")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].uuid", is(productUuid.toString())));
+
+        verify(productUseCasePort).getPopularProducts(12);
+    }
+
+    @Test
+    @DisplayName("GET /products/deals - Should return products on sale")
+    void testGetDealsProducts() throws Exception {
+        // Given
+        when(productUseCasePort.getDealsProducts(anyInt())).thenReturn(List.of(testProduct));
+        when(productMapper.toResponse(any(Product.class))).thenReturn(testProductResponse);
+
+        // When & Then
+        mockMvc.perform(get(BASE_URL + "/deals")
+                        .param("limit", "10")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(1)))
+                .andExpect(jsonPath("$[0].uuid", is(productUuid.toString())));
+
+        verify(productUseCasePort).getDealsProducts(10);
     }
 
     @Test

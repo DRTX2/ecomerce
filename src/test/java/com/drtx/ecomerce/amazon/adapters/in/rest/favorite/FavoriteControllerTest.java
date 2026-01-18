@@ -97,9 +97,10 @@ class FavoriteControllerTest {
 
         UserResponse userResponse = new UserResponse(UUID.randomUUID(), "Test User", "user@example.com", "USER", "Address", "Phone");
 
-        // Constructor ProductResponse: Long id, String name, String description,
-        // BigDecimal price, Integer stock, Category category, Double rating, List image
-        testProductResponse = new ProductResponse(1L, "Laptop", "Description", 999.99, testCategory, 4.5,
+        // Constructor ProductResponse: UUID uuid, String name, String description,
+        // Double price, Category category, Double averageRating, List<String> images,
+        // String sku, Integer stockQuantity, ProductStatus status, String slug, LocalDateTime createdAt, LocalDateTime updatedAt
+        testProductResponse = new ProductResponse(UUID.randomUUID(), "Laptop", "Description", 999.99, testCategory, 4.5,
                 Collections.emptyList(), "LAPTOP-001", 100,
                 com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE,
                 "laptop", java.time.LocalDateTime.now(), java.time.LocalDateTime.now());
