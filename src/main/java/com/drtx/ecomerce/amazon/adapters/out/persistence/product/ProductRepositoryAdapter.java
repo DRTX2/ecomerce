@@ -2,10 +2,15 @@ package com.drtx.ecomerce.amazon.adapters.out.persistence.product;
 
 import com.drtx.ecomerce.amazon.adapters.out.persistence.category.CategoryEntity;
 import com.drtx.ecomerce.amazon.adapters.out.persistence.category.CategoryPersistenceRepository;
+import com.drtx.ecomerce.amazon.core.model.pagination.SortDirection;
 import com.drtx.ecomerce.amazon.core.model.product.Product;
+import com.drtx.ecomerce.amazon.core.model.product.ProductSearchCriteria;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.ProductRepositoryPort;
 import com.drtx.ecomerce.amazon.core.model.exceptions.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -37,8 +42,51 @@ public class ProductRepositoryAdapter implements ProductRepositoryPort {
     }
 
     @Override
-    public List<Product> findAll() {
-        return productPersistenceRepository.findAll().stream().map(mapper::toDomain).toList();
+    public Page<Product> searchProducts(ProductSearchCriteria criteria) {
+        // Build Spring Data PageRequest from domain PageRequest
+        PageRequest pageRequest = buildPageRequest(criteria.pageRequest());
+
+        // Use specification to build dynamic query
+        Page<ProductEntity> entityPage = productPersistenceRepository.findAll(
+                ProductSpecifications.withCriteria(criteria),
+                pageRequest
+        );
+
+        // Map entities to domain
+        return entityPage.map(mapper::toDomain);
+    }
+
+    /**
+     * Convert domain PageRequest to Spring Data PageRequest
+     */
+    private PageRequest buildPageRequest(com.drtx.ecomerce.amazon.core.model.pagination.PageRequest pageRequest) {
+        if (pageRequest.sort().isPresent()) {
+            var sortSpec = pageRequest.sort().get();
+            Sort.Direction direction = sortSpec.direction() == SortDirection.ASC
+                    ? Sort.Direction.ASC
+                    : Sort.Direction.DESC;
+            Sort sort = Sort.by(direction, sortSpec.field());
+            return PageRequest.of(pageRequest.page(), pageRequest.size(), sort);
+        }
+        return PageRequest.of(pageRequest.page(), pageRequest.size());
+    }
+
+    @Override
+    public List<Product> findPopularProducts(int limit) {
+        PageRequest pageRequest = PageRequest.of(0, limit);
+        return productPersistenceRepository.findPopularProducts(pageRequest)
+                .stream()
+                .map(mapper::toDomain)
+                .toList();
+    }
+
+    @Override
+    public List<Product> findDealsProducts(int limit) {
+        PageRequest pageRequest = PageRequest.of(0, limit);
+        return productPersistenceRepository.findProductsWithDeals(pageRequest)
+                .stream()
+                .map(mapper::toDomain)
+                .toList();
     }
 
     @Override
@@ -57,7 +105,7 @@ public class ProductRepositoryAdapter implements ProductRepositoryPort {
         CategoryEntity categoryEntity = categoryPersistenceRepository.findById(
                 product.getCategory().getId())
                 .orElseThrow(() -> new EntityNotFoundException("Category not found"));
-        productToUpdate.setCategory(categoryEntity);// categoryEntity!=Category
+        productToUpdate.setCategory(categoryEntity);
         return mapper.toDomain(productPersistenceRepository.save(productToUpdate));
     }
 
@@ -65,4 +113,5 @@ public class ProductRepositoryAdapter implements ProductRepositoryPort {
     public void deleteByUuid(UUID uuid) {
         productPersistenceRepository.deleteByUuid(uuid);
     }
+
 }

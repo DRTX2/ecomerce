@@ -3,9 +3,10 @@ package com.drtx.ecomerce.amazon.adapters.in.rest.product.dto;
 import com.drtx.ecomerce.amazon.core.model.product.Category;
 
 import java.util.List;
+import java.util.UUID;
 
 public record ProductResponse(
-        Long id,
+        UUID uuid,
         String name,
         String description,
         Double price,

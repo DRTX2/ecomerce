@@ -3,10 +3,13 @@ package com.drtx.ecomerce.amazon.adapters.in.rest.product;
 import com.drtx.ecomerce.amazon.adapters.in.rest.product.dto.ImageUploadResponse;
 import com.drtx.ecomerce.amazon.adapters.in.rest.product.dto.ProductRequest;
 import com.drtx.ecomerce.amazon.adapters.in.rest.product.dto.ProductResponse;
+import com.drtx.ecomerce.amazon.adapters.in.rest.product.dto.ProductSearchRequest;
 import com.drtx.ecomerce.amazon.adapters.in.rest.product.mappers.ProductRestMapper;
 import com.drtx.ecomerce.amazon.core.model.exceptions.EntityNotFoundException;
+import com.drtx.ecomerce.amazon.core.model.pagination.PageResponse;
 import com.drtx.ecomerce.amazon.core.model.product.ImageFile;
 import com.drtx.ecomerce.amazon.core.model.product.Product;
+import com.drtx.ecomerce.amazon.core.model.product.ProductSearchCriteria;
 import com.drtx.ecomerce.amazon.core.ports.in.rest.ProductUseCasePort;
 import com.drtx.ecomerce.amazon.core.ports.in.rest.UploadProductImageUseCasePort;
 import lombok.AllArgsConstructor;
@@ -69,13 +72,52 @@ public class ProductController {
                 }
         }
 
-        @GetMapping
-        public ResponseEntity<List<ProductResponse>> getAllProducts() {
+        /**
+         * Search products with filters and pagination
+         * Example: GET /products/search?searchTerm=laptop&minPrice=100&maxPrice=1000&page=0&size=20&sort=price,asc
+         */
+        @GetMapping("/search")
+        public ResponseEntity<PageResponse<ProductResponse>> searchProducts(
+                        @ModelAttribute ProductSearchRequest searchRequest) {
+                ProductSearchCriteria criteria = mapper.toCriteria(searchRequest);
+                PageResponse<Product> page = service.searchProducts(criteria);
+
+                PageResponse<ProductResponse> response = PageResponse.of(
+                        page.content().stream().map(mapper::toResponse).toList(),
+                        page.page(),
+                        page.size(),
+                        page.totalElements()
+                );
+
+                return ResponseEntity.ok(response);
+        }
+
+        /**
+         * Get popular products (most favorited and highest rated)
+         * Example: GET /products/popular?limit=12
+         */
+        @GetMapping("/popular")
+        public ResponseEntity<List<ProductResponse>> getPopularProducts(
+                        @RequestParam(defaultValue = "12") int limit) {
                 return ResponseEntity.ok(
-                                this.service.getAllProducts()
-                                                .stream()
-                                                .map(mapper::toResponse)
-                                                .toList());
+                        service.getPopularProducts(limit)
+                                .stream()
+                                .map(mapper::toResponse)
+                                .toList());
+        }
+
+        /**
+         * Get products on sale/deals
+         * Example: GET /products/deals?limit=10
+         */
+        @GetMapping("/deals")
+        public ResponseEntity<List<ProductResponse>> getDealsProducts(
+                        @RequestParam(defaultValue = "10") int limit) {
+                return ResponseEntity.ok(
+                        service.getDealsProducts(limit)
+                                .stream()
+                                .map(mapper::toResponse)
+                                .toList());
         }
 
         @PostMapping

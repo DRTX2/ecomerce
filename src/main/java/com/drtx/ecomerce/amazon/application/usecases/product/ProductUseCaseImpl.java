@@ -1,11 +1,14 @@
 package com.drtx.ecomerce.amazon.application.usecases.product;
 
 import com.drtx.ecomerce.amazon.core.model.exceptions.DomainExceptionFactory;
+import com.drtx.ecomerce.amazon.core.model.pagination.PageResponse;
 import com.drtx.ecomerce.amazon.core.model.product.Product;
+import com.drtx.ecomerce.amazon.core.model.product.ProductSearchCriteria;
 import com.drtx.ecomerce.amazon.core.model.product.ProductStatus;
 import com.drtx.ecomerce.amazon.core.ports.in.rest.ProductUseCasePort;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.ProductRepositoryPort;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -43,8 +46,33 @@ public class ProductUseCaseImpl implements ProductUseCasePort {
     }
 
     @Override
-    public List<Product> getAllProducts() {
-        return repository.findAll();
+    public PageResponse<Product> searchProducts(ProductSearchCriteria searchCriteria) {
+        Page<Product> page = repository.searchProducts(searchCriteria);
+
+        return PageResponse.of(
+                page.getContent(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements()
+        );
+    }
+
+    @Override
+    public List<Product> getPopularProducts(int limit) {
+        // Validate limit
+        if (limit <= 0 || limit > 100) {
+            throw new IllegalArgumentException("Limit must be between 1 and 100");
+        }
+        return repository.findPopularProducts(limit);
+    }
+
+    @Override
+    public List<Product> getDealsProducts(int limit) {
+        // Validate limit
+        if (limit <= 0 || limit > 100) {
+            throw new IllegalArgumentException("Limit must be between 1 and 100");
+        }
+        return repository.findDealsProducts(limit);
     }
 
     @Override
