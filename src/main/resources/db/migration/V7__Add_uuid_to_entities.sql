@@ -42,18 +42,18 @@ ALTER TABLE appeals ALTER COLUMN uuid SET NOT NULL;
 ALTER TABLE appeals ADD CONSTRAINT appeals_uuid_unique UNIQUE (uuid);
 CREATE INDEX IF NOT EXISTS idx_appeals_uuid ON appeals(uuid);
 
-ALTER TABLE incidences ADD COLUMN IF NOT EXISTS public_ui UUID;
-UPDATE incidences SET public_ui = gen_random_uuid() WHERE public_ui IS NULL;
-ALTER TABLE incidences ALTER COLUMN public_ui SET NOT NULL;
+ALTER TABLE incidences ADD COLUMN IF NOT EXISTS uuid UUID;
+UPDATE incidences SET uuid = gen_random_uuid() WHERE uuid IS NULL;
+ALTER TABLE incidences ALTER COLUMN uuid SET NOT NULL;
 
 -- Add unique constraint if it doesn't exist
 DO $$
 BEGIN
     IF NOT EXISTS (
-        SELECT 1 FROM pg_constraint WHERE conname = 'incidences_public_ui_unique'
+        SELECT 1 FROM pg_constraint WHERE conname = 'incidences_uuid_unique'
     ) THEN
-        ALTER TABLE incidences ADD CONSTRAINT incidences_public_ui_unique UNIQUE (public_ui);
+        ALTER TABLE incidences ADD CONSTRAINT incidences_uuid_unique UNIQUE (uuid);
     END IF;
 END $$;
 
-CREATE INDEX IF NOT EXISTS idx_incidences_public_ui ON incidences(public_ui);
+CREATE INDEX IF NOT EXISTS idx_incidences_uuid ON incidences(uuid);
