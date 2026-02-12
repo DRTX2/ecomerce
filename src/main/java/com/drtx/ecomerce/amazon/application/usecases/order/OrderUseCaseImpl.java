@@ -2,6 +2,7 @@ package com.drtx.ecomerce.amazon.application.usecases.order;
 
 import com.drtx.ecomerce.amazon.core.model.exceptions.DomainExceptionFactory;
 import com.drtx.ecomerce.amazon.core.model.order.*;
+import com.drtx.ecomerce.amazon.core.model.pagination.PageResponse;
 import com.drtx.ecomerce.amazon.core.model.user.User;
 import com.drtx.ecomerce.amazon.core.ports.in.rest.OrderUseCasePort;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.CartRepositoryPort;
@@ -78,7 +79,8 @@ public class OrderUseCaseImpl implements OrderUseCasePort {
 
         // Calculate total
         BigDecimal total = orderItems.stream()
-                .map(item -> item.getPriceAtPurchase().multiply(BigDecimal.valueOf(item.getQuantity())))
+                .map(item -> item.getPriceAtPurchase().
+                        multiply(BigDecimal.valueOf(item.getQuantity())))
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
         // Create the order
@@ -107,9 +109,16 @@ public class OrderUseCaseImpl implements OrderUseCasePort {
     }
 
     @Override
-    public List<Order> getAllOrders() {
-        return orderRepository.findAll();
+    public PageResponse<Order> getAllOrders(OrderSearchCriteria searchCriteria){
+        org.springframework.data.domain.Page<Order> page = orderRepository.searchOrders(searchCriteria);
+        return PageResponse.of(
+                page.getContent(),
+                page.getNumber(),
+                page.getSize(),
+                page.getTotalElements()
+        );
     }
+
 
     @Override
     public List<Order> getOrdersByUserId(Long userId) {

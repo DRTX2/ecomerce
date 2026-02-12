@@ -1,9 +1,13 @@
 package com.drtx.ecomerce.amazon.adapters.out.persistence.order;
 
+import com.drtx.ecomerce.amazon.adapters.out.persistence.utils.PageMapper;
 import com.drtx.ecomerce.amazon.core.model.order.Order;
+import com.drtx.ecomerce.amazon.core.model.order.OrderSearchCriteria;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.OrderRepositoryPort;
 import com.drtx.ecomerce.amazon.core.model.exceptions.EntityNotFoundException;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -30,8 +34,16 @@ public class OrderRepositoryAdapter implements OrderRepositoryPort {
     }
 
     @Override
-    public List<Order> findAll() {
-        return repository.findAll().stream().map(orderMapper::toDomain).collect(Collectors.toList());
+    public Page<Order> searchOrders(OrderSearchCriteria searchCriteria) {
+        // Build Spring Data PageRequest from domain PageRequest
+        PageRequest pageRequest = PageMapper.buildPageRequest(searchCriteria.pageRequest());
+
+        // Use specification to build dynamic query
+        Page<OrderEntity> entityPage = repository.findAll(
+                OrderSpecifications.withCriteria(searchCriteria),
+                pageRequest
+        );
+        return entityPage.map(orderMapper::toDomain);
     }
 
     @Override

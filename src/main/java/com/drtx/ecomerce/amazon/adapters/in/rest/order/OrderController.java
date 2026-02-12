@@ -6,6 +6,7 @@ import com.drtx.ecomerce.amazon.adapters.in.rest.order.dto.OrderResponse;
 import com.drtx.ecomerce.amazon.adapters.in.rest.order.dto.UpdateOrderStateRequest;
 import com.drtx.ecomerce.amazon.adapters.in.rest.order.mappers.OrderRestMapper;
 import com.drtx.ecomerce.amazon.core.model.order.Order;
+import com.drtx.ecomerce.amazon.core.model.pagination.PageResponse;
 import com.drtx.ecomerce.amazon.core.ports.in.rest.OrderUseCasePort;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -31,16 +33,40 @@ public class OrderController {
     private final OrderRestMapper mapper;
 
     /**
-     * Obtiene todas las órdenes (solo ADMIN)
+     * Obtiene todas las órdenes (solo ADMIN) con paginación y filtros
      */
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<List<OrderResponse>> getAllOrders() {
-        return ResponseEntity.ok(
-                orderUseCasePort.getAllOrders()
-                        .stream()
-                        .map(mapper::toResponse)
-                        .toList());
+    public ResponseEntity<PageResponse<OrderResponse>> getAllOrders(
+            @RequestParam(required = false) UUID userUuid,
+            @RequestParam(required = false) com.drtx.ecomerce.amazon.core.model.order.OrderState status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "createdAt") String sortBy,
+            @RequestParam(defaultValue = "DESC") String sortDirection
+    ) {
+        var criteria = new com.drtx.ecomerce.amazon.core.model.order.OrderSearchCriteria(
+                Optional.ofNullable(userUuid),
+                Optional.ofNullable(status),
+                null, null, null, null,
+                new com.drtx.ecomerce.amazon.core.model.pagination.PageRequest(
+                        page,
+                        size,
+                        Optional.of(new com.drtx.ecomerce.amazon.core.model.pagination.PageRequest.Sort(
+                                sortBy,
+                                "ASC".equalsIgnoreCase(sortDirection) ? com.drtx.ecomerce.amazon.core.model.pagination.SortDirection.ASC : com.drtx.ecomerce.amazon.core.model.pagination.SortDirection.DESC
+                        ))
+                )
+        );
+
+        PageResponse<Order> ordersPage = orderUseCasePort.getAllOrders(criteria);
+
+        return ResponseEntity.ok(PageResponse.of(
+                ordersPage.content().stream().map(mapper::toResponse).toList(),
+                ordersPage.page(),
+                ordersPage.size(),
+                ordersPage.totalElements()
+        ));
     }
 
     /**

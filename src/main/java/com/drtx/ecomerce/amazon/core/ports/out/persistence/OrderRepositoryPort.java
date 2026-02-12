@@ -1,6 +1,8 @@
 package com.drtx.ecomerce.amazon.core.ports.out.persistence;
 
 import com.drtx.ecomerce.amazon.core.model.order.Order;
+import com.drtx.ecomerce.amazon.core.model.order.OrderSearchCriteria;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +15,7 @@ public interface OrderRepositoryPort {
 
     Optional<Order> findByUuid(UUID uuid);
 
-    List<Order> findAll();
+    Page<Order> searchOrders(OrderSearchCriteria searchCriteria);
 
     List<Order> findByUserId(Long userId);
 

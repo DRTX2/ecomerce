@@ -1,7 +1,9 @@
 package com.drtx.ecomerce.amazon.core.ports.in.rest;
 
 import com.drtx.ecomerce.amazon.core.model.order.Order;
+import com.drtx.ecomerce.amazon.core.model.order.OrderSearchCriteria;
 import com.drtx.ecomerce.amazon.core.model.order.OrderState;
+import com.drtx.ecomerce.amazon.core.model.pagination.PageResponse;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,7 +18,7 @@ public interface OrderUseCasePort {
 
     Optional<Order> getOrderByUuid(UUID uuid);
 
-    List<Order> getAllOrders();
+    PageResponse<Order> getAllOrders(OrderSearchCriteria searchCriteria);
 
     List<Order> getOrdersByUserId(Long userId);
 
