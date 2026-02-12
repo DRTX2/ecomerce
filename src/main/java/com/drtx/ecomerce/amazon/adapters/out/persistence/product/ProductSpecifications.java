@@ -21,10 +21,6 @@ import java.util.UUID;
  */
 public class ProductSpecifications {
 
-    private ProductSpecifications() {
-        // Utility class
-    }
-
     /**
      * Creates a specification based on search criteria
      */
@@ -155,6 +151,3 @@ public class ProductSpecifications {
         };
     }
 }
-
-
-

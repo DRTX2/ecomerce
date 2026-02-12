@@ -4,5 +4,5 @@ import com.drtx.ecomerce.amazon.core.model.product.ImageFile;
 import java.util.List;
 
 public interface UploadProductImageUseCasePort {
-    List<String> uploadImages(Long userId, String userRole, List<ImageFile> files);
+    List<String> uploadImages(Long userId, String userRole, List<ImageFile> files); // luego pensar en editar segundo parametro
 }

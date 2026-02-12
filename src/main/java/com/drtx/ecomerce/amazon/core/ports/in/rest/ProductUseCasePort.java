@@ -19,7 +19,7 @@ public interface ProductUseCasePort {
     PageResponse<Product> searchProducts(ProductSearchCriteria searchCriteria);
 
     /**
-     * Get popular products (most favorited and highest rated)
+     * Get popular products (most favorited and highest rated), this might need more filters in the future (e.g. category, time range)
      * @param limit Maximum number of products to return
      */
     List<Product> getPopularProducts(int limit);

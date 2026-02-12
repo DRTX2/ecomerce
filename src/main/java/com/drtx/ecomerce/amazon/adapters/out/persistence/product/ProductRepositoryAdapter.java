@@ -2,6 +2,7 @@ package com.drtx.ecomerce.amazon.adapters.out.persistence.product;
 
 import com.drtx.ecomerce.amazon.adapters.out.persistence.category.CategoryEntity;
 import com.drtx.ecomerce.amazon.adapters.out.persistence.category.CategoryPersistenceRepository;
+import com.drtx.ecomerce.amazon.adapters.out.persistence.utils.PageMapper;
 import com.drtx.ecomerce.amazon.core.model.pagination.SortDirection;
 import com.drtx.ecomerce.amazon.core.model.product.Product;
 import com.drtx.ecomerce.amazon.core.model.product.ProductSearchCriteria;
@@ -44,7 +45,7 @@ public class ProductRepositoryAdapter implements ProductRepositoryPort {
     @Override
     public Page<Product> searchProducts(ProductSearchCriteria criteria) {
         // Build Spring Data PageRequest from domain PageRequest
-        PageRequest pageRequest = buildPageRequest(criteria.pageRequest());
+        PageRequest pageRequest = PageMapper.buildPageRequest(criteria.pageRequest());
 
         // Use specification to build dynamic query
         Page<ProductEntity> entityPage = productPersistenceRepository.findAll(
@@ -54,21 +55,6 @@ public class ProductRepositoryAdapter implements ProductRepositoryPort {
 
         // Map entities to domain
         return entityPage.map(mapper::toDomain);
-    }
-
-    /**
-     * Convert domain PageRequest to Spring Data PageRequest
-     */
-    private PageRequest buildPageRequest(com.drtx.ecomerce.amazon.core.model.pagination.PageRequest pageRequest) {
-        if (pageRequest.sort().isPresent()) {
-            var sortSpec = pageRequest.sort().get();
-            Sort.Direction direction = sortSpec.direction() == SortDirection.ASC
-                    ? Sort.Direction.ASC
-                    : Sort.Direction.DESC;
-            Sort sort = Sort.by(direction, sortSpec.field());
-            return PageRequest.of(pageRequest.page(), pageRequest.size(), sort);
-        }
-        return PageRequest.of(pageRequest.page(), pageRequest.size());
     }
 
     @Override
