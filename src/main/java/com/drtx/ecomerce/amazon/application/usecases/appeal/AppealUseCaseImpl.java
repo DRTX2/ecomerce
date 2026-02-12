@@ -33,6 +33,19 @@ public class AppealUseCaseImpl implements AppealUseCasePort {
         Incidence incidence = incidenceRepository.findById(incidenceId)
                 .orElseThrow(() -> DomainExceptionFactory.incidenceNotFound(incidenceId));
 
+        return processCreateAppeal(incidence, reason, sellerEmail);
+    }
+
+    @Override
+    @Transactional
+    public Appeal createAppealByUuid(UUID incidenceUuid, String reason, String sellerEmail) {
+        Incidence incidence = incidenceRepository.findByUuid(incidenceUuid)
+                .orElseThrow(() -> DomainExceptionFactory.incidenceNotFound(incidenceUuid));
+
+        return processCreateAppeal(incidence, reason, sellerEmail);
+    }
+
+    private Appeal processCreateAppeal(Incidence incidence, String reason, String sellerEmail) {
         // Validate incidence status
         if (incidence.getStatus() != IncidenceStatus.DECIDED && incidence.getStatus() != IncidenceStatus.CLOSED) {
             throw DomainExceptionFactory.invalidOperation(
@@ -41,7 +54,7 @@ public class AppealUseCaseImpl implements AppealUseCasePort {
         }
 
         // Check if appeal already exists
-        if (appealRepository.findByIncidenceId(incidenceId).isPresent()) {
+        if (appealRepository.findByIncidenceId(incidence.getId()).isPresent()) {
             throw DomainExceptionFactory.invalidOperation("Appeal already exists for this incidence");
         }
 
@@ -104,7 +117,7 @@ public class AppealUseCaseImpl implements AppealUseCasePort {
         appeal.setStatus(AppealStatus.RESOLVED);
 
         Incidence incidence = appeal.getIncidence();
-        incidence.setStatus(decision == AppealDecision.GRANTED ? IncidenceStatus.DECIDED : IncidenceStatus.CLOSED);
+        incidence.setStatus(decision == AppealDecision.GRANTED ? IncidenceStatus.DECIDED : IncidenceStatus.CLOSED); // to check after if this is correct
         incidenceRepository.save(incidence);
 
         return appealRepository.save(appeal);

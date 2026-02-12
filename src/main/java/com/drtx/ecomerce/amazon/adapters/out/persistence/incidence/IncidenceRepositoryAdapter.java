@@ -35,12 +35,18 @@ public class IncidenceRepositoryAdapter implements IncidenceRepositoryPort {
 
     @Override
     public Optional<Incidence> findByUuid(UUID uuid) {
-        return repository.findByPublicUi(uuid).map(mapper::toDomain);
+        return repository.findByUuid(uuid).map(mapper::toDomain);
     }
 
     @Override
     public Optional<Incidence> findByProductIdAndStatusOpen(Long productId) {
         return repository.findByProductIdAndStatus(productId, IncidenceStatus.OPEN)
+                .map(mapper::toDomain);
+    }
+
+    @Override
+    public Optional<Incidence> findByProductUuidAndStatusOpen(UUID productUuid) {
+        return repository.findByProductUuidAndStatus(productUuid, IncidenceStatus.OPEN)
                 .map(mapper::toDomain);
     }
 
@@ -64,12 +70,12 @@ public class IncidenceRepositoryAdapter implements IncidenceRepositoryPort {
 
     @Override
     public Incidence updateByUuid(UUID uuid, Incidence incidence) {
-        IncidenceEntity existing = repository.findByPublicUi(uuid)
+        IncidenceEntity existing = repository.findByUuid(uuid)
                 .orElseThrow(() -> new EntityNotFoundException("Incidence not found with uuid: " + uuid));
 
         IncidenceEntity entity = mapper.toEntity(incidence);
         entity.setId(existing.getId());
-        entity.setPublicUi(existing.getPublicUi());
+        entity.setUuid(existing.getUuid());
 
         if (entity.getReports() != null) {
             entity.getReports().forEach(report -> report.setIncidence(entity));
@@ -84,7 +90,7 @@ public class IncidenceRepositoryAdapter implements IncidenceRepositoryPort {
 
     @Override
     public void deleteByUuid(UUID uuid) {
-        IncidenceEntity entity = repository.findByPublicUi(uuid)
+        IncidenceEntity entity = repository.findByUuid(uuid)
                 .orElseThrow(() -> new EntityNotFoundException("Incidence not found with uuid: " + uuid));
         repository.delete(entity);
     }

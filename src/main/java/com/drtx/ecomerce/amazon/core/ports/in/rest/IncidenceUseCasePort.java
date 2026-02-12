@@ -9,16 +9,23 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface IncidenceUseCasePort {
-    Incidence createIncidence(Long productId, Report report, String reporterEmail);
+    Incidence createIncidence(UUID productUuid, Report report, String reporterEmail);
 
-    Optional<Incidence> getIncidenceById(Long id);
     Optional<Incidence> getIncidenceByUuid(UUID uuid);
 
     List<Incidence> getAllIncidences();
 
-    Incidence resolveIncidence(Long id, IncidenceDecision decision, String moderatorComment, String moderatorEmail);
     Incidence resolveIncidenceByUuid(UUID uuid, IncidenceDecision decision, String moderatorComment, String moderatorEmail);
 
-    Incidence updateIncidence(Long id, Incidence incidence);
     Incidence updateIncidenceByUuid(UUID uuid, Incidence incidence);
+
+    void deleteIncidenceByUuid(UUID uuid);
+
+    // Legacy support (Deprecated)
+    @Deprecated
+    Optional<Incidence> getIncidenceById(Long id);
+    @Deprecated
+    Incidence createIncidence(Long productId, Report report, String reporterEmail);
+    @Deprecated
+    Incidence resolveIncidence(Long id, IncidenceDecision decision, String moderatorComment, String moderatorEmail);
 }

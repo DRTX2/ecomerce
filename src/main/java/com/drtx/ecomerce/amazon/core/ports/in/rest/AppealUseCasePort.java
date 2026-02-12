@@ -8,6 +8,7 @@ import java.util.UUID;
 
 public interface AppealUseCasePort {
     Appeal createAppeal(Long incidenceId, String reason, String sellerEmail);
+    Appeal createAppealByUuid(UUID incidenceUuid, String reason, String sellerEmail);
 
     Optional<Appeal> getAppealById(Long id);
     Optional<Appeal> getAppealByUuid(UUID uuid);

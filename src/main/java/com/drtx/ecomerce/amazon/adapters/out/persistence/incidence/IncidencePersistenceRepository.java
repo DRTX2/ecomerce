@@ -10,6 +10,7 @@ import java.util.UUID;
 @Repository
 public interface IncidencePersistenceRepository extends JpaRepository<IncidenceEntity, Long> {
     Optional<IncidenceEntity> findByProductIdAndStatus(Long productId, IncidenceStatus status);
+    Optional<IncidenceEntity> findByProductUuidAndStatus(UUID productUuid, IncidenceStatus status);
 
-    Optional<IncidenceEntity> findByPublicUi(UUID publicUi);
+    Optional<IncidenceEntity> findByUuid(UUID uuid);
 }

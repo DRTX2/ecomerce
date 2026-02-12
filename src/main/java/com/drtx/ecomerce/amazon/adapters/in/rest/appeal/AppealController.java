@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.UUID;
 
 @RestController
@@ -25,9 +26,12 @@ public class AppealController {
     private final AppealRestMapper mapper;
 
     @PostMapping
-    public ResponseEntity<AppealResponse> createAppeal(@Valid @RequestBody AppealRequest request) {
-        String sellerEmail = getAuthenticatedUserEmail();
-        Appeal appeal = appealUseCase.createAppeal(request.incidenceId(), request.reason(), sellerEmail);
+    public ResponseEntity<AppealResponse> createAppeal(@Valid @RequestBody AppealRequest request, Principal principal) {
+        Appeal appeal = appealUseCase.createAppealByUuid(
+                request.incidenceUuid(),
+                request.reason(),
+                principal.getName()
+        );
         return ResponseEntity.ok(mapper.toResponse(appeal));
     }
 

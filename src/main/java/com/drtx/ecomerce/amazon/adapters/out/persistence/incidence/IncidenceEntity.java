@@ -25,7 +25,7 @@ public class IncidenceEntity {
     private Long id;
 
     @Column(nullable = false, unique = true, updatable = false)
-    private UUID publicUi;
+    private UUID uuid;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
@@ -54,8 +54,8 @@ public class IncidenceEntity {
 
     @PrePersist
     public void prePersist() {
-        if (publicUi == null) {
-            publicUi = UUID.randomUUID();
+        if (uuid == null) {
+            uuid = UUID.randomUUID();
         }
         if (createdAt == null) {
             createdAt = LocalDateTime.now();

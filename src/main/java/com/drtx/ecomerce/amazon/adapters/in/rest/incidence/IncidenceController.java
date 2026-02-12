@@ -26,8 +26,20 @@ public class IncidenceController {
     private final IncidenceUseCasePort incidenceUseCase;
     private final IncidenceRestMapper mapper;
 
-    @PostMapping("/product/{productId}")
+    @PostMapping("/product/{productUuid}")
     public ResponseEntity<IncidenceResponse> reportProduct(
+            @PathVariable UUID productUuid,
+            @Valid @RequestBody ReportRequest request
+    ) {
+        String userEmail = getAuthenticatedUserEmail();
+        Report report = mapper.toDomain(request);
+        Incidence incidence = incidenceUseCase.createIncidence(productUuid, report, userEmail);
+        return ResponseEntity.ok(mapper.toResponse(incidence));
+    }
+
+    @Deprecated
+    @PostMapping("/product/legacy/{productId}")
+    public ResponseEntity<IncidenceResponse> reportProductLegacy(
             @PathVariable Long productId,
             @Valid @RequestBody ReportRequest request
     ) {
@@ -73,6 +85,15 @@ public class IncidenceController {
                 moderatorEmail
         );
         return ResponseEntity.ok(mapper.toResponse(incidence));
+    }
+
+    /**
+     * Delete incidence by UUID (main endpoint - MODERATOR only)
+     */
+    @DeleteMapping("/{uuid}")
+    public ResponseEntity<Void> deleteIncidenceByUuid(@PathVariable UUID uuid) {
+        incidenceUseCase.deleteIncidenceByUuid(uuid);
+        return ResponseEntity.noContent().build();
     }
 
     // Legacy endpoints using Long ID (deprecated)

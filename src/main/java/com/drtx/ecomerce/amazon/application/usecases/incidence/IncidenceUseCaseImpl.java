@@ -30,9 +30,9 @@ public class IncidenceUseCaseImpl implements IncidenceUseCasePort {
 
     @Override
     @Transactional
-    public Incidence createIncidence(Long productId, Report report, String reporterEmail) {
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> DomainExceptionFactory.productNotFound(productId));
+    public Incidence createIncidence(UUID productUuid, Report report, String reporterEmail) {
+        Product product = productRepository.findByUuid(productUuid)
+                .orElseThrow(() -> DomainExceptionFactory.productNotFound(productUuid));
 
         if (reporterEmail != null) {
             userRepository.findByEmail(reporterEmail).ifPresent(report::setReporter);
@@ -40,7 +40,7 @@ public class IncidenceUseCaseImpl implements IncidenceUseCasePort {
 
         report.initializeDefaults();
 
-        Optional<Incidence> existingIncidence = incidenceRepository.findByProductIdAndStatusOpen(productId);
+        Optional<Incidence> existingIncidence = incidenceRepository.findByProductUuidAndStatusOpen(productUuid);
 
         if (existingIncidence.isPresent()) {
             Incidence incidence = existingIncidence.get();
@@ -53,6 +53,14 @@ public class IncidenceUseCaseImpl implements IncidenceUseCasePort {
             newIncidence.getReports().add(report);
             return incidenceRepository.save(newIncidence);
         }
+    }
+
+    @Override
+    @Deprecated
+    public Incidence createIncidence(Long productId, Report report, String reporterEmail) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> DomainExceptionFactory.productNotFound(productId));
+        return createIncidence(product.getUuid(), report, reporterEmail);
     }
 
     @Override
@@ -70,23 +78,6 @@ public class IncidenceUseCaseImpl implements IncidenceUseCasePort {
         return incidenceRepository.findAll();
     }
 
-    @Override
-    @Transactional
-    public Incidence resolveIncidence(Long id, IncidenceDecision decision, String moderatorComment,
-            String moderatorEmail) {
-        Incidence incidence = incidenceRepository.findById(id)
-                .orElseThrow(() -> DomainExceptionFactory.incidenceNotFound(id));
-
-        if (moderatorEmail != null) {
-            userRepository.findByEmail(moderatorEmail).ifPresent(incidence::setModerator);
-        }
-
-        incidence.setDecision(decision);
-        incidence.setModeratorComment(moderatorComment);
-        incidence.setStatus(IncidenceStatus.DECIDED);
-
-        return incidenceRepository.save(incidence);
-    }
 
     @Override
     @Transactional
@@ -98,30 +89,34 @@ public class IncidenceUseCaseImpl implements IncidenceUseCasePort {
                 .orElseThrow(() -> DomainExceptionFactory.userNotFound(moderatorEmail));
 
         incidence.setModerator(moderator);
-        incidence.setModeratorComment(moderatorComment);
         incidence.setDecision(decision);
+        incidence.setModeratorComment(moderatorComment);
         incidence.setStatus(IncidenceStatus.DECIDED);
 
         return incidenceRepository.save(incidence);
     }
 
     @Override
-    @Transactional
-    public Incidence updateIncidence(Long id, Incidence incidence) {
-        // Verificar existencia antes de actualizar
-        if (incidenceRepository.findById(id).isEmpty()) {
-            throw DomainExceptionFactory.incidenceNotFound(id);
-        }
-        return incidenceRepository.updateById(id, incidence);
+    @Deprecated
+    public Incidence resolveIncidence(Long id, IncidenceDecision decision, String moderatorComment,
+            String moderatorEmail) {
+        Incidence incidence = incidenceRepository.findById(id)
+                .orElseThrow(() -> DomainExceptionFactory.incidenceNotFound(id));
+        return resolveIncidenceByUuid(incidence.getUuid(), decision, moderatorComment, moderatorEmail);
     }
 
     @Override
     @Transactional
     public Incidence updateIncidenceByUuid(UUID uuid, Incidence incidence) {
-        // Verify incidence exists
-        incidenceRepository.findByUuid(uuid)
+        Incidence existing = incidenceRepository.findByUuid(uuid)
                 .orElseThrow(() -> DomainExceptionFactory.incidenceNotFound(uuid));
 
-        return incidenceRepository.updateByUuid(uuid, incidence);
+        // Update fields if needed
+        return incidenceRepository.save(existing);
+    }
+
+    @Override
+    public void deleteIncidenceByUuid(UUID uuid) {
+        incidenceRepository.deleteByUuid(uuid);
     }
 }

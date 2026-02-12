@@ -13,6 +13,7 @@ public interface IncidenceRepositoryPort {
     Optional<Incidence> findByUuid(UUID uuid);
 
     Optional<Incidence> findByProductIdAndStatusOpen(Long productId);
+    Optional<Incidence> findByProductUuidAndStatusOpen(UUID productUuid);
     List<Incidence> findAll();
 
     Incidence updateById(Long id, Incidence incidence);
