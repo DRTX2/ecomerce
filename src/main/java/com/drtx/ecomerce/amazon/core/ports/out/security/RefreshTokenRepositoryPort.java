@@ -5,6 +5,7 @@ import com.drtx.ecomerce.amazon.core.model.security.RefreshToken;
 import java.time.Instant;
 import java.util.Optional;
 
+// check if this class have methods copied from other classes, if so, remove them and use the other class instead
 public interface RefreshTokenRepositoryPort {
     RefreshToken save(RefreshToken refreshToken);
 

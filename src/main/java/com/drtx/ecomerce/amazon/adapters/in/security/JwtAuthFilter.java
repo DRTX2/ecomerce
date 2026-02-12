@@ -89,7 +89,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             // identity match.
 
             if (tokenProvider.isTokenValid(token, userDomain)) {
-                UsernamePasswordAuthenticationTokuen authToken = new UsernamePasswordAuthenticationToken(
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,
                         userDetails.getAuthorities());

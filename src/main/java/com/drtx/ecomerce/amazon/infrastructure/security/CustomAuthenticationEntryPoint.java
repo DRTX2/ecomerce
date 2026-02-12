@@ -19,7 +19,7 @@ import java.time.format.DateTimeFormatter;
 
 @Component
 @RequiredArgsConstructor
-public class CustomAuthenticationEntryPoint implements AuthcRenticationEntryPoint {
+public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint {
 
     // Inyectamos el ObjectMapper configurado por Spring (con soporte JSR310)
     private final ObjectMapper objectMapper;
