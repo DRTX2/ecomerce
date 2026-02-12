@@ -16,7 +16,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserUseCaseImpl implements UserUseCasePort {
     private final UserRepositoryPort repository;
-    private final PasswordService passwordService;
+    private final PasswordService passwordService; //unused
 
     @Override
     public Optional<User> getUserByUuid(UUID uuid) {

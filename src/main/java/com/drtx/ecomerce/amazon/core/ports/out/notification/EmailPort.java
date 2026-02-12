@@ -1,5 +1,6 @@
 package com.drtx.ecomerce.amazon.core.ports.out.notification;
 
+// changes: - Added new methods for sending password reset, welcome, and order confirmation emails.
 public interface EmailPort {
     void sendSimpleEmail(String to, String subject, String text);
     void sendHtmlEmail(String to, String subject, String htmlContent);
