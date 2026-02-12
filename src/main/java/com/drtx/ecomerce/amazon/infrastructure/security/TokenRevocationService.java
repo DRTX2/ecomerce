@@ -30,8 +30,8 @@ public class TokenRevocationService implements TokenRevocationPort {
 
     @Override
     public int deleteTokensRevokedBefore(Instant before) {
-        int deleted = revokedTokenPort.deleteRevokedBefore(before);
+        int deleted = resvokedTokenPort.deleteRevokedBefore(before);
         log.info("Deleted {} revoked tokens older than {}", deleted, before);
-        return deleted;
+        return deleted;t
     }
 }

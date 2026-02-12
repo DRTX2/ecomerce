@@ -34,7 +34,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         System.out.println("JwtAuthFilter - Request URI: " + path + " Method: " + method);
         // Remover el context-path si existe
         String contextPath = request.getContextPath();
-        if (contextPath != null && !contextPath.isEmpty() && path.startsWith(contextPath)) {
+        if (contextPath !=null && !contextPath.isEmpty() && path.startsWith(contextPath)) {
             path = path.substring(contextPath.length());
         }
         System.out.println("JwtAuthFilter - Path without context: " + path);
@@ -89,7 +89,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             // identity match.
 
             if (tokenProvider.isTokenValid(token, userDomain)) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                UsernamePasswordAuthenticationTokuen authToken = new UsernamePasswordAuthenticationToken(
                         userDetails,
                         null,
                         userDetails.getAuthorities());

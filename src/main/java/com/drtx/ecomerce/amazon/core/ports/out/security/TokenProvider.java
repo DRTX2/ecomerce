@@ -13,13 +13,7 @@ public interface TokenProvider {
 
     boolean isRefreshTokenValid(String refreshToken);
 
-    /**
-     * Obtiene el tiempo de expiración del access token en milisegundos.
-     */
     long getAccessTokenExpirationMs();
 
-    /**
-     * Obtiene el tiempo de expiración del refresh token en milisegundos.
-     */
     long getRefreshTokenExpirationMs();
 }
