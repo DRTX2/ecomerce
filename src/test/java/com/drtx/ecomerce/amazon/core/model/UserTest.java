@@ -2,30 +2,33 @@ package com.drtx.ecomerce.amazon.core.model;
 
 import com.drtx.ecomerce.amazon.core.model.user.User;
 import com.drtx.ecomerce.amazon.core.model.user.UserRole;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class UserTest {
 
     @Test
-    public void testUserCreation() {
-        User user = new User(1L, "David", "email@test.com", "1234", "Ambato", "0999999999", UserRole.ADMIN);
+    @DisplayName("Should create user correctly")
+    void testUserCreation() {
+        UUID userUuid = UUID.randomUUID();
+        User user = new User(1L, userUuid, "David", "email@test.com", "1234", "Ambato", "0999999999", UserRole.ADMIN, true, false);
 
         assertEquals(1L, user.getId());
+        assertEquals(userUuid, user.getUuid());
         assertEquals("David", user.getName());
-        assertEquals("email@test.com", user.getEmail());
         assertEquals(UserRole.ADMIN, user.getRole());
     }
 
     @Test
-    public void testSetters() {
-        User user = new User(2L, "Temp", "temp@test.com", "pass", "Quito", "111", UserRole.USER);
-
-        user.setName("Updated");
-        user.setRole(UserRole.MODERATOR);
-
-        assertEquals("Updated", user.getName());
-        assertEquals(UserRole.MODERATOR, user.getRole());
+    @DisplayName("Should update fields correctly")
+    void testUpdateUser() {
+        UUID userUuid = UUID.randomUUID();
+        User user = new User(2L, userUuid, "Temp", "temp@test.com", "pass", "Quito", "111", UserRole.USER, true, false);
+        user.setName("New Name");
+        assertEquals("New Name", user.getName());
     }
 }

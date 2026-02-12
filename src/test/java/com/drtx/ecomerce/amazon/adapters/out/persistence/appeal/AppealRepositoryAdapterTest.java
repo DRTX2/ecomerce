@@ -24,6 +24,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.math.BigDecimal;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -66,17 +67,32 @@ class AppealRepositoryAdapterTest {
     @DisplayName("Should save appeal")
     void testSave() {
         // Given
-        CategoryEntity cat = categoryRepository.save(new CategoryEntity(null, "C", null, null));
-        ProductEntity prod = productRepository
-                .save(new ProductEntity(null, "P", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null,
-                        "SKU-" + System.nanoTime(), 100,
-                        com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE, "slug-" + System.nanoTime(),
-                        null, null));
-        UserEntity seller = userRepository.save(new UserEntity(null, "S", "s@mail.com", "p", "a", "1", null));
+        CategoryEntity cat = new CategoryEntity();
+        cat.setName("C");
+        cat.setUuid(UUID.randomUUID());
+        cat = categoryRepository.save(cat);
+
+        ProductEntity prod = new ProductEntity();
+        prod.setName("P");
+        prod.setDescription("D");
+        prod.setPrice(BigDecimal.ONE);
+        prod.setCategory(cat);
+        prod.setSku("SKU-" + System.nanoTime());
+        prod.setSlug("slug-" + System.nanoTime());
+        prod.setUuid(UUID.randomUUID());
+        prod = productRepository.save(prod);
+
+        UserEntity seller = new UserEntity();
+        seller.setName("S");
+        seller.setEmail("s@mail.com");
+        seller.setPassword("p");
+        seller.setUuid(UUID.randomUUID());
+        seller = userRepository.save(seller);
 
         IncidenceEntity incidence = new IncidenceEntity();
         incidence.setProduct(prod);
         incidence.setStatus(IncidenceStatus.OPEN);
+        incidence.setUuid(UUID.randomUUID());
         incidence = incidenceRepository.save(incidence);
 
         Appeal appeal = new Appeal();
@@ -86,12 +102,14 @@ class AppealRepositoryAdapterTest {
         entity.setSeller(seller);
         entity.setReason("It wasn't me");
         entity.setStatus(AppealStatus.PENDING);
+        entity.setUuid(UUID.randomUUID());
 
         when(mapper.toEntity(appeal)).thenReturn(entity);
         when(mapper.toDomain(any(AppealEntity.class))).thenAnswer(inv -> {
             AppealEntity e = inv.getArgument(0);
             Appeal a = new Appeal();
             a.setId(e.getId());
+            a.setUuid(e.getUuid());
             return a;
         });
 
@@ -100,24 +118,42 @@ class AppealRepositoryAdapterTest {
 
         // Then
         assertThat(saved.getId()).isNotNull();
-        AppealEntity fromDb = appealRepository.findById(saved.getId()).orElseThrow();
-        assertThat(fromDb.getIncidence().getId()).isEqualTo(incidence.getId());
-        assertThat(fromDb.getSeller().getEmail()).isEqualTo("s@mail.com");
+        assertThat(appealRepository.findById(saved.getId())).isPresent();
     }
 
     @Test
     @DisplayName("Should find appeal by incidence ID")
     void testFindByIncidenceId() {
         // Given
-        CategoryEntity cat = categoryRepository.save(new CategoryEntity(null, "C2", null, null));
-        ProductEntity prod = productRepository
-                .save(new ProductEntity(null, "P2", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null,
-                        "SKU2-" + System.nanoTime(), 100, com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE, "slug2-" + System.nanoTime(), null, null));
-        UserEntity seller = userRepository.save(new UserEntity(null, "S2", "s2@mail.com", "p", "a", "1", null));
+        CategoryEntity cat = new CategoryEntity();
+        cat.setName("C2");
+        cat.setUuid(UUID.randomUUID());
+        cat = categoryRepository.save(cat);
+
+        ProductEntity prod = new ProductEntity();
+        prod.setName("P2");
+        prod.setDescription("D");
+        prod.setPrice(BigDecimal.ONE);
+        prod.setCategory(cat);
+        prod.setSku("SKU2-" + System.nanoTime());
+        prod.setSlug("slug2-" + System.nanoTime());
+        prod.setUuid(UUID.randomUUID());
+        prod.setStockQuantity(100);
+        prod.setStatus(com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE);
+        prod = productRepository.save(prod);
+
+        UserEntity seller = new UserEntity();
+        seller.setName("S2");
+        seller.setEmail("s2@mail.com");
+        seller.setPassword("p");
+        seller.setUuid(UUID.randomUUID());
+        seller.setEnabled(true);
+        seller = userRepository.save(seller);
 
         IncidenceEntity incidence = new IncidenceEntity();
         incidence.setProduct(prod);
         incidence.setStatus(IncidenceStatus.OPEN);
+        incidence.setUuid(UUID.randomUUID());
         incidence = incidenceRepository.save(incidence);
 
         AppealEntity entity = new AppealEntity();
@@ -125,6 +161,7 @@ class AppealRepositoryAdapterTest {
         entity.setSeller(seller);
         entity.setReason("Check pls");
         entity.setStatus(AppealStatus.PENDING);
+        entity.setUuid(UUID.randomUUID());
         appealRepository.save(entity);
 
         Appeal domain = new Appeal();

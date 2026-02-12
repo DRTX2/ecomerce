@@ -17,6 +17,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -45,7 +46,7 @@ class AppealUseCaseImplTest {
         incidence.setId(incidenceId);
         incidence.setStatus(IncidenceStatus.DECIDED);
         
-        User seller = new User(null, "Name", sellerEmail, "pwd", "addr", "123", UserRole.USER);
+        User seller = new User(1L, UUID.randomUUID(), "Name", sellerEmail, "pwd", "addr", "123", UserRole.USER, true, false);
 
         when(incidenceRepository.findById(incidenceId)).thenReturn(Optional.of(incidence));
         when(appealRepository.findByIncidenceId(incidenceId)).thenReturn(Optional.empty());

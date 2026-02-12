@@ -1,8 +1,10 @@
 package com.drtx.ecomerce.amazon.application.usecases;
 
 import com.drtx.ecomerce.amazon.application.usecases.product.ProductUseCaseImpl;
+import com.drtx.ecomerce.amazon.core.model.pagination.PageResponse;
 import com.drtx.ecomerce.amazon.core.model.product.Category;
 import com.drtx.ecomerce.amazon.core.model.product.Product;
+import com.drtx.ecomerce.amazon.core.model.product.ProductSearchCriteria;
 import com.drtx.ecomerce.amazon.core.model.product.ProductStatus;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.ProductRepositoryPort;
 import org.junit.jupiter.api.BeforeEach;
@@ -48,6 +50,7 @@ class ProductUseCaseImplTest {
 
         testCategory = new Category(
                 1L,
+                UUID.randomUUID(),
                 "Electronics",
                 "Electronic devices",
                 List.of()
@@ -110,15 +113,23 @@ class ProductUseCaseImplTest {
     }
 
     @Test
-    @DisplayName("Should get all products successfully")
-    void shouldGetAllProductsSuccessfully() {
-        when(productRepositoryPort.findAll())
-                .thenReturn(List.of(testProduct));
+    @DisplayName("Should search products successfully")
+    void shouldSearchProductsSuccessfully() {
+        ProductSearchCriteria criteria = mock(ProductSearchCriteria.class);
+        org.springframework.data.domain.Page<Product> mockPage = mock(org.springframework.data.domain.Page.class);
 
-        List<Product> result = productUseCase.getAllProducts();
+        when(mockPage.getContent()).thenReturn(List.of(testProduct));
+        when(mockPage.getNumber()).thenReturn(0);
+        when(mockPage.getSize()).thenReturn(10);
+        when(mockPage.getTotalElements()).thenReturn(1L);
 
-        assertThat(result).hasSize(1);
-        verify(productRepositoryPort).findAll();
+        when(productRepositoryPort.searchProducts(criteria))
+                .thenReturn(mockPage);
+
+        PageResponse<Product> result = productUseCase.searchProducts(criteria);
+
+        assertThat(result.content()).hasSize(1);
+        verify(productRepositoryPort).searchProducts(criteria);
     }
 
     @Test

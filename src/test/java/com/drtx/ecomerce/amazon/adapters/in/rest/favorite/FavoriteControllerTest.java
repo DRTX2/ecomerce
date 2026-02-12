@@ -78,14 +78,17 @@ class FavoriteControllerTest {
 
         User testUser = new User();
         testUser.setId(1L);
+        testUser.setUuid(UUID.randomUUID());
         testUser.setEmail("user@example.com");
 
         Category testCategory = new Category();
         testCategory.setId(1L);
+        testCategory.setUuid(UUID.randomUUID());
         testCategory.setName("Electronics");
 
         testProduct = new Product();
         testProduct.setId(1L);
+        testProduct.setUuid(UUID.randomUUID());
         testProduct.setName("Laptop");
         testProduct.setPrice(new BigDecimal("999.99"));
         testProduct.setCategory(testCategory);
@@ -95,15 +98,23 @@ class FavoriteControllerTest {
         testFavorite.setUser(testUser);
         testFavorite.setProduct(testProduct);
 
-        UserResponse userResponse = new UserResponse(UUID.randomUUID(), "Test User", "user@example.com", "USER", "Address", "Phone");
+        UserResponse userResponse = new UserResponse(testUser.getUuid(), "Test User", "user@example.com", "USER", "Address", "Phone");
 
-        // Constructor ProductResponse: UUID uuid, String name, String description,
-        // Double price, Category category, Double averageRating, List<String> images,
-        // String sku, Integer stockQuantity, ProductStatus status, String slug, LocalDateTime createdAt, LocalDateTime updatedAt
-        testProductResponse = new ProductResponse(UUID.randomUUID(), "Laptop", "Description", 999.99, testCategory, 4.5,
-                Collections.emptyList(), "LAPTOP-001", 100,
-                com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE,
-                "laptop", java.time.LocalDateTime.now(), java.time.LocalDateTime.now());
+        testProductResponse = new ProductResponse(
+                testProduct.getUuid(),
+                testProduct.getName(),
+                "Description",
+                999.99,
+                testCategory,
+                4.5,
+                Collections.emptyList(),
+                "SKU-1",
+                10,
+                null,
+                "laptop",
+                LocalDateTime.now(),
+                null
+        );
 
         testFavoriteResponse = new FavoriteResponse(1L, userResponse, testProductResponse, LocalDateTime.now());
     }

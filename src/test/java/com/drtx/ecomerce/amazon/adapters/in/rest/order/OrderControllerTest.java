@@ -10,6 +10,8 @@ import com.drtx.ecomerce.amazon.core.model.user.User;
 import com.drtx.ecomerce.amazon.core.ports.in.rest.OrderUseCasePort;
 import com.drtx.ecomerce.amazon.adapters.in.rest.order.dto.OrderItemDto;
 import com.drtx.ecomerce.amazon.core.model.order.OrderItem;
+import com.drtx.ecomerce.amazon.core.model.order.OrderSearchCriteria;
+import com.drtx.ecomerce.amazon.core.model.pagination.PageResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -27,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -59,16 +62,20 @@ class OrderControllerTest {
 
                 User testUser = new User();
                 testUser.setId(1L);
+                testUser.setUuid(UUID.randomUUID());
                 testUser.setName("John Doe");
 
                 Product testProduct = new Product();
                 testProduct.setId(1L);
+                testProduct.setUuid(UUID.randomUUID());
                 testProduct.setName("Test Product");
                 testProduct.setPrice(new BigDecimal("99.99"));
 
                 OrderItem item = new OrderItem(1L, null, testProduct, 1, new BigDecimal("99.99"));
+                UUID orderUuid = UUID.randomUUID();
                 testOrder = new Order(
                                 1L,
+                                orderUuid,
                                 testUser,
                                 List.of(item),
                                 new BigDecimal("99.99"),
@@ -85,7 +92,7 @@ class OrderControllerTest {
                                 LocalDateTime.now(),
                                 null);
 
-                testOrderResponse = new OrderResponse(1L, List.of(itemDto), new BigDecimal("99.99"), OrderState.PENDING,
+                testOrderResponse = new OrderResponse(orderUuid, List.of(itemDto), new BigDecimal("99.99"), OrderState.PENDING,
                                 LocalDateTime.now(), null);
         }
 
@@ -93,16 +100,16 @@ class OrderControllerTest {
         @DisplayName("GET /api/orders - Should return all orders")
         void testGetAllOrders() throws Exception {
                 // Given
-                List<Order> orders = Arrays.asList(testOrder);
-                when(orderUseCasePort.getAllOrders()).thenReturn(orders);
+                PageResponse<Order> ordersPage = PageResponse.of(Arrays.asList(testOrder), 0, 20, 1);
+                when(orderUseCasePort.getAllOrders(any(OrderSearchCriteria.class))).thenReturn(ordersPage);
                 when(orderMapper.toResponse(any(Order.class))).thenReturn(testOrderResponse);
 
                 // When & Then
-                mockMvc.perform(get("/api/orders")
+                mockMvc.perform(get("/orders")
                                 .contentType(MediaType.APPLICATION_JSON))
                                 .andExpect(status().isOk());
 
-                verify(orderUseCasePort, times(1)).getAllOrders();
+                verify(orderUseCasePort, times(1)).getAllOrders(any(OrderSearchCriteria.class));
         }
 
         @Test

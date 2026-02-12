@@ -22,6 +22,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -58,26 +60,36 @@ class PaymentRepositoryAdapterTest {
     @DisplayName("Should save payment")
     void testSave() {
         // Given
-        UserEntity user = userRepository.save(new UserEntity(null, "UserP", "p@mail.com", "pass", "addr", "1", null));
-        OrderEntity order = new OrderEntity(null, user, Collections.emptyList(), Collections.emptyList(),
-                BigDecimal.TEN, OrderState.PENDING,
-                LocalDateTime.now(), null);
+        UserEntity user = new UserEntity();
+        user.setName("UserP");
+        user.setEmail("p@mail.com");
+        user.setPassword("pass");
+        user.setUuid(UUID.randomUUID());
+        user = userRepository.save(user);
+
+        OrderEntity order = new OrderEntity();
+        order.setUser(user);
+        order.setTotal(BigDecimal.TEN);
+        order.setOrderState(OrderState.PENDING);
+        order.setCreatedAt(LocalDateTime.now());
+        order.setItems(Collections.emptyList());
+        order.setUuid(UUID.randomUUID());
         order = orderRepository.save(order);
 
-        Payment payment = new Payment(null, null, BigDecimal.TEN, PaymentStatus.PENDING, PaymentMethod.CREDIT_CARD,
-                LocalDateTime.now());
-
+        Payment payment = new Payment();
         PaymentEntity entity = new PaymentEntity();
         entity.setOrder(order);
         entity.setAmount(BigDecimal.TEN);
-        entity.setStatus(PaymentStatus.PENDING);
+        entity.setStatus(PaymentStatus.COMPLETED);
         entity.setMethod(PaymentMethod.CREDIT_CARD);
         entity.setPaymentDate(LocalDateTime.now());
 
         when(mapper.toEntity(payment)).thenReturn(entity);
         when(mapper.toDomain(any(PaymentEntity.class))).thenAnswer(inv -> {
             PaymentEntity e = inv.getArgument(0);
-            return new Payment(e.getId(), null, e.getAmount(), e.getStatus(), e.getMethod(), e.getPaymentDate());
+            Payment p = new Payment();
+            p.setId(e.getId());
+            return p;
         });
 
         // When

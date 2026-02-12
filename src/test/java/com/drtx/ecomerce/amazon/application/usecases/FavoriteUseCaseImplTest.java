@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,19 +38,20 @@ class FavoriteUseCaseImplTest {
     void addFavorite_ShouldSucceed_WhenNotDuplicate() {
         // Arrange
         String userEmail = "user@test.com";
-        Long productId = 5L;
-        User user = new User(1L, "Test User", userEmail, "password", "address", "phone", null);
-        
+        UUID productUuid = UUID.randomUUID();
+        User user = new User(1L, UUID.randomUUID(), "Test User", userEmail, "password", "address", "phone", null, true, false);
+
         Product product = new Product();
-        product.setId(productId);
+        product.setId(5L);
+        product.setUuid(productUuid);
 
         when(userRepository.findByEmail(userEmail)).thenReturn(Optional.of(user));
-        when(favoriteRepository.findByUserIdAndProductId(user.getId(), productId)).thenReturn(Optional.empty());
-        when(productRepository.findByUuid(productId)).thenReturn(Optional.of(product));
+        when(favoriteRepository.findByUserIdAndProductId(user.getId(), product.getId())).thenReturn(Optional.empty());
+        when(productRepository.findByUuid(productUuid)).thenReturn(Optional.of(product));
         when(favoriteRepository.save(any(Favorite.class))).thenAnswer(i -> i.getArgument(0));
 
         // Act
-        Favorite result = favoriteUseCase.addFavorite(productId, userEmail);
+        Favorite result = favoriteUseCase.addFavorite(product.getId(), userEmail);
 
         // Assert
         assertNotNull(result);
@@ -63,7 +65,7 @@ class FavoriteUseCaseImplTest {
         // Arrange
         String userEmail = "user@test.com";
         Long productId = 5L;
-        User user = new User(1L, "Test User", userEmail, "password", "address", "phone", null);
+        User user = new User(1L, UUID.randomUUID(), "Test User", userEmail, "password", "address", "phone", null, true, false);
 
         when(userRepository.findByEmail(userEmail)).thenReturn(Optional.of(user));
         when(favoriteRepository.findByUserIdAndProductId(user.getId(), productId)).thenReturn(Optional.of(new Favorite()));
@@ -77,8 +79,8 @@ class FavoriteUseCaseImplTest {
     void getUserFavorites_ShouldReturnList() {
         // Arrange
         String userEmail = "user@test.com";
-        User user = new User(1L, "Test User", userEmail, "password", "address", "phone", null);
-        
+        User user = new User(1L, UUID.randomUUID(), "Test User", userEmail, "password", "address", "phone", null, true, false);
+
         List<Product> mockProducts = List.of(new Product(), new Product());
 
         when(userRepository.findByEmail(userEmail)).thenReturn(Optional.of(user));

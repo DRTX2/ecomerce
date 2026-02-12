@@ -16,9 +16,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -38,14 +40,17 @@ class CartUseCaseImplTest {
     void setUp() {
         testUser = new User(
                 1L,
+                UUID.randomUUID(),
                 "John Doe",
                 "john@example.com",
                 "password123",
                 "123 Main St",
                 "555-0100",
-                UserRole.USER);
+                UserRole.USER,
+                true,
+                false);
 
-        testCart = new Cart(1L, testUser, List.of());
+        testCart = new Cart(1L, UUID.randomUUID(), testUser, List.of());
     }
 
     @Test
@@ -53,7 +58,7 @@ class CartUseCaseImplTest {
     void shouldCreateCartSuccessfully() {
         // Given
         Cart newCart = new Cart(testUser, List.of());
-        Cart savedCart = new Cart(1L, testUser, List.of());
+        Cart savedCart = new Cart(1L, UUID.randomUUID(), testUser, List.of());
 
         when(cartRepositoryPort.save(any(Cart.class))).thenReturn(savedCart);
 
@@ -101,12 +106,12 @@ class CartUseCaseImplTest {
 
     @Test
     @DisplayName("Should get all carts for user successfully")
-    void shouldGetAllCartsForUserSuccessfully() {
+    void shouldGetAllCartsSuccessfully() {
         // Given
         Long userId = 1L;
-        Cart cart2 = new Cart(2L, testUser, List.of());
-
+        Cart cart2 = new Cart(2L, UUID.randomUUID(), testUser, List.of());
         List<Cart> carts = Arrays.asList(testCart, cart2);
+
         when(cartRepositoryPort.findAll(userId)).thenReturn(carts);
 
         // When
@@ -138,17 +143,20 @@ class CartUseCaseImplTest {
     void shouldUpdateCartSuccessfully() {
         // Given
         Long cartId = 1L;
-        Cart updatedCart = new Cart(cartId, testUser, List.of());
+        Cart updatedCart = new Cart(cartId, testCart.getUuid(), testUser, List.of());
 
-        when(cartRepositoryPort.update(any(Cart.class))).thenReturn(updatedCart);
+        when(cartRepositoryPort.updateByUuid(eq(testCart.getUuid()), any(Cart.class)))
+                .thenReturn(updatedCart);
+
+        when(cartRepositoryPort.findByUuid(testCart.getUuid())).thenReturn(Optional.of(testCart));
 
         // When
-        Cart result = cartUseCase.updateCart(cartId, updatedCart);
+        Cart result = cartUseCase.updateCartByUuid(testCart.getUuid(), updatedCart);
 
         // Then
         assertThat(result).isNotNull();
         assertThat(result.getId()).isEqualTo(cartId);
-        verify(cartRepositoryPort, times(1)).update(updatedCart);
+        verify(cartRepositoryPort, times(1)).updateByUuid(eq(testCart.getUuid()), any(Cart.class));
     }
 
     @Test

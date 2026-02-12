@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -52,13 +53,15 @@ class CategoryControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(controller).build();
         objectMapper = new ObjectMapper();
 
+        UUID categoryUuid = UUID.randomUUID();
         testCategory = new Category();
         testCategory.setId(1L);
+        testCategory.setUuid(categoryUuid);
         testCategory.setName("Electronics");
         testCategory.setDescription("Electronic devices and accessories");
 
         testCategoryRequest = new CategoryRequest("Electronics", "Electronic devices and accessories");
-        testCategoryResponse = new CategoryResponse(1L, "Electronics", "Electronic devices and accessories");
+        testCategoryResponse = new CategoryResponse(categoryUuid, "Electronics", "Electronic devices and accessories");
     }
 
     @Test
@@ -74,7 +77,7 @@ class CategoryControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].id", is(1)))
+                .andExpect(jsonPath("$[0].uuid", is(testCategory.getUuid().toString())))
                 .andExpect(jsonPath("$[0].name", is("Electronics")));
 
         verify(categoryUseCasePort, times(1)).getAllCategories();
@@ -93,7 +96,7 @@ class CategoryControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testCategoryRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.uuid", is(testCategory.getUuid().toString())))
                 .andExpect(jsonPath("$.name", is("Electronics")));
 
         verify(categoryUseCasePort, times(1)).createCategory(any(Category.class));
@@ -146,35 +149,70 @@ class CategoryControllerTest {
     }
 
     @Test
-    @DisplayName("PUT /categories/{id} - Should update category")
-    void testUpdateCategory() throws Exception {
+    @DisplayName("GET /categories/{uuid} - Should return category when found")
+    void testGetCategoryByUuid_Found() throws Exception {
         // Given
-        when(categoryMapper.toDomain(any(CategoryRequest.class))).thenReturn(testCategory);
-        when(categoryUseCasePort.updateCategory(eq(1L), any(Category.class))).thenReturn(testCategory);
+        UUID uuid = testCategory.getUuid();
+        when(categoryUseCasePort.getCategoryByUuid(uuid)).thenReturn(Optional.of(testCategory));
         when(categoryMapper.toResponse(testCategory)).thenReturn(testCategoryResponse);
 
         // When & Then
-        mockMvc.perform(put("/categories/{id}", 1L)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(testCategoryRequest)))
+        mockMvc.perform(get("/categories/{uuid}", uuid)
+                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)))
+                .andExpect(jsonPath("$.uuid", is(uuid.toString())))
                 .andExpect(jsonPath("$.name", is("Electronics")));
 
-        verify(categoryUseCasePort, times(1)).updateCategory(eq(1L), any(Category.class));
+        verify(categoryUseCasePort, times(1)).getCategoryByUuid(uuid);
     }
 
     @Test
-    @DisplayName("DELETE /categories/{id} - Should delete category")
-    void testDeleteCategory() throws Exception {
+    @DisplayName("GET /categories/{uuid} - Should return 404 when category not found")
+    void testGetCategoryByUuid_NotFound() throws Exception {
         // Given
-        doNothing().when(categoryUseCasePort).deleteCategory(1L);
+        UUID uuid = UUID.randomUUID();
+        when(categoryUseCasePort.getCategoryByUuid(uuid)).thenReturn(Optional.empty());
 
         // When & Then
-        mockMvc.perform(delete("/categories/{id}", 1L)
+        mockMvc.perform(get("/categories/{uuid}", uuid)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+
+        verify(categoryUseCasePort, times(1)).getCategoryByUuid(uuid);
+    }
+
+    @Test
+    @DisplayName("PUT /categories/{uuid} - Should update category")
+    void testUpdateCategoryByUuid() throws Exception {
+        // Given
+        UUID uuid = testCategory.getUuid();
+        when(categoryMapper.toDomain(any(CategoryRequest.class))).thenReturn(testCategory);
+        when(categoryUseCasePort.updateCategoryByUuid(eq(uuid), any(Category.class))).thenReturn(testCategory);
+        when(categoryMapper.toResponse(testCategory)).thenReturn(testCategoryResponse);
+
+        // When & Then
+        mockMvc.perform(put("/categories/{uuid}", uuid)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(testCategoryRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.uuid", is(uuid.toString())))
+                .andExpect(jsonPath("$.name", is("Electronics")));
+
+        verify(categoryUseCasePort, times(1)).updateCategoryByUuid(eq(uuid), any(Category.class));
+    }
+
+    @Test
+    @DisplayName("DELETE /categories/{uuid} - Should delete category")
+    void testDeleteCategoryByUuid() throws Exception {
+        // Given
+        UUID uuid = testCategory.getUuid();
+        doNothing().when(categoryUseCasePort).deleteCategoryByUuid(uuid);
+
+        // When & Then
+        mockMvc.perform(delete("/categories/{uuid}", uuid)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
-        verify(categoryUseCasePort, times(1)).deleteCategory(1L);
+        verify(categoryUseCasePort, times(1)).deleteCategoryByUuid(uuid);
     }
 }

@@ -14,6 +14,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -134,11 +135,12 @@ class UserRepositoryAdapterTest {
 
     @Test
     @DisplayName("Should update existing user")
-    void testUpdateById() {
+    void testUpdateByUuid() {
         // Given
         UserEntity entity = new UserEntity();
         entity.setEmail("old@example.com");
         entity.setName("Old Name");
+        entity.setUuid(UUID.randomUUID());
         entity = repository.save(entity);
 
         User updateData = new User();
@@ -155,7 +157,7 @@ class UserRepositoryAdapterTest {
         when(mapper.toDomain(any(UserEntity.class))).thenReturn(updatedDomain);
 
         // When
-        User updatedUser = adapter.updateById(entity.getId(), updateData);
+        User updatedUser = adapter.updateByUuid(entity.getUuid(), updateData);
 
         // Then
         assertThat(updatedUser.getName()).isEqualTo("New Name");
@@ -167,14 +169,15 @@ class UserRepositoryAdapterTest {
 
     @Test
     @DisplayName("Should delete user")
-    void testDelete() {
+    void testDeleteByUuid() {
         // Given
         UserEntity entity = new UserEntity();
         entity.setEmail("delete@example.com");
+        entity.setUuid(UUID.randomUUID());
         entity = repository.save(entity);
 
         // When
-        adapter.delete(entity.getId());
+        adapter.deleteByUuid(entity.getUuid());
 
         // Then
         assertThat(repository.existsById(entity.getId())).isFalse();

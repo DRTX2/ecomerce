@@ -28,11 +28,11 @@ class IncidencePersistenceMapperTest {
     private UserPersistenceMapper userMapper;
 
     @Test
-    void toDomain_ShouldMapFields() {
+    void toDomain_ShouldMapAllFields() {
         // Arrange
         IncidenceEntity entity = new IncidenceEntity();
         entity.setId(1L);
-        entity.setPublicUi(UUID.randomUUID());
+        entity.setUuid(UUID.randomUUID());
         entity.setStatus(IncidenceStatus.OPEN);
         entity.setCreatedAt(LocalDateTime.now());
         entity.setDecision(IncidenceDecision.PENDING);
@@ -43,18 +43,18 @@ class IncidencePersistenceMapperTest {
         // Assert
         assertNotNull(domain);
         assertEquals(entity.getId(), domain.getId());
-        assertEquals(entity.getPublicUi(), domain.getPublicUi());
+        assertEquals(entity.getUuid(), domain.getUuid());
         assertEquals(entity.getStatus(), domain.getStatus());
         assertEquals(entity.getDecision(), domain.getDecision());
     }
 
     @Test
-    void toEntity_ShouldMapFields() {
+    void toEntity_ShouldMapAllFields() {
         // Arrange
         Incidence domain = new Incidence();
         domain.setId(1L);
-        domain.setPublicUi(UUID.randomUUID());
-        domain.setStatus(IncidenceStatus.CLOSED);
+        domain.setUuid(UUID.randomUUID());
+        domain.setStatus(IncidenceStatus.OPEN);
 
         // Act
         IncidenceEntity entity = mapper.toEntity(domain);
@@ -62,7 +62,7 @@ class IncidencePersistenceMapperTest {
         // Assert
         assertNotNull(entity);
         assertEquals(domain.getId(), entity.getId());
-        assertEquals(domain.getPublicUi(), entity.getPublicUi());
+        assertEquals(domain.getUuid(), entity.getUuid());
         assertEquals(domain.getStatus(), entity.getStatus());
     }
 }

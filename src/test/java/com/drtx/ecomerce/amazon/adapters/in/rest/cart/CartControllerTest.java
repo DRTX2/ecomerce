@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -58,41 +59,45 @@ class CartControllerTest {
 
         testProduct = new Product();
         testProduct.setId(1L);
+        testProduct.setUuid(UUID.randomUUID());
         testProduct.setName("Test Product");
         testProduct.setPrice(new BigDecimal("99.99"));
 
+        UUID cartUuid = UUID.randomUUID();
         testCart = new Cart();
         testCart.setId(1L);
+        testCart.setUuid(cartUuid);
         CartItem cartItem = new CartItem(1L, testCart, testProduct, 1);
         testCart.setItems(List.of(cartItem));
 
         CartItemDto cartItemDto = new CartItemDto(1L, 1);
         testCartRequest = new CartRequest(List.of(cartItemDto));
 
-        testCartResponse = new CartResponse(1L, List.of(cartItemDto));
+        testCartResponse = new CartResponse(cartUuid, List.of(cartItemDto));
     }
 
     @Test
-    @DisplayName("GET /cart - Should return all carts")
+    @DisplayName("GET /carts - Should return all carts")
     void testGetAllCarts() throws Exception {
         // Given
         List<Cart> carts = Arrays.asList(testCart);
-        // Note: The controller currently hardcodes the userId to 1111L
+        // Updated to use the userId parameter from search criteria or simple param
         when(cartUseCasePort.getAllCarts(1111L)).thenReturn(carts);
         when(cartMapper.toResponse(any(Cart.class))).thenReturn(testCartResponse);
 
         // When & Then
-        mockMvc.perform(get("/cart")
+        mockMvc.perform(get("/carts")
+                        .param("userId", "1111")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].id", is(1)));
+                .andExpect(jsonPath("$[0].uuid", is(testCart.getUuid().toString())));
 
         verify(cartUseCasePort, times(1)).getAllCarts(1111L);
     }
 
     @Test
-    @DisplayName("POST /cart - Should create new cart")
+    @DisplayName("POST /carts - Should create new cart")
     void testCreateCart() throws Exception {
         // Given
         when(cartMapper.toDomain(any(CartRequest.class))).thenReturn(testCart);
@@ -100,23 +105,23 @@ class CartControllerTest {
         when(cartMapper.toResponse(testCart)).thenReturn(testCartResponse);
 
         // When & Then
-        mockMvc.perform(post("/cart")
+        mockMvc.perform(post("/carts")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testCartRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)));
+                .andExpect(jsonPath("$.uuid", is(testCart.getUuid().toString())));
 
         verify(cartUseCasePort, times(1)).createCart(any(Cart.class));
     }
 
     @Test
-    @DisplayName("POST /cart - Should return 400 when list of products is empty")
+    @DisplayName("POST /carts - Should return 400 when list of products is empty")
     void testCreateCart_ValidationFail() throws Exception {
         // Given
         CartRequest invalidRequest = new CartRequest(new ArrayList<>()); // Lista vacía
 
         // When & Then
-        mockMvc.perform(post("/cart")
+        mockMvc.perform(post("/carts")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isBadRequest());
@@ -125,29 +130,30 @@ class CartControllerTest {
     }
 
     @Test
-    @DisplayName("GET /cart/{id} - Should return cart when found")
-    void testGetCartById_Found() throws Exception {
+    @DisplayName("GET /carts/{uuid} - Should return cart when found")
+    void testGetCartByUuid_Found() throws Exception {
         // Given
-        when(cartUseCasePort.getCartById(1L)).thenReturn(Optional.of(testCart));
+        UUID uuid = testCart.getUuid();
+        when(cartUseCasePort.getCartByUuid(uuid)).thenReturn(Optional.of(testCart));
         when(cartMapper.toResponse(testCart)).thenReturn(testCartResponse);
 
         // When & Then
-        mockMvc.perform(get("/cart/{id}", 1L)
+        mockMvc.perform(get("/carts/{uuid}", uuid)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)));
+                .andExpect(jsonPath("$.uuid", is(uuid.toString())));
 
-        verify(cartUseCasePort, times(1)).getCartById(1L);
+        verify(cartUseCasePort, times(1)).getCartByUuid(uuid);
     }
 
     @Test
-    @DisplayName("GET /cart/{id} - Should return 404 when cart not found")
+    @DisplayName("GET /carts/{uuid} - Should return 404 when cart not found")
     void testGetCartById_NotFound() throws Exception {
         // Given
         when(cartUseCasePort.getCartById(999L)).thenReturn(Optional.empty());
 
         // When & Then
-        mockMvc.perform(get("/cart/{id}", 999L)
+        mockMvc.perform(get("/carts/{id}", 999L)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
@@ -155,34 +161,36 @@ class CartControllerTest {
     }
 
     @Test
-    @DisplayName("PUT /cart/{id} - Should update cart")
-    void testUpdateCart() throws Exception {
+    @DisplayName("PUT /carts/{uuid} - Should update cart")
+    void testUpdateCartByUuid() throws Exception {
         // Given
+        UUID uuid = testCart.getUuid();
         when(cartMapper.toDomain(any(CartRequest.class))).thenReturn(testCart);
-        when(cartUseCasePort.updateCart(eq(1L), any(Cart.class))).thenReturn(testCart);
+        when(cartUseCasePort.updateCartByUuid(eq(uuid), any(Cart.class))).thenReturn(testCart);
         when(cartMapper.toResponse(testCart)).thenReturn(testCartResponse);
 
         // When & Then
-        mockMvc.perform(put("/cart/{id}", 1L)
+        mockMvc.perform(put("/carts/{uuid}", uuid)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testCartRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)));
+                .andExpect(jsonPath("$.uuid", is(uuid.toString())));
 
-        verify(cartUseCasePort, times(1)).updateCart(eq(1L), any(Cart.class));
+        verify(cartUseCasePort, times(1)).updateCartByUuid(eq(uuid), any(Cart.class));
     }
 
     @Test
-    @DisplayName("DELETE /cart/{id} - Should delete cart")
-    void testDeleteCart() throws Exception {
+    @DisplayName("DELETE /carts/{uuid} - Should delete cart")
+    void testDeleteCartByUuid() throws Exception {
         // Given
-        doNothing().when(cartUseCasePort).deleteCart(1L);
+        UUID uuid = testCart.getUuid();
+        doNothing().when(cartUseCasePort).deleteCartByUuid(uuid);
 
         // When & Then
-        mockMvc.perform(delete("/cart/{id}", 1L)
+        mockMvc.perform(delete("/carts/{uuid}", uuid)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
 
-        verify(cartUseCasePort, times(1)).deleteCart(1L);
+        verify(cartUseCasePort, times(1)).deleteCartByUuid(uuid);
     }
 }

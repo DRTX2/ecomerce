@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -40,25 +41,25 @@ class IncidenceUseCaseImplTest {
 
     @BeforeEach
     void setUp() {
-        sampleReport = Report.builder()
-                .reason("Bad product")
-                .comment("Broken")
-                .build();
-        
+        sampleReport = new Report();
+        sampleReport.setReason("Bad product");
+        sampleReport.setComment("Broken");
+
         sampleProduct = new Product();
         sampleProduct.setId(1L);
+        sampleProduct.setUuid(UUID.randomUUID());
     }
 
     @Test
     void createIncidence_ShouldCreateNew_WhenNoneExists() {
         // Arrange
-        Long productId = 1L;
-        when(productRepository.findByUuid(productId)).thenReturn(Optional.of(sampleProduct));
-        when(incidenceRepository.findByProductIdAndStatusOpen(productId)).thenReturn(Optional.empty());
+        UUID productUuid = sampleProduct.getUuid();
+        when(productRepository.findByUuid(productUuid)).thenReturn(Optional.of(sampleProduct));
+        when(incidenceRepository.findByProductUuidAndStatusOpen(productUuid)).thenReturn(Optional.empty());
         when(incidenceRepository.save(any(Incidence.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
-        Incidence result = incidenceUseCase.createIncidence(productId, sampleReport, null);
+        Incidence result = incidenceUseCase.createIncidence(productUuid, sampleReport, null);
 
         // Assert
         assertNotNull(result);
@@ -71,19 +72,20 @@ class IncidenceUseCaseImplTest {
     @Test
     void createIncidence_ShouldAttachToExisting_WhenOpenExists() {
         // Arrange
-        Long productId = 1L;
+        UUID productUuid = sampleProduct.getUuid();
         Incidence existingIncidence = new Incidence();
         existingIncidence.setId(100L);
+        existingIncidence.setUuid(UUID.randomUUID());
         existingIncidence.setProduct(sampleProduct);
         existingIncidence.setStatus(IncidenceStatus.OPEN);
         existingIncidence.setReports(new ArrayList<>());
         
-        when(productRepository.findByUuid(productId)).thenReturn(Optional.of(sampleProduct));
-        when(incidenceRepository.findByProductIdAndStatusOpen(productId)).thenReturn(Optional.of(existingIncidence));
+        when(productRepository.findByUuid(productUuid)).thenReturn(Optional.of(sampleProduct));
+        when(incidenceRepository.findByProductUuidAndStatusOpen(productUuid)).thenReturn(Optional.of(existingIncidence));
         when(incidenceRepository.save(any(Incidence.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         // Act
-        Incidence result = incidenceUseCase.createIncidence(productId, sampleReport, null);
+        Incidence result = incidenceUseCase.createIncidence(productUuid, sampleReport, null);
 
         // Assert
         assertEquals(100L, result.getId());

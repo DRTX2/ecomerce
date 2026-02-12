@@ -23,6 +23,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -66,14 +67,26 @@ class FavoriteRepositoryAdapterTest {
         @DisplayName("Should save a new favorite")
         void testSave() {
                 // Given
-                UserEntity user = userRepository
-                                .save(new UserEntity(null, "User", "email@test.com", "pass", "addr", "123", null));
-                CategoryEntity cat = categoryRepository.save(new CategoryEntity(null, "C", null, null));
-                ProductEntity prod = productRepository
-                                .save(new ProductEntity(null, "P", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null,
-                                                "SKU-FAV", 100,
-                                                com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE,
-                                                "slug-fav", null, null));
+                UserEntity user = new UserEntity();
+                user.setName("User");
+                user.setEmail("email@test.com");
+                user.setUuid(UUID.randomUUID());
+                user = userRepository.save(user);
+
+                CategoryEntity cat = new CategoryEntity();
+                cat.setName("C");
+                cat.setUuid(UUID.randomUUID());
+                cat = categoryRepository.save(cat);
+
+                ProductEntity prod = new ProductEntity();
+                prod.setName("P");
+                prod.setDescription("D");
+                prod.setPrice(BigDecimal.ONE);
+                prod.setCategory(cat);
+                prod.setSku("SKU-FAV");
+                prod.setSlug("slug-fav");
+                prod.setUuid(UUID.randomUUID());
+                prod = productRepository.save(prod);
 
                 Favorite favorite = new Favorite(); // Domain object
 
@@ -101,14 +114,26 @@ class FavoriteRepositoryAdapterTest {
         @DisplayName("Should find favorites by User ID")
         void testFindFavoritesByUserId() {
                 // Given
-                UserEntity user = userRepository
-                                .save(new UserEntity(null, "User2", "email2@test.com", "pass", "addr", "123", null));
-                CategoryEntity cat = categoryRepository.save(new CategoryEntity(null, "C2", null, null));
-                ProductEntity prod = productRepository
-                                .save(new ProductEntity(null, "P2", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null,
-                                                "SKU-FAV2", 100,
-                                                com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE,
-                                                "slug-fav2", null, null));
+                UserEntity user = new UserEntity();
+                user.setName("User2");
+                user.setEmail("email2@test.com");
+                user.setUuid(UUID.randomUUID());
+                user = userRepository.save(user);
+
+                CategoryEntity cat = new CategoryEntity();
+                cat.setName("C2");
+                cat.setUuid(UUID.randomUUID());
+                cat = categoryRepository.save(cat);
+
+                ProductEntity prod = new ProductEntity();
+                prod.setName("P2");
+                prod.setDescription("D");
+                prod.setPrice(BigDecimal.ONE);
+                prod.setCategory(cat);
+                prod.setSku("SKU-FAV2");
+                prod.setSlug("slug-fav2");
+                prod.setUuid(UUID.randomUUID());
+                prod = productRepository.save(prod);
 
                 FavoriteEntity favEntity = new FavoriteEntity();
                 favEntity.setUser(user);
@@ -118,6 +143,7 @@ class FavoriteRepositoryAdapterTest {
                 Favorite domainFav = new Favorite();
                 Product domainProd = new Product();
                 domainProd.setId(prod.getId());
+                domainProd.setUuid(prod.getUuid());
                 domainFav.setProduct(domainProd);
 
                 // Mock list mapping
@@ -138,14 +164,26 @@ class FavoriteRepositoryAdapterTest {
         @DisplayName("Should delete favorite by User ID and Product ID")
         void testDelete() {
                 // Given
-                UserEntity user = userRepository
-                                .save(new UserEntity(null, "User3", "email3@test.com", "pass", "addr", "123", null));
-                CategoryEntity cat = categoryRepository.save(new CategoryEntity(null, "C3", null, null));
-                ProductEntity prod = productRepository
-                                .save(new ProductEntity(null, "P3", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null,
-                                                "SKU-FAV3", 100,
-                                                com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE,
-                                                "slug-fav3", null, null));
+                UserEntity user = new UserEntity();
+                user.setName("User3");
+                user.setEmail("email3@test.com");
+                user.setUuid(UUID.randomUUID());
+                user = userRepository.save(user);
+
+                CategoryEntity cat = new CategoryEntity();
+                cat.setName("C3");
+                cat.setUuid(UUID.randomUUID());
+                cat = categoryRepository.save(cat);
+
+                ProductEntity prod = new ProductEntity();
+                prod.setName("P3");
+                prod.setDescription("D");
+                prod.setPrice(BigDecimal.ONE);
+                prod.setCategory(cat);
+                prod.setSku("SKU-FAV3");
+                prod.setSlug("slug-fav3");
+                prod.setUuid(UUID.randomUUID());
+                prod = productRepository.save(prod);
 
                 FavoriteEntity fav = new FavoriteEntity();
                 fav.setUser(user);

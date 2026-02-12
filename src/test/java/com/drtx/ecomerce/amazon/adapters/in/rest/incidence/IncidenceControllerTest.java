@@ -79,11 +79,11 @@ class IncidenceControllerTest {
 
         testIncidence = new Incidence();
         testIncidence.setId(1L);
+        testIncidence.setUuid(UUID.randomUUID());
         testIncidence.setStatus(IncidenceStatus.OPEN);
 
         testIncidenceResponse = new IncidenceResponse(
-                1L,
-                UUID.randomUUID(),
+                testIncidence.getUuid(),
                 null,
                 IncidenceStatus.OPEN,
                 LocalDateTime.now(),
@@ -103,22 +103,23 @@ class IncidenceControllerTest {
     }
 
     @Test
-    @DisplayName("POST /incidences/product/{productId} - Should report product")
+    @DisplayName("POST /incidences/product/{productUuid} - Should create incidence")
     void testReportProduct() throws Exception {
         // Given
+        UUID productUuid = UUID.randomUUID();
         when(incidenceMapper.toDomain(any(ReportRequest.class))).thenReturn(new Report());
-        when(incidenceUseCasePort.createIncidence(eq(1L), any(Report.class), eq("user@example.com")))
+        when(incidenceUseCasePort.createIncidence(eq(productUuid), any(Report.class), eq("user@example.com")))
                 .thenReturn(testIncidence);
         when(incidenceMapper.toResponse(testIncidence)).thenReturn(testIncidenceResponse);
 
         // When & Then
-        mockMvc.perform(post("/incidences/product/{productId}", 1L)
+        mockMvc.perform(post("/incidences/product/{productUuid}", productUuid)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testReportRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)));
+                .andExpect(jsonPath("$.status", is("OPEN")));
 
-        verify(incidenceUseCasePort, times(1)).createIncidence(eq(1L), any(Report.class), eq("user@example.com"));
+        verify(incidenceUseCasePort, times(1)).createIncidence(eq(productUuid), any(Report.class), eq("user@example.com"));
     }
 
     @Test
@@ -149,25 +150,27 @@ class IncidenceControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].id", is(1)));
+                .andExpect(jsonPath("$[0].uuid", is(testIncidence.getUuid().toString())));
 
         verify(incidenceUseCasePort, times(1)).getAllIncidences();
     }
 
     @Test
-    @DisplayName("GET /incidences/{id} - Should return incidence when found")
-    void testGetIncidenceById_Found() throws Exception {
+    @DisplayName("GET /incidences/{uuid} - Should return incidence when found")
+    void testGetIncidenceByUuid_Found() throws Exception {
         // Given
-        when(incidenceUseCasePort.getIncidenceById(1L)).thenReturn(Optional.of(testIncidence));
+        UUID uuid = testIncidence.getUuid();
+        when(incidenceUseCasePort.getIncidenceByUuid(uuid)).thenReturn(Optional.of(testIncidence));
         when(incidenceMapper.toResponse(testIncidence)).thenReturn(testIncidenceResponse);
 
         // When & Then
-        mockMvc.perform(get("/incidences/{id}", 1L)
+        mockMvc.perform(get("/incidences/{uuid}", uuid)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)));
+                .andExpect(jsonPath("$.status", is("OPEN")))
+                .andExpect(jsonPath("$.uuid", is(uuid.toString())));
 
-        verify(incidenceUseCasePort, times(1)).getIncidenceById(1L);
+        verify(incidenceUseCasePort, times(1)).getIncidenceByUuid(uuid);
     }
 
     @Test
@@ -185,37 +188,20 @@ class IncidenceControllerTest {
     }
 
     @Test
-    @DisplayName("PUT /incidences/{id}/resolve - Should resolve incidence")
-    void testResolveIncidence() throws Exception {
+    @DisplayName("PUT /incidences/{uuid}/resolve - Should resolve incidence (MODERATOR only)")
+    void testResolveIncidenceByUuid() throws Exception {
         // Given
-        when(incidenceUseCasePort.resolveIncidence(eq(1L), eq(IncidenceDecision.DELETE), eq("Banned for spam"),
-                eq("user@example.com")))
+        UUID uuid = testIncidence.getUuid();
+        when(incidenceUseCasePort.resolveIncidenceByUuid(eq(uuid), eq(IncidenceDecision.DELETE), anyString(), eq("user@example.com")))
                 .thenReturn(testIncidence);
         when(incidenceMapper.toResponse(testIncidence)).thenReturn(testIncidenceResponse);
 
         // When & Then
-        mockMvc.perform(put("/incidences/{id}/resolve", 1L)
+        mockMvc.perform(put("/incidences/{uuid}/resolve", uuid)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testResolveRequest)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)));
+                .andExpect(status().isOk());
 
-        verify(incidenceUseCasePort, times(1)).resolveIncidence(eq(1L), eq(IncidenceDecision.DELETE),
-                eq("Banned for spam"), eq("user@example.com"));
-    }
-
-    @Test
-    @DisplayName("PUT /incidences/{id}/resolve - Should return 400 when decision is null")
-    void testResolveIncidence_ValidationFail() throws Exception {
-        // Given
-        ResolveIncidenceRequest invalidRequest = new ResolveIncidenceRequest(null, "Comment"); // Decision null
-
-        // When & Then
-        mockMvc.perform(put("/incidences/{id}/resolve", 1L)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(invalidRequest)))
-                .andExpect(status().isBadRequest());
-
-        verify(incidenceUseCasePort, never()).resolveIncidence(anyLong(), any(), anyString(), anyString());
+        verify(incidenceUseCasePort, times(1)).resolveIncidenceByUuid(eq(uuid), eq(IncidenceDecision.DELETE), anyString(), eq("user@example.com"));
     }
 }

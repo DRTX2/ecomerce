@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -36,6 +37,7 @@ class CategoryUseCaseImplTest {
     void setUp() {
         testCategory = new Category(
                 1L,
+                UUID.randomUUID(),
                 "Electronics",
                 "Electronic devices and accessories",
                 List.of()
@@ -48,6 +50,7 @@ class CategoryUseCaseImplTest {
         // Given
         Category newCategory = new Category(
                 null,
+                UUID.randomUUID(),
                 "Books",
                 "Books and literature",
                 List.of()
@@ -55,6 +58,7 @@ class CategoryUseCaseImplTest {
 
         Category savedCategory = new Category(
                 2L,
+                UUID.randomUUID(),
                 "Books",
                 "Books and literature",
                 List.of()
@@ -112,15 +116,16 @@ class CategoryUseCaseImplTest {
         // Given
         Category category2 = new Category(
                 2L,
-                "Clothing",
-                "Apparel and fashion",
+                UUID.randomUUID(),
+                "Books",
+                "Books and literature",
                 List.of()
         );
-
         Category category3 = new Category(
                 3L,
-                "Home & Garden",
-                "Home improvement and gardening",
+                UUID.randomUUID(),
+                "Home",
+                "Home appliance",
                 List.of()
         );
 
@@ -154,26 +159,26 @@ class CategoryUseCaseImplTest {
     @DisplayName("Should update category successfully")
     void shouldUpdateCategorySuccessfully() {
         // Given
-        Long categoryId = 1L;
         Category updatedCategory = new Category(
-                categoryId,
+                1L,
+                testCategory.getUuid(),
                 "Electronics & Gadgets",
-                "Updated description for electronics",
+                "Electronic devices and accessories",
                 List.of()
         );
 
-        when(categoryRepositoryPort.updateById(eq(categoryId), any(Category.class)))
+        when(categoryRepositoryPort.updateById(eq(1L), any(Category.class)))
                 .thenReturn(updatedCategory);
 
         // When
-        Category result = categoryUseCase.updateCategory(categoryId, updatedCategory);
+        Category result = categoryUseCase.updateCategory(1L, updatedCategory);
 
         // Then
         assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(categoryId);
+        assertThat(result.getId()).isEqualTo(1L);
         assertThat(result.getName()).isEqualTo("Electronics & Gadgets");
-        assertThat(result.getDescription()).isEqualTo("Updated description for electronics");
-        verify(categoryRepositoryPort, times(1)).updateById(categoryId, updatedCategory);
+        assertThat(result.getDescription()).isEqualTo("Electronic devices and accessories");
+        verify(categoryRepositoryPort, times(1)).updateById(1L, updatedCategory);
     }
 
     @Test

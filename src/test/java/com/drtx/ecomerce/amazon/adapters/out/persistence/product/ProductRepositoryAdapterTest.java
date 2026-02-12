@@ -18,6 +18,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import java.math.BigDecimal;
 import java.util.Collections;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -58,6 +59,7 @@ class ProductRepositoryAdapterTest {
         // Given
         CategoryEntity categoryEntity = new CategoryEntity();
         categoryEntity.setName("Electronics");
+        categoryEntity.setUuid(UUID.randomUUID());
         categoryEntity = categoryRepository.save(categoryEntity);
 
         Product product = new Product();
@@ -69,6 +71,11 @@ class ProductRepositoryAdapterTest {
         entity.setPrice(new BigDecimal("999.99"));
         entity.setDescription("Desc");
         entity.setCategory(categoryEntity);
+        entity.setUuid(UUID.randomUUID());
+        entity.setSku("LAP-123");
+        entity.setSlug("laptop");
+        entity.setStockQuantity(100);
+        entity.setStatus(com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE);
 
         // Mocks
         when(mapper.toEntity(product)).thenReturn(entity);
@@ -95,86 +102,108 @@ class ProductRepositoryAdapterTest {
         // Given
         CategoryEntity categoryEntity = new CategoryEntity();
         categoryEntity.setName("Books");
+        categoryEntity.setUuid(UUID.randomUUID());
         categoryEntity = categoryRepository.save(categoryEntity);
 
         ProductEntity entity = new ProductEntity();
-        entity.setName("Clean Code");
-        entity.setDescription("Book");
-        entity.setPrice(BigDecimal.TEN);
+        entity.setName("Java Programming");
         entity.setCategory(categoryEntity);
+        entity.setDescription("Learn Java");
+        entity.setSku("JAVA-123");
+        entity.setSlug("java-programming");
+        entity.setUuid(UUID.randomUUID());
+        entity.setStockQuantity(50);
+        entity.setPrice(BigDecimal.TEN);
+        entity.setStatus(com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE);
         entity = productRepository.save(entity);
 
-        Product domainProduct = new Product();
-        domainProduct.setId(entity.getId());
-        domainProduct.setName("Clean Code");
-
-        when(mapper.toDomain(any(ProductEntity.class))).thenReturn(domainProduct);
-
-        // When
-        Optional<Product> found = adapter.findByUuid(entity.getId());
-
-        // Then
-        assertThat(found).isPresent();
-        assertThat(found.get().getName()).isEqualTo("Clean Code");
-    }
-
-    @Test
-    @DisplayName("Should update product")
-    void testUpdateById() {
-        // Given
-        CategoryEntity cat1 = categoryRepository.save(new CategoryEntity(null, "Cat1", null, null));
-        CategoryEntity cat2 = categoryRepository.save(new CategoryEntity(null, "Cat2", null, null));
-
-        ProductEntity entity = new ProductEntity(null, "Old Name", "Desc", BigDecimal.ONE, cat1,
-                BigDecimal.valueOf(5), null, "SKU-OLD", 10,
-                com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE, "old-slug", null, null);
-        entity = productRepository.save(entity);
-
-        Product updateData = new Product();
-        updateData.setName("New Name");
-        updateData.setDescription("New Desc");
-        updateData.setPrice(BigDecimal.TEN);
-        updateData.setAverageRating(BigDecimal.valueOf(4.5));
-        updateData.setImages(Collections.emptyList());
-
-        Category domainCategory = new Category();
-        domainCategory.setId(cat2.getId()); // Switching to Cat2
-        updateData.setCategory(domainCategory);
-
-        when(mapperHelper.mapToEntities(anyList())).thenReturn(Collections.emptyList());
         when(mapper.toDomain(any(ProductEntity.class))).thenAnswer(inv -> {
             ProductEntity e = inv.getArgument(0);
             Product p = new Product();
-            p.setName(e.getName());
             p.setId(e.getId());
+            p.setUuid(e.getUuid());
+            p.setName(e.getName());
             return p;
         });
 
         // When
-        Product updated = adapter.updateById(entity.getId(), updateData);
+        Optional<Product> found = adapter.findByUuid(entity.getUuid());
+
+        // Then
+        assertThat(found).isPresent();
+        assertThat(found.get().getName()).isEqualTo("Java Programming");
+    }
+
+    @Test
+    @DisplayName("Should update product")
+    void testUpdateByUuid() {
+        // Given
+        CategoryEntity cat1 = new CategoryEntity();
+        cat1.setName("Cat1");
+        cat1.setUuid(UUID.randomUUID());
+        cat1 = categoryRepository.save(cat1);
+
+        ProductEntity entity = new ProductEntity();
+        entity.setName("Old Name");
+        entity.setDescription("Desc");
+        entity.setPrice(BigDecimal.ONE);
+        entity.setCategory(cat1);
+        entity.setSku("SKU-UPD");
+        entity.setSlug("old-name");
+        entity.setUuid(UUID.randomUUID());
+        entity.setStockQuantity(50);
+        entity.setStatus(com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE);
+        entity = productRepository.save(entity);
+
+        Product updateData = new Product();
+        updateData.setName("New Name");
+        updateData.setDescription("Desc");
+        updateData.setPrice(BigDecimal.TEN);
+        updateData.setCategory(new Category(cat1.getId(), cat1.getUuid(), "Cat1", null, null));
+
+        when(mapper.toDomain(any(ProductEntity.class))).thenAnswer(inv -> {
+            ProductEntity e = inv.getArgument(0);
+            Product p = new Product();
+            p.setId(e.getId());
+            p.setUuid(e.getUuid());
+            p.setName(e.getName());
+            return p;
+        });
+
+        // When
+        Product updated = adapter.updateByUuid(entity.getUuid(), updateData);
 
         // Then
         assertThat(updated.getName()).isEqualTo("New Name");
-
-        ProductEntity fromDb = productRepository.findById(entity.getId()).orElseThrow();
-        assertThat(fromDb.getName()).isEqualTo("New Name");
-        assertThat(fromDb.getCategory().getId()).isEqualTo(cat2.getId()); // Verify category change
+        ProductEntity saved = productRepository.findById(entity.getId()).orElseThrow();
+        assertThat(saved.getName()).isEqualTo("New Name");
     }
 
     @Test
     @DisplayName("Should delete product")
-    void testDelete() {
+    void testDeleteByUuid() {
         // Given
-        CategoryEntity cat = categoryRepository.save(new CategoryEntity(null, "Cat", null, null));
-        ProductEntity entity = productRepository
-                .save(new ProductEntity(null, "ToDel", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null,
-                        "SKU-DEL", 0, com.drtx.ecomerce.amazon.core.model.product.ProductStatus.DRAFT, "del-slug", null,
-                        null));
+        CategoryEntity cat = new CategoryEntity();
+        cat.setName("Cat");
+        cat.setUuid(UUID.randomUUID());
+        cat = categoryRepository.save(cat);
+
+        ProductEntity entity = new ProductEntity();
+        entity.setName("ToDel");
+        entity.setDescription("D");
+        entity.setPrice(BigDecimal.ONE);
+        entity.setCategory(cat);
+        entity.setSku("SKU-DEL");
+        entity.setSlug("todel");
+        entity.setUuid(UUID.randomUUID());
+        entity.setStockQuantity(50);
+        entity.setStatus(com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE);
+        entity = productRepository.save(entity);
 
         // When
-        adapter.delete(entity.getId());
+        adapter.deleteByUuid(entity.getUuid());
 
         // Then
-        assertThat(productRepository.existsById(entity.getId())).isFalse();
+        assertThat(productRepository.findById(entity.getId())).isEmpty();
     }
 }

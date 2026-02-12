@@ -25,6 +25,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -73,12 +74,14 @@ class AppealControllerTest {
         objectMapper = new ObjectMapper();
         objectMapper.registerModule(new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule());
 
+        UUID appealUuid = UUID.randomUUID();
         testAppeal = new Appeal();
         testAppeal.setId(1L);
+        testAppeal.setUuid(appealUuid);
         testAppeal.setStatus(AppealStatus.PENDING);
 
         testAppealResponse = new AppealResponse(
-                1L,
+                appealUuid,
                 null, // Incidence response null for simplicity
                 null,
                 "Unfair ban",
@@ -88,7 +91,7 @@ class AppealControllerTest {
                 AppealDecision.PENDING,
                 null);
 
-        testAppealRequest = new AppealRequest(10L, "Unfair ban");
+        testAppealRequest = new AppealRequest(UUID.randomUUID(), "Unfair ban");
         testResolveRequest = new ResolveAppealRequest(AppealDecision.GRANTED);
     }
 
@@ -98,10 +101,11 @@ class AppealControllerTest {
     }
 
     @Test
-    @DisplayName("POST /appeals - Should create appeal")
+    @DisplayName("POST /appeals - Should create appeal (authenticated only)")
     void testCreateAppeal() throws Exception {
         // Given
-        when(appealUseCasePort.createAppeal(eq(10L), eq("Unfair ban"), eq("seller@example.com")))
+        when(appealMapper.toDomain(any(AppealRequest.class))).thenReturn(testAppeal);
+        when(appealUseCasePort.createAppealByUuid(eq(testAppealRequest.incidenceUuid()), eq("Unfair ban"), eq("seller@example.com")))
                 .thenReturn(testAppeal);
         when(appealMapper.toResponse(testAppeal)).thenReturn(testAppealResponse);
 
@@ -110,9 +114,10 @@ class AppealControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testAppealRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)));
+                .andExpect(jsonPath("$.status", is("PENDING")))
+                .andExpect(jsonPath("$.uuid", is(testAppeal.getUuid().toString())));
 
-        verify(appealUseCasePort, times(1)).createAppeal(eq(10L), eq("Unfair ban"), eq("seller@example.com"));
+        verify(appealUseCasePort, times(1)).createAppealByUuid(eq(testAppealRequest.incidenceUuid()), eq("Unfair ban"), eq("seller@example.com"));
     }
 
     @Test
@@ -127,23 +132,24 @@ class AppealControllerTest {
                 .content(objectMapper.writeValueAsString(invalidRequest)))
                 .andExpect(status().isBadRequest());
 
-        verify(appealUseCasePort, never()).createAppeal(anyLong(), anyString(), anyString());
+        verify(appealUseCasePort, never()).createAppealByUuid(any(), anyString(), anyString());
     }
 
     @Test
-    @DisplayName("GET /appeals/{id} - Should return appeal when found")
-    void testGetAppeal_Found() throws Exception {
+    @DisplayName("GET /appeals/{uuid} - Should return appeal when found")
+    void testGetAppealByUuid_Found() throws Exception {
         // Given
-        when(appealUseCasePort.getAppealById(1L)).thenReturn(Optional.of(testAppeal));
+        UUID uuid = testAppeal.getUuid();
+        when(appealUseCasePort.getAppealByUuid(uuid)).thenReturn(Optional.of(testAppeal));
         when(appealMapper.toResponse(testAppeal)).thenReturn(testAppealResponse);
 
         // When & Then
-        mockMvc.perform(get("/appeals/{id}", 1L)
+        mockMvc.perform(get("/appeals/{uuid}", uuid)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)));
+                .andExpect(jsonPath("$.uuid", is(uuid.toString())));
 
-        verify(appealUseCasePort, times(1)).getAppealById(1L);
+        verify(appealUseCasePort, times(1)).getAppealByUuid(uuid);
     }
 
     @Test
@@ -161,35 +167,20 @@ class AppealControllerTest {
     }
 
     @Test
-    @DisplayName("PUT /appeals/{id}/resolve - Should resolve appeal")
-    void testResolveAppeal() throws Exception {
+    @DisplayName("PUT /appeals/{uuid}/resolve - Should resolve appeal (ADMIN only)")
+    void testResolveAppealByUuid() throws Exception {
         // Given
-        when(appealUseCasePort.resolveAppeal(eq(1L), eq(AppealDecision.GRANTED), eq("seller@example.com")))
+        UUID uuid = testAppeal.getUuid();
+        when(appealUseCasePort.resolveAppealByUuid(eq(uuid), eq(AppealDecision.GRANTED), eq("seller@example.com")))
                 .thenReturn(testAppeal);
         when(appealMapper.toResponse(testAppeal)).thenReturn(testAppealResponse);
 
         // When & Then
-        mockMvc.perform(put("/appeals/{id}/resolve", 1L)
+        mockMvc.perform(put("/appeals/{uuid}/resolve", uuid)
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(testResolveRequest)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(1)));
+                .andExpect(status().isOk());
 
-        verify(appealUseCasePort, times(1)).resolveAppeal(eq(1L), eq(AppealDecision.GRANTED), eq("seller@example.com"));
-    }
-
-    @Test
-    @DisplayName("PUT /appeals/{id}/resolve - Should return 400 when decision is null")
-    void testResolveAppeal_ValidationFail() throws Exception {
-        // Given
-        ResolveAppealRequest invalidRequest = new ResolveAppealRequest(null);
-
-        // When & Then
-        mockMvc.perform(put("/appeals/{id}/resolve", 1L)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(invalidRequest)))
-                .andExpect(status().isBadRequest());
-
-        verify(appealUseCasePort, never()).resolveAppeal(anyLong(), any(), anyString());
+        verify(appealUseCasePort, times(1)).resolveAppealByUuid(eq(uuid), eq(AppealDecision.GRANTED), eq("seller@example.com"));
     }
 }

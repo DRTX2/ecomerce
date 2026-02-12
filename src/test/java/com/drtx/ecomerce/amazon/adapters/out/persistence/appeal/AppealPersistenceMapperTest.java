@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
+import java.util.UUID;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest(classes = {AppealPersistenceMapperImpl.class})
@@ -28,6 +30,7 @@ class AppealPersistenceMapperTest {
         // Arrange
         AppealEntity entity = new AppealEntity();
         entity.setId(5L);
+        entity.setUuid(UUID.randomUUID());
         entity.setReason("Test Reason");
         entity.setStatus(AppealStatus.PENDING);
 
@@ -37,6 +40,7 @@ class AppealPersistenceMapperTest {
         // Assert
         assertNotNull(domain);
         assertEquals(entity.getId(), domain.getId());
+        assertEquals(entity.getUuid(), domain.getUuid());
         assertEquals(entity.getReason(), domain.getReason());
         assertEquals(entity.getStatus(), domain.getStatus());
     }
@@ -46,6 +50,7 @@ class AppealPersistenceMapperTest {
         // Arrange
         Appeal domain = new Appeal();
         domain.setId(5L);
+        domain.setUuid(UUID.randomUUID());
         domain.setReason("Test Reason");
         domain.setStatus(AppealStatus.RESOLVED);
 
@@ -55,6 +60,7 @@ class AppealPersistenceMapperTest {
         // Assert
         assertNotNull(entity);
         assertEquals(domain.getId(), entity.getId());
+        assertEquals(domain.getUuid(), entity.getUuid());
         assertEquals(domain.getReason(), entity.getReason());
         assertEquals(domain.getStatus(), entity.getStatus());
     }

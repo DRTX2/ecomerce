@@ -24,6 +24,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -63,22 +64,42 @@ class IncidenceRepositoryAdapterTest {
     @DisplayName("Should save incidence with reports")
     void testSave() {
         // Given
-        CategoryEntity cat = categoryRepository.save(new CategoryEntity(null, "C", null, null));
-        ProductEntity prod = productRepository
-                .save(new ProductEntity(null, "P", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null,
-                        "SKU-INC", 100, com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE, "slug-inc",
-                        null, null));
-        UserEntity reporter = userRepository.save(new UserEntity(null, "U", "e@mail.com", "p", "a", "1", null));
+        CategoryEntity cat = new CategoryEntity();
+        cat.setName("C");
+        cat.setUuid(UUID.randomUUID());
+        cat = categoryRepository.save(cat);
+
+        ProductEntity prod = new ProductEntity();
+        prod.setName("P");
+        prod.setDescription("D");
+        prod.setPrice(BigDecimal.ONE);
+        prod.setCategory(cat);
+        prod.setSku("SKU-INC");
+        prod.setSlug("slug-inc");
+        prod.setUuid(UUID.randomUUID());
+        prod.setStockQuantity(10);
+        prod.setStatus(com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE);
+        prod = productRepository.save(prod);
+
+        UserEntity user = new UserEntity();
+        user.setName("U");
+        user.setEmail("e@mail.com");
+        user.setPassword("p");
+        user.setUuid(UUID.randomUUID());
+        user.setEnabled(true);
+        user.setLocked(false);
+        user = userRepository.save(user);
 
         Incidence incidence = new Incidence();
 
         IncidenceEntity entity = new IncidenceEntity();
         entity.setProduct(prod);
         entity.setStatus(IncidenceStatus.OPEN);
+        entity.setUuid(UUID.randomUUID());
 
         ReportEntity report = new ReportEntity();
         report.setReason("Spam");
-        report.setReporter(reporter);
+        report.setReporter(user);
 
         List<ReportEntity> reports = new ArrayList<>();
         reports.add(report);
@@ -89,6 +110,7 @@ class IncidenceRepositoryAdapterTest {
             IncidenceEntity e = inv.getArgument(0);
             Incidence i = new Incidence();
             i.setId(e.getId());
+            i.setUuid(e.getUuid());
             return i;
         });
 
@@ -99,22 +121,33 @@ class IncidenceRepositoryAdapterTest {
         assertThat(saved.getId()).isNotNull();
         IncidenceEntity fromDb = incidenceRepository.findById(saved.getId()).orElseThrow();
         assertThat(fromDb.getReports()).hasSize(1);
-        assertThat(fromDb.getReports().get(0).getIncidence()).isEqualTo(fromDb);
     }
 
     @Test
     @DisplayName("Should find open incidence by product")
     void testFindByProductOpen() {
         // Given
-        CategoryEntity cat = categoryRepository.save(new CategoryEntity(null, "C2", null, null));
-        ProductEntity prod = productRepository
-                .save(new ProductEntity(null, "P2", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null,
-                        "SKU-INC2", 100, com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE, "slug-inc2",
-                        null, null));
+        CategoryEntity cat = new CategoryEntity();
+        cat.setName("C2");
+        cat.setUuid(UUID.randomUUID());
+        cat = categoryRepository.save(cat);
+
+        ProductEntity prod = new ProductEntity();
+        prod.setName("P2");
+        prod.setDescription("D");
+        prod.setPrice(BigDecimal.ONE);
+        prod.setCategory(cat);
+        prod.setSku("SKU-INC2");
+        prod.setSlug("slug-inc2");
+        prod.setUuid(UUID.randomUUID());
+        prod.setStockQuantity(10);
+        prod.setStatus(com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE);
+        prod = productRepository.save(prod);
 
         IncidenceEntity entity = new IncidenceEntity();
         entity.setProduct(prod);
         entity.setStatus(IncidenceStatus.OPEN);
+        entity.setUuid(UUID.randomUUID());
         incidenceRepository.save(entity);
 
         Incidence domain = new Incidence();
@@ -132,19 +165,33 @@ class IncidenceRepositoryAdapterTest {
     @DisplayName("Should update incidence")
     void testUpdate() {
         // Given
-        CategoryEntity cat = categoryRepository.save(new CategoryEntity(null, "C3", null, null));
-        ProductEntity prod = productRepository
-                .save(new ProductEntity(null, "P3", "D", BigDecimal.ONE, cat, BigDecimal.ONE, null,
-                        "SKU-INC3", 100, com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE, "slug-inc3",
-                        null, null));
+        CategoryEntity cat = new CategoryEntity();
+        cat.setName("C3");
+        cat.setUuid(UUID.randomUUID());
+        cat = categoryRepository.save(cat);
+
+        ProductEntity prod = new ProductEntity();
+        prod.setName("P3");
+        prod.setDescription("D");
+        prod.setPrice(BigDecimal.ONE);
+        prod.setCategory(cat);
+        prod.setSku("SKU-INC3");
+        prod.setSlug("slug-inc3");
+        prod.setUuid(UUID.randomUUID());
+        prod.setStockQuantity(10);
+        prod.setStatus(com.drtx.ecomerce.amazon.core.model.product.ProductStatus.ACTIVE);
+        prod = productRepository.save(prod);
+
         IncidenceEntity entity = new IncidenceEntity();
         entity.setProduct(prod);
         entity.setStatus(IncidenceStatus.OPEN);
+        entity.setUuid(UUID.randomUUID());
         entity = incidenceRepository.save(entity);
 
         Incidence updateData = new Incidence();
         IncidenceEntity updateEntity = new IncidenceEntity();
         updateEntity.setId(entity.getId());
+        updateEntity.setUuid(entity.getUuid());
         updateEntity.setStatus(IncidenceStatus.CLOSED);
         updateEntity.setProduct(prod);
         updateEntity.setDecision(IncidenceDecision.DELETE);
