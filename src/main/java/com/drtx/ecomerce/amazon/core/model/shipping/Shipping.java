@@ -9,7 +9,7 @@ public class Shipping {
     private Order order;
     private String deliveryAddress; // also could be a complex Address object
     private ShippingStatus status;
-    private String carrier; // in big systems, this could be a Carrier entity
+    private String carrier; // transportador, in big systems, this could be a Carrier entity
     private String trackingNumber;
     private LocalDateTime estimatedDelivery;
 

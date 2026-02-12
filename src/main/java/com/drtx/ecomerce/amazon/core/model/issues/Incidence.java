@@ -8,13 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Modelo de dominio para incidencias.
- * Simplificado: usa constructor vacío + setters en lugar de builder.
- */
 public class Incidence {
     private Long id;
-    private UUID publicUi;
+    private UUID uuid;
     private Product product;
     private IncidenceStatus status;
     private LocalDateTime createdAt;
@@ -27,11 +23,11 @@ public class Incidence {
     public Incidence() {
     }
 
-    public Incidence(Long id, UUID publicUi, Product product, IncidenceStatus status, LocalDateTime createdAt,
+    public Incidence(Long id, UUID uuid, Product product, IncidenceStatus status, LocalDateTime createdAt,
             Boolean autoclosed, User moderator, String moderatorComment, IncidenceDecision decision,
             List<Report> reports) {
         this.id = id;
-        this.publicUi = publicUi;
+        this.uuid = uuid;
         this.product = product;
         this.status = status;
         this.createdAt = createdAt;
@@ -50,12 +46,12 @@ public class Incidence {
         this.id = id;
     }
 
-    public UUID getPublicUi() {
-        return publicUi;
+    public UUID getUuid() {
+        return uuid;
     }
 
-    public void setPublicUi(UUID publicUi) {
-        this.publicUi = publicUi;
+    public void setUuid(UUID uuid) {
+        this.uuid = uuid;
     }
 
     public Product getProduct() {
@@ -123,8 +119,8 @@ public class Incidence {
     }
 
     public void initializeDefaults() {
-        if (this.publicUi == null)
-            this.publicUi = UUID.randomUUID();
+        if (this.uuid == null)
+            this.uuid = UUID.randomUUID();
         if (this.createdAt == null)
             this.createdAt = LocalDateTime.now();
         if (this.status == null)

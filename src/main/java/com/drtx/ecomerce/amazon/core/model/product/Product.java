@@ -3,6 +3,7 @@ package com.drtx.ecomerce.amazon.core.model.product;
 import com.drtx.ecomerce.amazon.core.model.exceptions.DomainException;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,12 +18,12 @@ public class Product {
     private List<String> images;
 
     // New fields
-    private String sku;
+    private String sku; // id for inventory management, this should be unique across products. It could be reaplaced by UPC/EAN
     private Integer stockQuantity;
     private ProductStatus status;
     private String slug;
-    private java.time.LocalDateTime createdAt;
-    private java.time.LocalDateTime updatedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
     public Product() {
     }

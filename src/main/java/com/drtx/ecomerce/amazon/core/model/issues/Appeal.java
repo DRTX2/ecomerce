@@ -5,10 +5,6 @@ import com.drtx.ecomerce.amazon.core.model.user.User;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-/**
- * Modelo de dominio para apelaciones.
- * Simplificado: usa constructor vacío + setters en lugar de builder.
- */
 public class Appeal {
     private Long id;
     private UUID uuid;

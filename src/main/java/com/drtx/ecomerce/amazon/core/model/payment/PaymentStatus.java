@@ -4,5 +4,5 @@ public enum PaymentStatus {
     PENDING,
     COMPLETED,
     FAILED,
-    REFUNDED
+    REFUNDED // reembolsado, indicate that the payment has been refunded to the customer
 }

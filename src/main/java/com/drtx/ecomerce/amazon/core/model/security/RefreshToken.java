@@ -2,11 +2,6 @@ package com.drtx.ecomerce.amazon.core.model.security;
 
 import java.time.Instant;
 
-/**
- * Modelo de dominio para Refresh Token.
- * Simplificado sin Builder ni Lombok para consistencia con el resto del
- * dominio.
- */
 public class RefreshToken {
     private Long id;
     private String token;
