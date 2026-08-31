@@ -1,19 +1,18 @@
 package com.drtx.ecomerce.amazon.adapters.out.persistence.order;
 
 import com.drtx.ecomerce.amazon.adapters.out.persistence.product.ProductPersistenceMapper;
+import com.drtx.ecomerce.amazon.adapters.out.persistence.user.UserPersistenceMapper;
 import com.drtx.ecomerce.amazon.core.model.order.Order;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import com.drtx.ecomerce.amazon.core.model.order.OrderItem;
 
-@Mapper(componentModel = "spring", uses = { ProductPersistenceMapper.class })
+@Mapper(componentModel = "spring", uses = { ProductPersistenceMapper.class, UserPersistenceMapper.class })
 public interface OrderPersistenceMapper {
-    @Mapping(target = "user", ignore = true)
     @Mapping(source = "discounts", target = "appliedDiscounts")
     Order toDomain(OrderEntity entity);
 
-    @Mapping(target = "user", ignore = true)
     @Mapping(source = "appliedDiscounts", target = "discounts")
     OrderEntity toEntity(Order domain);
 

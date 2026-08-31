@@ -9,6 +9,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,6 +22,7 @@ import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class JwtAuthFilter extends OncePerRequestFilter {
 
     private final TokenProvider tokenProvider;
@@ -31,13 +33,11 @@ public class JwtAuthFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getRequestURI();
         String method = request.getMethod();
-        System.out.println("JwtAuthFilter - Request URI: " + path + " Method: " + method);
         // Remover el context-path si existe
         String contextPath = request.getContextPath();
         if (contextPath != null && !contextPath.isEmpty() && path.startsWith(contextPath)) {
             path = path.substring(contextPath.length());
         }
-        System.out.println("JwtAuthFilter - Path without context: " + path);
 
         // Rutas de autenticación siempre se saltan
         boolean isAuthRoute = path.equals("/auth/login") ||
@@ -50,7 +50,7 @@ public class JwtAuthFilter extends OncePerRequestFilter {
                 (path.startsWith("/products") || path.startsWith("/categories"));
 
         boolean skip = isAuthRoute || isPublicReadRoute;
-        System.out.println("JwtAuthFilter - Should skip: " + skip);
+        log.trace("jwt_filter_skip path={} method={} skip={}", path, method, skip);
         return skip;
     }
 

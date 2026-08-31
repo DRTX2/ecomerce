@@ -11,11 +11,22 @@ import com.drtx.ecomerce.amazon.core.model.security.AuthResult;
 import com.drtx.ecomerce.amazon.core.model.security.LoginCommand;
 import com.drtx.ecomerce.amazon.core.model.user.User;
 import com.drtx.ecomerce.amazon.core.ports.in.rest.security.AuthUseCasePort;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
+@Tag(name = "Autenticación", description = "Endpoints de autenticación y autorización (públicos)")
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
@@ -23,6 +34,13 @@ public class AuthController {
     private final AuthUseCasePort authService;
     private final UserSecurityMapper userSecurityMapper;
 
+    @Operation(summary = "Registrar nuevo usuario", description = "Crea una nueva cuenta de usuario y devuelve tokens de acceso")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Usuario registrado exitosamente",
+                    content = @Content(schema = @Schema(implementation = AuthResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Datos de registro inválidos"),
+            @ApiResponse(responseCode = "409", description = "Email ya registrado")
+    })
     @PostMapping("/register")
     public ResponseEntity<AuthResponse> register(@RequestBody @Valid RegisterRequest request) {
         User user = userSecurityMapper.registerRequestToDomain(request);
@@ -30,21 +48,44 @@ public class AuthController {
         return ResponseEntity.ok(toAuthResponse(result));
     }
 
+    @Operation(summary = "Iniciar sesión", description = "Autentica un usuario y devuelve tokens JWT de acceso y refresh")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Login exitoso",
+                    content = @Content(schema = @Schema(implementation = AuthResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Credenciales inválidas"),
+            @ApiResponse(responseCode = "401", description = "Email o contraseña incorrectos"),
+            @ApiResponse(responseCode = "423", description = "Cuenta bloqueada")
+    })
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody @Valid AuthRequest request) {
-        System.out.println("AuthController - Login request received for: " + request.email());
         LoginCommand command = new LoginCommand(request.email(), request.password());
         AuthResult result = authService.login(command);
         return ResponseEntity.ok(toAuthResponse(result));
     }
 
+    @Operation(summary = "Cerrar sesión", description = "Invalida el token de acceso actual (requiere autenticación)")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "Logout exitoso"),
+            @ApiResponse(responseCode = "401", description = "No autenticado"),
+            @ApiResponse(responseCode = "400", description = "Token inválido")
+    })
+    @SecurityRequirement(name = "bearerAuth")
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(@RequestHeader("Authorization") String authHeader) {
+    public ResponseEntity<Void> logout(
+            @Parameter(description = "Bearer token", required = true)
+            @RequestHeader("Authorization") String authHeader) {
         String token = authHeader.replace("Bearer ", "");
         authService.logout(token);
         return ResponseEntity.noContent().build();
     }
 
+    @Operation(summary = "Refrescar token de acceso", description = "Obtiene un nuevo access token usando el refresh token")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Token refrescado exitosamente",
+                    content = @Content(schema = @Schema(implementation = AuthResponse.class))),
+            @ApiResponse(responseCode = "400", description = "Refresh token inválido o expirado"),
+            @ApiResponse(responseCode = "401", description = "Refresh token revocado")
+    })
     @PostMapping("/refresh")
     public ResponseEntity<AuthResponse> refreshToken(@RequestBody RefreshTokenRequest request) {
         AuthResult result = authService.refreshToken(request.refreshToken());
@@ -52,50 +93,6 @@ public class AuthController {
     }
 
     private AuthResponse toAuthResponse(AuthResult result) {
-        // Need to convert Domain User to UserResponse DTO
-        // Ideally UserSecurityMapper should do this.
-        // Assuming UserSecurityMapper has toUserResponse(User).
-        // If not, I'll need to add it or do it manually here.
-        // Let's check imports to see if UserSecurityMapper handles this.
-        // The original code passed UserResponse directly from AuthService which used
-        // SecurityUserMapper.
-        // Now AuthService returns AuthResult (domain + token).
-        // I need to use userSecurityMapper here, BUT imports of AuthService showed
-        // SecurityUserMapper,
-        // and imports of AuthController shows UserSecurityMapper.
-        // These might be different mappers or same one renamed or imported differently.
-        // Original AuthController line 19: private final UserSecurityMapper
-        // userSecurityMapper;
-        // Function registerRequestToDomain uses it.
-        // Let's assume it has methods we need or I can add a helper here.
-
-        // Wait, I can't see UserSecurityMapper content.
-        // But I can define the DTOs here to be safe or rely on what I saw in
-        // AuthService removed imports.
-        // AuthService imported:
-        // com.drtx.ecomerce.amazon.adapters.in.security.mappers.SecurityUserMapper
-        // AuthController imports:
-        // com.drtx.ecomerce.amazon.adapters.in.security.mappers.UserSecurityMapper
-        // They sound different!
-
-        // But let's assume I can construct AuthResponse manually if needed.
-        // AuthResponse(UserResponse user, AuthTokens tokens)
-
-        // Wait, UserSecurityMapper is injected.
-        // Let's assume it has a method toUserResponse(User). I'll use it.
-        // If it fails, I'll fix it.
-
-        // But wait, the mapper in AuthService was
-        // `com.drtx.ecomerce...SecurityUserMapper`.
-        // The one in AuthController is `com.drtx.ecomerce...UserSecurityMapper`.
-        // I should probably check `adapters/in/security` to see the mappers.
-
-        // For now I will assume `userSecurityMapper` in AuthController is the one to
-        // use.
-        // If compilation fails, I'll fix.
-
-        // Wait, I need UserResponse and AuthTokens constructions
-
         UserResponse userResponse = new UserResponse(
                 result.user().getId(),
                 result.user().getName(),

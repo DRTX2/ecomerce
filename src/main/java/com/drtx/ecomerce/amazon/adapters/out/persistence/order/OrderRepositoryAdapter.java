@@ -3,6 +3,8 @@ package com.drtx.ecomerce.amazon.adapters.out.persistence.order;
 import com.drtx.ecomerce.amazon.core.model.order.Order;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.OrderRepositoryPort;
 import com.drtx.ecomerce.amazon.core.model.exceptions.EntityNotFoundException;
+import com.drtx.ecomerce.amazon.adapters.out.persistence.product.ProductPersistenceRepository;
+import com.drtx.ecomerce.amazon.adapters.out.persistence.user.UserPersistenceRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -15,10 +17,13 @@ import java.util.stream.Collectors;
 public class OrderRepositoryAdapter implements OrderRepositoryPort {
     private final OrderPersistenceRepository repository;
     private final OrderPersistenceMapper orderMapper;
+    private final UserPersistenceRepository userRepository;
+    private final ProductPersistenceRepository productRepository;
 
     @Override
     public Order save(Order order) {
         OrderEntity orderToSave = orderMapper.toEntity(order);
+        attachReferences(orderToSave);
         orderToSave = repository.save(orderToSave);
         return orderMapper.toDomain(orderToSave);
     }
@@ -31,6 +36,11 @@ public class OrderRepositoryAdapter implements OrderRepositoryPort {
     @Override
     public List<Order> findAll() {
         return repository.findAll().stream().map(orderMapper::toDomain).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Order> findByUserId(Long userId) {
+        return repository.findByUserId(userId).stream().map(orderMapper::toDomain).collect(Collectors.toList());
     }
 
     @Override
@@ -63,5 +73,15 @@ public class OrderRepositoryAdapter implements OrderRepositoryPort {
             throw new EntityNotFoundException("Order not found with id: " + id);
         }
         repository.deleteById(id);
+    }
+
+    private void attachReferences(OrderEntity order) {
+        order.setUser(userRepository.getReferenceById(order.getUser().getId()));
+        if (order.getItems() != null) {
+            order.getItems().forEach(item -> {
+                item.setOrder(order);
+                item.setProduct(productRepository.getReferenceById(item.getProduct().getId()));
+            });
+        }
     }
 }

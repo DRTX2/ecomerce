@@ -87,9 +87,12 @@ log/
 # ============================
 spring-boot-devtools.properties
 
+# Node.js / Next.js
+node_modules/
+.next/
+
 # ============================
 # Database
 # ============================
 *.db
 *.sqlite
-

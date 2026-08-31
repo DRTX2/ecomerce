@@ -45,6 +45,12 @@ Secure access using JWT (Json Web Tokens).
 `GET /products`
 - **Response**: Array of product objects.
 
+### Confirm Order From Cart
+
+`POST /orders/from-cart/{cartId}`
+
+Creates an order for the authenticated cart owner. Prices, totals, ownership, state, and stock reservation are computed server-side; the request has no body. The initial state is `PENDING_CONFIRMATION` and does not represent a completed payment.
+
 ### Errors
 The API uses standard HTTP codes.
 - `200 OK`: Success.

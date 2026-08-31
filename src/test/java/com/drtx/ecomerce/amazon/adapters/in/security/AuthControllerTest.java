@@ -16,6 +16,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -47,8 +48,10 @@ class AuthControllerTest {
         @BeforeEach
         void setUp() {
                 AuthController authController = new AuthController(authService, userSecurityMapper);
-                mockMvc = MockMvcBuilders.standaloneSetup(authController).build();
                 objectMapper = new ObjectMapper();
+                mockMvc = MockMvcBuilders.standaloneSetup(authController)
+                                .setMessageConverters(new MappingJackson2HttpMessageConverter(objectMapper))
+                                .build();
 
                 testUser = new User();
                 testUser.setId(1L);
@@ -119,9 +122,9 @@ class AuthControllerTest {
                 mockMvc.perform(post("/auth/login")
                                 .contentType(MediaType.APPLICATION_JSON)
                                 .content(objectMapper.writeValueAsString(testAuthRequest)))
-                                .andDo(org.springframework.test.web.servlet.result.MockMvcResultHandlers.print())
                                 .andExpect(status().isOk())
-                                .andExpect(content().string(containsString("mock-jwt-token")));
+                                .andExpect(content().string(containsString("mock-jwt-token")))
+                                .andExpect(jsonPath("$.tokens.expiresInMs").value(86400000));
 
                 verify(authService, times(1)).login(any(LoginCommand.class));
         }

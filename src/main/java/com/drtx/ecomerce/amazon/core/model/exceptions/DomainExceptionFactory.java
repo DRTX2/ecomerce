@@ -74,6 +74,18 @@ public final class DomainExceptionFactory {
                 String.format("Insufficient stock for product '%s'. Available: %d", productName, available));
     }
 
+    public static DomainException emptyCart(Long cartId) {
+        return new DomainException(String.format("Cart %d has no items", cartId));
+    }
+
+    public static DomainException invalidCartItem(Long cartId) {
+        return new DomainException(String.format("Cart %d contains an invalid item", cartId));
+    }
+
+    public static DomainException productUnavailable(Long productId) {
+        return new DomainException(String.format("Product %d is not available for purchase", productId));
+    }
+
     // ========== Storage Exceptions ==========
 
     public static StorageException imageUploadFailed(String fileName, Throwable cause) {

@@ -1,181 +1,80 @@
 package com.drtx.ecomerce.amazon.application.usecases;
 
 import com.drtx.ecomerce.amazon.application.usecases.cart.CartUseCaseImpl;
+import com.drtx.ecomerce.amazon.core.model.exceptions.EntityNotFoundException;
 import com.drtx.ecomerce.amazon.core.model.order.Cart;
 import com.drtx.ecomerce.amazon.core.model.user.User;
 import com.drtx.ecomerce.amazon.core.model.user.UserRole;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.CartRepositoryPort;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("CartUseCaseImpl Unit Tests")
 class CartUseCaseImplTest {
-
     @Mock
-    private CartRepositoryPort cartRepositoryPort;
+    private CartRepositoryPort cartRepository;
 
     @InjectMocks
     private CartUseCaseImpl cartUseCase;
 
-    private Cart testCart;
-    private User testUser;
+    private User owner;
+    private User otherUser;
+    private Cart cart;
 
     @BeforeEach
     void setUp() {
-        testUser = new User(
-                1L,
-                "John Doe",
-                "john@example.com",
-                "password123",
-                "123 Main St",
-                "555-0100",
-                UserRole.USER);
-
-        testCart = new Cart(1L, testUser, List.of());
+        owner = new User(1L, "Owner", "owner@example.com", "password", null, null, UserRole.USER);
+        otherUser = new User(2L, "Other", "other@example.com", "password", null, null, UserRole.USER);
+        cart = new Cart(10L, owner, List.of());
     }
 
     @Test
-    @DisplayName("Should create cart successfully")
-    void shouldCreateCartSuccessfully() {
-        // Given
-        Cart newCart = new Cart(testUser, List.of());
-        Cart savedCart = new Cart(1L, testUser, List.of());
+    void createCartAssignsTheAuthenticatedOwner() {
+        when(cartRepository.save(any(Cart.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        when(cartRepositoryPort.save(any(Cart.class))).thenReturn(savedCart);
+        Cart created = cartUseCase.createCart(new Cart(null, List.of()), owner);
 
-        // When
-        Cart result = cartUseCase.createCart(newCart);
-
-        // Then
-        assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(1L);
-        assertThat(result.getUser()).isEqualTo(testUser);
-        verify(cartRepositoryPort, times(1)).save(newCart);
+        assertThat(created.getUser()).isSameAs(owner);
     }
 
     @Test
-    @DisplayName("Should get cart by ID successfully")
-    void shouldGetCartByIdSuccessfully() {
-        // Given
-        Long cartId = 1L;
-        when(cartRepositoryPort.findById(cartId)).thenReturn(Optional.of(testCart));
+    void getCartRejectsAnotherUser() {
+        when(cartRepository.findById(cart.getId())).thenReturn(Optional.of(cart));
 
-        // When
-        Optional<Cart> result = cartUseCase.getCartById(cartId);
-
-        // Then
-        assertThat(result).isPresent();
-        assertThat(result.get().getId()).isEqualTo(cartId);
-        assertThat(result.get().getUser()).isEqualTo(testUser);
-        verify(cartRepositoryPort, times(1)).findById(cartId);
+        assertThatThrownBy(() -> cartUseCase.getCartById(cart.getId(), otherUser))
+                .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
-    @DisplayName("Should return empty when cart not found by ID")
-    void shouldReturnEmptyWhenCartNotFoundById() {
-        // Given
-        Long cartId = 999L;
-        when(cartRepositoryPort.findById(cartId)).thenReturn(Optional.empty());
+    void updateCartPreservesTheStoredOwner() {
+        Cart update = new Cart(null, otherUser, List.of());
+        when(cartRepository.findById(cart.getId())).thenReturn(Optional.of(cart));
+        when(cartRepository.update(any(Cart.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        // When
-        Optional<Cart> result = cartUseCase.getCartById(cartId);
+        Cart updated = cartUseCase.updateCart(cart.getId(), update, owner);
 
-        // Then
-        assertThat(result).isEmpty();
-        verify(cartRepositoryPort, times(1)).findById(cartId);
+        assertThat(updated.getId()).isEqualTo(cart.getId());
+        assertThat(updated.getUser()).isSameAs(owner);
     }
 
     @Test
-    @DisplayName("Should get all carts for user successfully")
-    void shouldGetAllCartsForUserSuccessfully() {
-        // Given
-        Long userId = 1L;
-        Cart cart2 = new Cart(2L, testUser, List.of());
+    void deleteCartRejectsAnotherUser() {
+        when(cartRepository.findById(cart.getId())).thenReturn(Optional.of(cart));
 
-        List<Cart> carts = Arrays.asList(testCart, cart2);
-        when(cartRepositoryPort.findAll(userId)).thenReturn(carts);
-
-        // When
-        List<Cart> result = cartUseCase.getAllCarts(userId);
-
-        // Then
-        assertThat(result).hasSize(2);
-        assertThat(result).containsExactlyInAnyOrder(testCart, cart2);
-        verify(cartRepositoryPort, times(1)).findAll(userId);
-    }
-
-    @Test
-    @DisplayName("Should return empty list when no carts exist for user")
-    void shouldReturnEmptyListWhenNoCartsExistForUser() {
-        // Given
-        Long userId = 999L;
-        when(cartRepositoryPort.findAll(userId)).thenReturn(List.of());
-
-        // When
-        List<Cart> result = cartUseCase.getAllCarts(userId);
-
-        // Then
-        assertThat(result).isEmpty();
-        verify(cartRepositoryPort, times(1)).findAll(userId);
-    }
-
-    @Test
-    @DisplayName("Should update cart successfully")
-    void shouldUpdateCartSuccessfully() {
-        // Given
-        Long cartId = 1L;
-        Cart updatedCart = new Cart(cartId, testUser, List.of());
-
-        when(cartRepositoryPort.update(any(Cart.class))).thenReturn(updatedCart);
-
-        // When
-        Cart result = cartUseCase.updateCart(cartId, updatedCart);
-
-        // Then
-        assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(cartId);
-        verify(cartRepositoryPort, times(1)).update(updatedCart);
-    }
-
-    @Test
-    @DisplayName("Should delete cart successfully")
-    void shouldDeleteCartSuccessfully() {
-        // Given
-        Long cartId = 1L;
-        doNothing().when(cartRepositoryPort).delete(cartId);
-
-        // When
-        cartUseCase.deleteCart(cartId);
-
-        // Then
-        verify(cartRepositoryPort, times(1)).delete(cartId);
-    }
-
-    @Test
-    @DisplayName("Should handle delete for non-existent cart")
-    void shouldHandleDeleteForNonExistentCart() {
-        // Given
-        Long cartId = 999L;
-        doNothing().when(cartRepositoryPort).delete(cartId);
-
-        // When
-        cartUseCase.deleteCart(cartId);
-
-        // Then
-        verify(cartRepositoryPort, times(1)).delete(cartId);
+        assertThatThrownBy(() -> cartUseCase.deleteCart(cart.getId(), otherUser))
+                .isInstanceOf(EntityNotFoundException.class);
+        verify(cartRepository, never()).delete(anyLong());
     }
 }

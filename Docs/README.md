@@ -31,18 +31,37 @@ Detailed usage guide for consumers of the API.
 - *GraphQL Schema overview.*
 - *Interactive examples.*
 
-### 5. ⚙️ [Operations & Deployment Guide](./setup_guide.md)
+### 5. 📖 [API Documentation (Scalar & OpenAPI)](./API_DOCUMENTATION.md)
+Interactive API documentation with modern UI.
+- **Scalar UI**: `/api/v1/scalar` - Modern, fast, beautiful reference
+- **Swagger UI**: `/api/v1/swagger-ui.html` - Classic interface
+- **OpenAPI Spec**: `/api/v1/v3/api-docs` - JSON/YAML specification
+- *Authentication, code samples, testing built-in*
+
+### 6. ⚙️ [Operations & Deployment Guide](./setup_guide.md)
 From local development to production deployment.
 - *Docker & Docker Compose orchestration.*
 - *Environment configuration (.env).*
 - *CI/CD pipeline considerations.*
 - *Database management.*
 
-### 6. 🔒 [Security Implementation](./security.md)
+### 7. 🔒 [Security Implementation](./security.md)
 Analysis of the security layer.
 - *Stateless Authentication (JWT).*
 - *Role-Based Access Control (RBAC).*
 - *CORS and CSRF configurations.*
+
+### 8. [Phase 0: Product Scope and Flows](./phase-0/scope.md)
+The current product boundary, actors, non-goals, SLOs, and known implementation gaps.
+
+### 9. [Prioritized Backlog](./phase-0/backlog.md)
+The delivery sequence and acceptance criteria for the first product milestones.
+
+### 10. [Architecture Decisions](./adr/)
+Accepted ADRs for modularity, reliable events, and authorization.
+
+### 11. [C4 Architecture](./architecture-c4.md) and [Current Schema](./current-schema.md)
+Current and target system views, aligned to code and Flyway migrations.
 
 ---
 > **Note for Recruiters/Reviewers:** This project demonstrates advanced Spring Boot capabilities, clean code principles, and a focus on enterprise-grade architecture. The documentation reflects a commitment to clarity and knowledge sharing.

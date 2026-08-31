@@ -4,10 +4,12 @@ import com.drtx.ecomerce.amazon.core.model.issues.Incidence;
 import com.drtx.ecomerce.amazon.core.model.issues.IncidenceDecision;
 import com.drtx.ecomerce.amazon.core.model.issues.Report;
 import com.drtx.ecomerce.amazon.core.ports.in.rest.IncidenceUseCasePort;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.RequiredArgsConstructor;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
+import org.springframework.graphql.data.method.annotation.SchemaMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,19 +24,19 @@ public class IncidenceGraphQLController {
 
     private final IncidenceUseCasePort incidenceUseCase;
 
-    @QueryMapping
+    @SchemaMapping(typeName = "Query", field = "getAllIncidences")
     @PreAuthorize("hasRole('MODERATOR')")
     public List<Incidence> getAllIncidences() {
         return incidenceUseCase.getAllIncidences();
     }
 
-    @QueryMapping
+    @SchemaMapping(typeName = "Query", field = "getIncidenceById")
     @PreAuthorize("hasRole('MODERATOR')")
     public Optional<Incidence> getIncidenceById(@Argument Long id) {
         return incidenceUseCase.getIncidenceById(id);
     }
 
-    @MutationMapping
+    @SchemaMapping(typeName = "Mutation", field = "createIncidence")
     public Incidence createIncidence(@Argument Long productId, @Argument ReportInput input) {
         String userEmail = getAuthenticatedUserEmail();
         Report report = Report.builder()
@@ -44,7 +46,7 @@ public class IncidenceGraphQLController {
         return incidenceUseCase.createIncidence(productId, report, userEmail);
     }
 
-    @MutationMapping
+    @SchemaMapping(typeName = "Mutation", field = "resolveIncidence")
     @PreAuthorize("hasRole('MODERATOR')")
     public Incidence resolveIncidence(@Argument Long id, @Argument ResolveIncidenceInput input) {
         String moderatorEmail = getAuthenticatedUserEmail();
@@ -60,9 +62,15 @@ public class IncidenceGraphQLController {
         return null;
     }
 
-    record ReportInput(String reason, String comment) {
-    }
+    @SchemaMapping(typeName = "ReportInput")
+    record ReportInput(
+            @Schema(description = "Motivo de la incidencia", example = "Producto defectuoso", required = true) String reason,
+            @Schema(description = "Comentario adicional", example = "El producto llegó roto") String comment
+    ) {}
 
-    record ResolveIncidenceInput(IncidenceDecision decision, String moderatorComment) {
-    }
+    @SchemaMapping(typeName = "ResolveIncidenceInput")
+    record ResolveIncidenceInput(
+            @Schema(description = "Decisión del moderador", example = "APPROVED", required = true) IncidenceDecision decision,
+            @Schema(description = "Comentario del moderador", example = "Reembolso aprobado", required = true) String moderatorComment
+    ) {}
 }

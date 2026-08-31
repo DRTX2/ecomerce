@@ -1,236 +1,112 @@
 package com.drtx.ecomerce.amazon.application.usecases;
-import com.drtx.ecomerce.amazon.application.usecases.order.OrderUseCaseImpl;
 
+import com.drtx.ecomerce.amazon.application.usecases.order.OrderUseCaseImpl;
+import com.drtx.ecomerce.amazon.core.model.exceptions.DomainException;
+import com.drtx.ecomerce.amazon.core.model.exceptions.EntityNotFoundException;
+import com.drtx.ecomerce.amazon.core.model.order.Cart;
+import com.drtx.ecomerce.amazon.core.model.order.CartItem;
 import com.drtx.ecomerce.amazon.core.model.order.Order;
 import com.drtx.ecomerce.amazon.core.model.order.OrderState;
+import com.drtx.ecomerce.amazon.core.model.product.Product;
+import com.drtx.ecomerce.amazon.core.model.product.ProductStatus;
 import com.drtx.ecomerce.amazon.core.model.user.User;
 import com.drtx.ecomerce.amazon.core.model.user.UserRole;
+import com.drtx.ecomerce.amazon.core.ports.out.persistence.CartRepositoryPort;
+import com.drtx.ecomerce.amazon.core.ports.out.persistence.AuditLogPort;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.OrderRepositoryPort;
+import com.drtx.ecomerce.amazon.core.ports.out.persistence.OutboxPort;
+import com.drtx.ecomerce.amazon.core.ports.out.persistence.ProductRepositoryPort;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("OrderUseCaseImpl Unit Tests")
 class OrderUseCaseImplTest {
-
     @Mock
-    private OrderRepositoryPort orderRepositoryPort;
+    private OrderRepositoryPort orderRepository;
+    @Mock
+    private CartRepositoryPort cartRepository;
+    @Mock
+    private ProductRepositoryPort productRepository;
+    @Mock
+    private AuditLogPort auditLogPort;
+    @Mock
+    private OutboxPort outboxPort;
 
     @InjectMocks
     private OrderUseCaseImpl orderUseCase;
 
-    private Order testOrder;
-    private User testUser;
+    private User owner;
+    private User otherUser;
+    private Product product;
+    private Cart cart;
 
     @BeforeEach
     void setUp() {
-        testUser = new User(
-                1L,
-                "John Doe",
-                "john@example.com",
-                "password123",
-                "123 Main St",
-                "555-0100",
-                UserRole.USER);
-
-        testOrder = new Order(
-                1L,
-                testUser,
-                List.of(),
-                new BigDecimal("299.99"),
-                OrderState.PENDING,
-                LocalDateTime.now(),
-                null,
-                List.of());
+        owner = new User(1L, "Owner", "owner@example.com", "password", null, null, UserRole.USER);
+        otherUser = new User(2L, "Other", "other@example.com", "password", null, null, UserRole.USER);
+        product = new Product();
+        product.setId(20L);
+        product.setName("Keyboard");
+        product.setPrice(new BigDecimal("50.00"));
+        product.setStockQuantity(3);
+        product.setStatus(ProductStatus.ACTIVE);
+        cart = new Cart(10L, owner, List.of(new CartItem(null, null, product, 2)));
     }
 
     @Test
-    @DisplayName("Should create order successfully")
-    void shouldCreateOrderSuccessfully() {
-        // Given
-        Order newOrder = new Order(
-                null,
-                testUser,
-                List.of(),
-                new BigDecimal("149.99"),
-                OrderState.PENDING,
-                LocalDateTime.now(),
-                null,
-                List.of());
+    void confirmCartCreatesAnOrderFromServerSideProductData() {
+        when(cartRepository.findById(cart.getId())).thenReturn(Optional.of(cart));
+        when(productRepository.findById(product.getId())).thenReturn(Optional.of(product));
+        when(productRepository.reserveStock(product.getId(), 2)).thenReturn(true);
+        when(orderRepository.save(any(Order.class))).thenAnswer(invocation -> {
+            Order order = invocation.getArgument(0);
+            order.setId(40L);
+            return order;
+        });
 
-        Order savedOrder = new Order(
-                2L,
-                testUser,
-                List.of(),
-                new BigDecimal("149.99"),
-                OrderState.PENDING,
-                newOrder.getCreatedAt(),
-                null,
-                List.of());
+        Order created = orderUseCase.confirmCart(cart.getId(), owner);
 
-        when(orderRepositoryPort.save(any(Order.class))).thenReturn(savedOrder);
-
-        // When
-        Order result = orderUseCase.createOrder(newOrder);
-
-        // Then
-        assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(2L);
-        assertThat(result.getUser()).isEqualTo(testUser);
-        assertThat(result.getTotal()).isEqualByComparingTo(new BigDecimal("149.99"));
-        verify(orderRepositoryPort, times(1)).save(newOrder);
+        assertThat(created.getUser()).isSameAs(owner);
+        assertThat(created.getOrderState()).isEqualTo(OrderState.PENDING_CONFIRMATION);
+        assertThat(created.getTotal()).isEqualByComparingTo("100.00");
+        assertThat(created.getItems()).singleElement().satisfies(item ->
+                assertThat(item.getPriceAtPurchase()).isEqualByComparingTo("50.00"));
+        verify(cartRepository).delete(cart.getId());
+        verify(auditLogPort).append(any());
+        verify(outboxPort).append(any());
     }
 
     @Test
-    @DisplayName("Should get order by ID successfully")
-    void shouldGetOrderByIdSuccessfully() {
-        // Given
-        Long orderId = 1L;
-        when(orderRepositoryPort.findById(orderId)).thenReturn(Optional.of(testOrder));
+    void confirmCartLeavesCartUntouchedWhenStockCannotBeReserved() {
+        when(cartRepository.findById(cart.getId())).thenReturn(Optional.of(cart));
+        when(productRepository.findById(product.getId())).thenReturn(Optional.of(product));
+        when(productRepository.reserveStock(product.getId(), 2)).thenReturn(false);
 
-        // When
-        Optional<Order> result = orderUseCase.getOrderById(orderId);
-
-        // Then
-        assertThat(result).isPresent();
-        assertThat(result.get().getId()).isEqualTo(orderId);
-        assertThat(result.get().getUser()).isEqualTo(testUser);
-        assertThat(result.get().getTotal()).isEqualByComparingTo(new BigDecimal("299.99"));
-        verify(orderRepositoryPort, times(1)).findById(orderId);
+        assertThatThrownBy(() -> orderUseCase.confirmCart(cart.getId(), owner))
+                .isInstanceOf(DomainException.class);
+        verify(orderRepository, never()).save(any());
+        verify(cartRepository, never()).delete(anyLong());
     }
 
     @Test
-    @DisplayName("Should return empty when order not found by ID")
-    void shouldReturnEmptyWhenOrderNotFoundById() {
-        // Given
-        Long orderId = 999L;
-        when(orderRepositoryPort.findById(orderId)).thenReturn(Optional.empty());
+    void getOrderRejectsAnotherUser() {
+        Order order = new Order(30L, owner, List.of(), BigDecimal.ONE, OrderState.PENDING, null, null, List.of());
+        when(orderRepository.findById(order.getId())).thenReturn(Optional.of(order));
 
-        // When
-        Optional<Order> result = orderUseCase.getOrderById(orderId);
-
-        // Then
-        assertThat(result).isEmpty();
-        verify(orderRepositoryPort, times(1)).findById(orderId);
-    }
-
-    @Test
-    @DisplayName("Should get all orders successfully")
-    void shouldGetAllOrdersSuccessfully() {
-        // Given
-        Order order2 = new Order(
-                2L,
-                testUser,
-                List.of(),
-                new BigDecimal("499.99"),
-                OrderState.SENT,
-                LocalDateTime.now(),
-                null,
-                List.of());
-
-        Order order3 = new Order(
-                3L,
-                testUser,
-                List.of(),
-                new BigDecimal("99.99"),
-                OrderState.DELIVERED,
-                LocalDateTime.now().minusDays(5),
-                LocalDateTime.now(),
-                List.of());
-
-        List<Order> orders = Arrays.asList(testOrder, order2, order3);
-        when(orderRepositoryPort.findAll()).thenReturn(orders);
-
-        // When
-        List<Order> result = orderUseCase.getAllOrders();
-
-        // Then
-        assertThat(result).hasSize(3);
-        assertThat(result).containsExactlyInAnyOrder(testOrder, order2, order3);
-        verify(orderRepositoryPort, times(1)).findAll();
-    }
-
-    @Test
-    @DisplayName("Should return empty list when no orders exist")
-    void shouldReturnEmptyListWhenNoOrdersExist() {
-        // Given
-        when(orderRepositoryPort.findAll()).thenReturn(List.of());
-
-        // When
-        List<Order> result = orderUseCase.getAllOrders();
-
-        // Then
-        assertThat(result).isEmpty();
-        verify(orderRepositoryPort, times(1)).findAll();
-    }
-
-    @Test
-    @DisplayName("Should update order successfully")
-    void shouldUpdateOrderSuccessfully() {
-        // Given
-        Order updatedOrder = new Order(
-                1L,
-                testUser,
-                List.of(),
-                new BigDecimal("349.99"),
-                OrderState.SENT,
-                testOrder.getCreatedAt(),
-                null,
-                List.of());
-
-        when(orderRepositoryPort.updateById(any(Order.class))).thenReturn(updatedOrder);
-
-        // When
-        Order result = orderUseCase.updateOrder(updatedOrder);
-
-        // Then
-        assertThat(result).isNotNull();
-        assertThat(result.getId()).isEqualTo(1L);
-        assertThat(result.getTotal()).isEqualByComparingTo(new BigDecimal("349.99"));
-        assertThat(result.getOrderState()).isEqualTo(OrderState.SENT);
-        verify(orderRepositoryPort, times(1)).updateById(updatedOrder);
-    }
-
-    @Test
-    @DisplayName("Should delete order successfully")
-    void shouldDeleteOrderSuccessfully() {
-        // Given
-        Long orderId = 1L;
-        doNothing().when(orderRepositoryPort).delete(orderId);
-
-        // When
-        orderUseCase.deleteOrder(orderId);
-
-        // Then
-        verify(orderRepositoryPort, times(1)).delete(orderId);
-    }
-
-    @Test
-    @DisplayName("Should handle delete for non-existent order")
-    void shouldHandleDeleteForNonExistentOrder() {
-        // Given
-        Long orderId = 999L;
-        doNothing().when(orderRepositoryPort).delete(orderId);
-
-        // When
-        orderUseCase.deleteOrder(orderId);
-
-        // Then
-        verify(orderRepositoryPort, times(1)).delete(orderId);
+        assertThatThrownBy(() -> orderUseCase.getOrderById(order.getId(), otherUser))
+                .isInstanceOf(EntityNotFoundException.class);
     }
 }

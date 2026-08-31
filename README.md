@@ -96,6 +96,14 @@ For full project documentation (detailed guides, architecture decisions, and API
 |------------------|
 | ➡️ **[Explore Technical Documentation](./Docs/README.md)** |
 
+### 🔌 Interactive API Documentation
+
+| Interface | URL | Description |
+|-----------|-----|-------------|
+| **Scalar UI** | `http://localhost:8080/api/v1/scalar` | **Recommended** - Modern, fast, beautiful reference |
+| **Swagger UI** | `http://localhost:8080/api/v1/swagger-ui.html` | Classic Swagger interface |
+| **OpenAPI Spec** | `http://localhost:8080/api/v1/v3/api-docs` | JSON/OpenAPI 3.1 specification |
+
 <!-- esto se agrego -->
 ## � Roadmap & Future Improvements
 

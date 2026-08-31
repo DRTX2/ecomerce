@@ -2,6 +2,7 @@ package com.drtx.ecomerce.amazon.application.usecases.product;
 
 import com.drtx.ecomerce.amazon.core.model.exceptions.DomainExceptionFactory;
 import com.drtx.ecomerce.amazon.core.model.product.Product;
+import com.drtx.ecomerce.amazon.core.model.product.ProductPage;
 import com.drtx.ecomerce.amazon.core.ports.out.persistence.ProductRepositoryPort;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -42,6 +43,11 @@ public class ProductUseCaseImpl implements com.drtx.ecomerce.amazon.core.ports.i
     @Override
     public List<Product> getAllProducts() {
         return repository.findAll();
+    }
+
+    @Override
+    public ProductPage searchActiveProducts(String query, Long categoryId, int page, int size) {
+        return repository.searchActive(query == null || query.isBlank() ? null : query.trim(), categoryId, page, size);
     }
 
     @Override
